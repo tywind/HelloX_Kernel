@@ -23,7 +23,7 @@
 //
 //************************************************************************
 
-#define VERSION_INFO "    HelloX [Version 1.760,build in 2014/06/06,by Garry.Xin]"
+#define VERSION_INFO "    HelloX [Version 1.760,build in 2014/06/15,by Garry.Xin]"
 #define SLOGAN_INFO  "    HelloX OS,through which you can talk to everything."
 
 //************************************************************************
@@ -119,6 +119,8 @@
 //in console object.
 #define __CFG_SYS_CONSOLE
 
+// Logcat service for debug subsystem
+#define __CFG_SYS_LOGCAT
 
 //************************************************************************
 //
@@ -194,3 +196,4 @@
 //************************************************************************
 
 //More compiling switches can be appended here.
+
