@@ -384,7 +384,7 @@ void __OS_Entry()
 		goto __TERMINAL;
 	}
 
-#endif
+#endif  //__CFG_SYS_LOGCAT.
 
 	System.EndInitialize((__COMMON_OBJECT*)&System);
 	//Enter a dead loop to wait for the scheduling of kernel threads.
