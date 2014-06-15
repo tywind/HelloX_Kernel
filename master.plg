@@ -6,7 +6,7 @@
 --------------------Configuration: master - Win32 Release--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating temporary file "C:\Users\Jack\AppData\Local\Temp\RSPACC3.tmp" with contents
+Creating temporary file "C:\Users\Jack\AppData\Local\Temp\RSPB9DC.tmp" with contents
 [
 /nologo /MT /W3 /GX /O1 /I ".\include" /I ".\arch\x86" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "MASTER_EXPORTS" /Fp"Release/master.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
 "G:\Develop\HelloX\HelloX_Kernel\drivers\x86\com.c"
@@ -17,6 +17,7 @@ Creating temporary file "C:\Users\Jack\AppData\Local\Temp\RSPACC3.tmp" with cont
 "G:\Develop\HelloX\HelloX_Kernel\lib\stdio.c"
 "G:\Develop\HelloX\HelloX_Kernel\lib\string.c"
 "G:\Develop\HelloX\HelloX_Kernel\kthread\idle.c"
+"G:\Develop\HelloX\HelloX_Kernel\kthread\logcat.c"
 "G:\Develop\HelloX\HelloX_Kernel\arch\x86\ARCH_X86.C"
 "G:\Develop\HelloX\HelloX_Kernel\arch\x86\BIOS.C"
 "G:\Develop\HelloX\HelloX_Kernel\arch\x86\HELLOCN.C"
@@ -46,6 +47,7 @@ Creating temporary file "C:\Users\Jack\AppData\Local\Temp\RSPACC3.tmp" with cont
 "G:\Develop\HelloX\HelloX_Kernel\osentry\OS_ENTRY.C"
 "G:\Develop\HelloX\HelloX_Kernel\kernel\COMQUEUE.C"
 "G:\Develop\HelloX\HelloX_Kernel\kernel\console.c"
+"G:\Develop\HelloX\HelloX_Kernel\kernel\debug.c"
 "G:\Develop\HelloX\HelloX_Kernel\kernel\DEVMGR.C"
 "G:\Develop\HelloX\HelloX_Kernel\kernel\DIM.C"
 "G:\Develop\HelloX\HelloX_Kernel\kernel\HEAP.C"
@@ -71,10 +73,10 @@ Creating temporary file "C:\Users\Jack\AppData\Local\Temp\RSPACC3.tmp" with cont
 "G:\Develop\HelloX\HelloX_Kernel\kernel\TYPES.C"
 "G:\Develop\HelloX\HelloX_Kernel\kernel\VMM.C"
 ]
-Creating command line "cl.exe @C:\Users\Jack\AppData\Local\Temp\RSPACC3.tmp" 
-Creating temporary file "C:\Users\Jack\AppData\Local\Temp\RSPACC4.tmp" with contents
+Creating command line "cl.exe @C:\Users\Jack\AppData\Local\Temp\RSPB9DC.tmp" 
+Creating temporary file "C:\Users\Jack\AppData\Local\Temp\RSPB9DD.tmp" with contents
 [
-kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x110000" /entry:"__OS_Entry" /dll /incremental:no /pdb:"Release/master.pdb" /map:"Release/master.map" /machine:I386 /out:"Release/master.dll" /implib:"Release/master.lib" /ALIGN:16 
+libcmt.lib /nologo /base:"0x110000" /entry:"__OS_Entry" /dll /incremental:no /pdb:"Release/master.pdb" /map:"Release/master.map" /machine:I386 /out:"Release/master.dll" /implib:"Release/master.lib" /ALIGN:16 
 .\Release\com.obj
 .\Release\IDEBASE.OBJ
 .\Release\IDEHD.OBJ
@@ -83,6 +85,7 @@ kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32
 .\Release\stdio.obj
 .\Release\string.obj
 .\Release\idle.obj
+.\Release\logcat.obj
 .\Release\ARCH_X86.OBJ
 .\Release\BIOS.OBJ
 .\Release\HELLOCN.OBJ
@@ -112,6 +115,7 @@ kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32
 .\Release\OS_ENTRY.OBJ
 .\Release\COMQUEUE.OBJ
 .\Release\console.obj
+.\Release\debug.obj
 .\Release\DEVMGR.OBJ
 .\Release\DIM.OBJ
 .\Release\HEAP.OBJ
@@ -137,7 +141,7 @@ kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32
 .\Release\TYPES.OBJ
 .\Release\VMM.OBJ
 ]
-Creating command line "link.exe @C:\Users\Jack\AppData\Local\Temp\RSPACC4.tmp"
+Creating command line "link.exe @C:\Users\Jack\AppData\Local\Temp\RSPB9DD.tmp"
 <h3>Output Window</h3>
 Compiling...
 com.c
@@ -164,6 +168,7 @@ MOUSE.C
 stdio.c
 string.c
 idle.c
+logcat.c
 ARCH_X86.C
 BIOS.C
 HELLOCN.C
@@ -206,6 +211,7 @@ mem_scat.c
 OS_ENTRY.C
 COMQUEUE.C
 console.c
+debug.c
 DEVMGR.C
 DIM.C
 HEAP.C

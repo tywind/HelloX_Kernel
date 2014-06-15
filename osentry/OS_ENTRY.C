@@ -33,6 +33,15 @@
 
 #include "..\lib\stdio.h"
 
+//**********ERWIN********
+// FOR LOG TEST
+#ifndef __DEBUG_H__
+#include "..\include\debug.h"
+#endif
+#ifndef __LOGCAT_H__
+#include "..\kthread\logcat.h"
+#endif
+
 //Welcome information.
 char* pszStartMsg1 = "Hello China is running now.If you have any question,";
 char* pszStartMsg2 = "please send email to : garryxin@yahoo.com.cn.";
@@ -67,6 +76,8 @@ extern DWORD _HCNMain(LPVOID);
 //But the dead loop codes only run a short time since the kernel thread(s) will be 
 //scheduled once system clock occurs and the dead loop will end.
 //
+
+
 void __OS_Entry()
 {
 	__KERNEL_THREAD_OBJECT*       lpIdleThread     = NULL;
@@ -76,6 +87,10 @@ void __OS_Entry()
 #endif
 	DWORD                         dwIndex          = 0;
 	CHAR                          strInfo[64];
+
+	//*****************ERWIN********
+	//FOR DEBUG LOG TEST
+	__KERNEL_THREAD_OBJECT *lpLogcatDaemonThread = NULL;
 
 	//Prepare the OS initialization environment.It's worth noting that even the System
 	//object self is not initialized yet.
@@ -104,7 +119,7 @@ void __OS_Entry()
 
 #ifdef __CFG_SYS_VMM  //Enable VMM.
 	*(__PDE*)PD_START = NULL_PDE;    //Set the first page directory entry to NULL,to indicate
-	                                 //this location is not initialized yet.
+	//this location is not initialized yet.
 #endif
 
 
@@ -128,7 +143,7 @@ void __OS_Entry()
 		goto __TERMINAL;
 	}
 #endif
-	
+
 	//Initialize Kernel Thread Manager object.
 	if(!KernelThreadManager.Initialize((__COMMON_OBJECT*)&KernelThreadManager))
 	{
@@ -170,7 +185,7 @@ void __OS_Entry()
 	//Initialize DeviceManager object.
 	if(!DeviceManager.Initialize(&DeviceManager))
 	{
-	    goto __TERMINAL;
+		goto __TERMINAL;
 	}
 #endif
 
@@ -224,7 +239,7 @@ void __OS_Entry()
 		//PrintLine("Initialize Console object successfully.");
 	}
 #endif
-
+	//BISStartup();
 	//Load external modules.
 	//ModuleMgr.LoadExternalMod("MODCFG.INI");     //MODCFG.INI is the module's configure file.
 	//PrintLine("Load external module is disabled for debugging.");
@@ -283,7 +298,7 @@ void __OS_Entry()
 			(__COMMON_OBJECT*)&KernelThreadManager,
 			0,
 			KERNEL_THREAD_STATUS_READY,
-			PRIORITY_LEVEL_NORMAL,
+			PRIORITY_LEVEL_HIGH,
 			ShellEntryPoint,
 			NULL,
 			NULL,
@@ -312,15 +327,15 @@ void __OS_Entry()
 		}
 	}
 	g_lpShellThread = lpShellThread;     //Initialize the shell thread global variable.
-	
+
 	//Print out the default system prompt,which can be changed by 'sysname' command.
 	strcpy(&HostName[0],"[system-view]");
 #endif
 
 	//Initialize DeviceInputManager object.
 	if(!DeviceInputManager.Initialize((__COMMON_OBJECT*)&DeviceInputManager,
-		                              NULL,
-		                              (__COMMON_OBJECT*)lpShellThread))
+		NULL,
+		(__COMMON_OBJECT*)lpShellThread))
 	{
 		__ERROR_HANDLER(ERROR_LEVEL_FATAL,0,NULL);
 		goto __TERMINAL;
@@ -334,26 +349,44 @@ void __OS_Entry()
 
 	//Create user kernel thread.
 #ifdef __CFG_USE_EOS
-		lpUserThread = KernelThreadManager.CreateKernelThread(   //Create shell thread.
-			(__COMMON_OBJECT*)&KernelThreadManager,
-			0,
-			KERNEL_THREAD_STATUS_READY,
-			__HCNMAIN_PRIORITY,
-			_HCNMain,
-			NULL,
-			NULL,
-			__HCNMAIN_NAME);
-		if(NULL == lpUserThread)
-		{
-			__ERROR_HANDLER(ERROR_LEVEL_FATAL,0,NULL);
-			goto __TERMINAL;
-		}
+	lpUserThread = KernelThreadManager.CreateKernelThread(   //Create shell thread.
+		(__COMMON_OBJECT*)&KernelThreadManager,
+		0,
+		KERNEL_THREAD_STATUS_READY,
+		__HCNMAIN_PRIORITY,
+		_HCNMain,
+		NULL,
+		NULL,
+		__HCNMAIN_NAME);
+	if(NULL == lpUserThread)
+	{
+		__ERROR_HANDLER(ERROR_LEVEL_FATAL,0,NULL);
+		goto __TERMINAL;
+	}
 #endif
 
-	//Finish OS initialization phase by calling EndInitialize routine of System object,coresponding the
-	//BeginInitialize routine call before initialization.
-	System.EndInitialize((__COMMON_OBJECT*)&System);
+	//If log debugging functions is enabled.
+#ifdef __CFG_SYS_LOGCAT
 
+	DebugManager.Initialize(&DebugManager);
+
+	lpLogcatDaemonThread = KernelThreadManager.CreateKernelThread(   //Create logcat daemon thread.
+		(__COMMON_OBJECT*)&KernelThreadManager,
+		0,
+		KERNEL_THREAD_STATUS_READY,
+		PRIORITY_LEVEL_NORMAL,
+		LogcatDaemon,
+		NULL,
+		NULL,
+		"Logcat Daemon");
+	if(NULL == lpLogcatDaemonThread)
+	{
+		goto __TERMINAL;
+	}
+
+#endif
+
+	System.EndInitialize((__COMMON_OBJECT*)&System);
 	//Enter a dead loop to wait for the scheduling of kernel threads.
 	DeadLoop();
 

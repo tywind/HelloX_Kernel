@@ -602,3 +602,26 @@ VOID DestroyRingBuff(HANDLE hRb)
 		&ObjectManager,
 		hRb);
 }
+
+
+//*********************************
+// For log
+//Author :	Erwin
+//Email  :	erwin.wang@qq.com
+//Date	 :  7th June, 2014
+//********************************
+void Log(char *tag, char *msg)
+{
+#ifdef __CFG_SYS_LOGCAT
+	DebugManager.Log(&DebugManager, tag, msg);
+#endif //__CFG_SYS_LOGCAT.
+	return;
+}
+
+void Logk(char *tag, char *msg)
+{
+#ifdef __CFG_SYS_LOGCAT
+	DebugManager.Logk(&DebugManager, tag, msg);
+#endif //__CFG_SYS_LOGCAT.
+	return;
+}
