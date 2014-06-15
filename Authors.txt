@@ -1,4 +1,4 @@
-All authors have contribution to the GUI module of HelloX operating system will be recorded here.
+All authors have contribution to the Kernel module of HelloX operating system will be recorded here.
 
    NAME           CONTRIBUTION                      CONTACT                  OTHER INFO
 ----------   -----------------------           ----------------       -------------------------`
