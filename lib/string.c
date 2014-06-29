@@ -21,6 +21,50 @@
 #include "string.h"
 #endif
 
+//------------------------------------------------------------------------
+// Memory manipulating functions,memcpy,memset,...
+//------------------------------------------------------------------------
+
+void * memcpy (
+        void * dst,
+        const void * src,
+        size_t count
+        )
+{
+        void * ret = dst;
+
+        //copy from lower addresses to higher addresses
+        while (count--) {
+                *(char *)dst = *(char *)src;
+                dst = (char *)dst + 1;
+                src = (char *)src + 1;
+        }
+        return(ret);
+}
+
+void * memset (
+        void *dst,
+        int val,
+        size_t count
+        )
+{
+        void *start = dst;
+
+        while (count--) {
+                *(char *)dst = (char)val;
+                dst = (char *)dst + 1;
+        }
+
+        return(start);
+}
+
+void * memzero(
+		void* dst,
+		size_t count)
+{
+	return memset(dst,0,count);
+}
+
 //
 //String operation functions implementation.
 //
@@ -424,4 +468,63 @@ VOID ToCapital(LPSTR lpszString)
 			lpszString[nIndex] += 'A' - 'a';
 		}
 	}
+}
+
+//string comparation code.
+int _cdecl strcmp (
+        const char * src,
+        const char * dst
+        )
+{
+        int ret = 0 ;
+        while( ! (ret = *(unsigned char *)src - *(unsigned char *)dst) && *dst)
+                ++src, ++dst;  
+        if ( ret < 0 )
+                ret = -1 ;
+        else if ( ret > 0 )
+                ret = 1 ;
+        return( ret );
+}
+
+int _cdecl memcmp(const void *buffer1,const void *buffer2,int count)
+{
+   if (!count)
+      return(0);
+   while ( --count && *(char *)buffer1 == *(char *)buffer2)
+   {
+      buffer1 = (char *)buffer1 + 1;
+        buffer2 = (char *)buffer2 + 1;
+   }
+   return( *((unsigned char *)buffer1) - *((unsigned char *)buffer2) );
+}
+
+int _cdecl strlen(const char * s)
+{
+   int i;
+   for (i = 0; s[i]; i++) ;
+   return i;
+}
+
+char *strcpy(char * dst, const char * src)
+{
+    char * cp = dst;
+    while( *cp++ = *src++ )
+            ;               /* Copy src over dst */
+    return( dst );
+}
+
+char * _cdecl strcat (
+        char * dst,
+        const char * src
+        )
+{
+        char * cp = dst;
+ 
+        while( *cp )
+                cp++;                   /* find end of dst */
+ 
+        while( *cp++ = *src++ ) ;       /* Copy src to end of dst */
+ 
+        return( dst );                  /* return dst */
+ 
 }

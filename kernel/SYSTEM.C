@@ -25,18 +25,12 @@
 //***********************************************************************/
 
 #ifndef __STDAFX_H__
-#include "..\INCLUDE\StdAfx.h"
+#include "StdAfx.h"
 #endif
 
-#ifndef __SYSCALL_H__
-#include "..\INCLUDE\SYSCALL.H"
-#endif
-
-#ifdef __I386__
+#include "SYSCALL.H"
+#include "stdio.h"
 #include "..\arch\x86\bios.h"
-#endif
-
-#include "..\lib\stdio.h"
 
 
 __PERF_RECORDER  TimerIntPr = {

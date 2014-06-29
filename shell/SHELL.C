@@ -317,17 +317,20 @@ VOID IoCtrlApp(LPSTR pstr)
 		return;
 	}
 
+    //Set the current focus thread to IO control application.
 	DeviceInputManager.SetFocusThread((__COMMON_OBJECT*)&DeviceInputManager,
-		(__COMMON_OBJECT*)lpIoCtrlThread);    //Set the current focus to IO control
-	//application.
+		(__COMMON_OBJECT*)lpIoCtrlThread);
 
-	lpIoCtrlThread->WaitForThisObject((__COMMON_OBJECT*)lpIoCtrlThread);  //Block the shell
-	//thread until
-	//the IO control
-	//application end.
+	//Block the shell thread untile IoCtrlThread over.
+	lpIoCtrlThread->WaitForThisObject((__COMMON_OBJECT*)lpIoCtrlThread);
+
+	//Reset the current focus kernel thread to shell.
+	DeviceInputManager.SetFocusThread((__COMMON_OBJECT*)&DeviceInputManager,
+		NULL);
+
+	//Destroy the application thread object.
 	KernelThreadManager.DestroyKernelThread((__COMMON_OBJECT*)&KernelThreadManager,
-		(__COMMON_OBJECT*)lpIoCtrlThread);  //Destroy the thread object.
-
+		(__COMMON_OBJECT*)lpIoCtrlThread);
 }
 
 //
@@ -352,12 +355,20 @@ VOID SysDiagApp(LPSTR pstr)
 		return;
 	}
 
+	//Set current focus kernel thread to diagnostic thread.
 	DeviceInputManager.SetFocusThread((__COMMON_OBJECT*)&DeviceInputManager,
 		(__COMMON_OBJECT*)lpSysDiagThread);
 
+	//Block current shell thread to wait the diagnostic application execute over.
 	lpSysDiagThread->WaitForThisObject((__COMMON_OBJECT*)lpSysDiagThread);
+
+	//Reset the current focus thread.
+	DeviceInputManager.SetFocusThread((__COMMON_OBJECT*)&DeviceInputManager,
+		NULL);
+
+	//Destroy the diagnostic thread object.
 	KernelThreadManager.DestroyKernelThread((__COMMON_OBJECT*)&KernelThreadManager,
-		(__COMMON_OBJECT*)lpSysDiagThread);  //Destroy the kernel thread object.
+		(__COMMON_OBJECT*)lpSysDiagThread);
 }
 
 //Entry point of reboot.
@@ -380,7 +391,7 @@ VOID Poweroff(LPSTR pstr)
 //Handler for 'runtime' command.
 VOID RunTimeHandler(LPSTR pstr)
 {
-	CHAR  Buffer[192];
+	char  Buffer[192];
 	DWORD week = 0,day = 0,hour = 0,minute = 0,second = 0;
 
 	second = System.GetSysTick(NULL);  //Get system tick counter.
@@ -540,12 +551,13 @@ static VOID  DoCommand()
 				DeviceInputManager.SetFocusThread((__COMMON_OBJECT*)&DeviceInputManager,
 					(__COMMON_OBJECT*)hKernelThread);  //Give the current input focus to this thread.
 				hKernelThread->WaitForThisObject((__COMMON_OBJECT*)hKernelThread);
-				KernelThreadManager.DestroyKernelThread(
-					(__COMMON_OBJECT*)&KernelThreadManager,
-					(__COMMON_OBJECT*)hKernelThread);  //Destroy it.
 				//Set focus thread to shell.
 				DeviceInputManager.SetFocusThread((__COMMON_OBJECT*)&DeviceInputManager,
 					NULL);
+				//Destroy the kernel thread object.
+				KernelThreadManager.DestroyKernelThread(
+					(__COMMON_OBJECT*)&KernelThreadManager,
+					(__COMMON_OBJECT*)hKernelThread);
 			}
 			bResult = TRUE;
 			goto __END;

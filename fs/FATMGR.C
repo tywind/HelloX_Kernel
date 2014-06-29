@@ -865,7 +865,7 @@ BOOL GetDirEntry(__FAT32_FS* pFat32Fs,
 	BOOL                 bResult            = FALSE;
 	DWORD                dwLevel            = 0;
 	int                  i;
-	BYTE*                pBuffer            = 0;
+	//BYTE*                pBuffer            = 0;
 	DWORD                dwStartClus        = 0;      //Start cluster of current directory to search.
 	DWORD                dwSector           = 0;
 	__FAT32_SHORTENTRY   ShortEntry         = {0};
@@ -936,10 +936,10 @@ BOOL GetDirEntry(__FAT32_FS* pFat32Fs,
 	memcpy((char*)pfse,(const char*)&ShortEntry,sizeof(__FAT32_SHORTENTRY));
 	bResult = TRUE;
 __TERMINAL:
-	if(pBuffer)
-	{
-		free(pBuffer);
-	}
+	//if(pBuffer)
+	//{
+	//	free(pBuffer);
+	//}
 	return bResult;
 }
 

@@ -188,6 +188,7 @@ VOID HlpHandler(LPSTR pstr)           //Command 'help' 's handler.
 	LPSTR strSysDiagApp  = "    sysdiag      : System or hardware diag application.";
 	LPSTR strFsApp       = "    fs           : File system operating application.";
 	LPSTR strFdiskApp    = "    fdisk        : Hard disk operating application.";
+	LPSTR strNetApp      = "    network      : Network diagnostic application.";
 	LPSTR strLoadappApp  = "    loadapp      : Load application module and execute it.";
 	LPSTR strGUIApp      = "    gui          : Load GUI module and enter GUI mode.";
 	LPSTR strReboot      = "    reboot       : Reboot the system.";
@@ -204,6 +205,7 @@ VOID HlpHandler(LPSTR pstr)           //Command 'help' 's handler.
 	PrintLine(strIoCtrlApp);
 	PrintLine(strSysDiagApp);
 	PrintLine(strFsApp);
+	PrintLine(strNetApp);
 	PrintLine(strFdiskApp);
 	PrintLine(strLoadappApp);
 	PrintLine(strGUIApp);

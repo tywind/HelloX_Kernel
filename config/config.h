@@ -23,7 +23,7 @@
 //
 //************************************************************************
 
-#define VERSION_INFO "    HelloX [Version 1.760,build in 2014/06/15,by Garry.Xin]"
+#define VERSION_INFO "    HelloX [Version 1.760,build in 2014/06/26,by Garry.Xin]"
 #define SLOGAN_INFO  "    HelloX OS,through which you can talk to everything."
 
 //************************************************************************
@@ -93,6 +93,9 @@
 
 //Include virtual memory management functions in OS.
 #define __CFG_SYS_VMM
+
+//Include thread heap functions.
+#define __CFG_SYS_HEAP
 
 //Include bus management code.
 #define __CFG_SYS_BM
@@ -168,10 +171,10 @@
 //************************************************************************
 
 //Include IPv4 network protocol in OS.
-#define __CFG_NET_IPV4
+#define __CFG_NET_IPv4
 
 //Include IPv6 network protocol in OS.
-#define __CFG_NET_IPV6
+#define __CFG_NET_IPv6
 
 //************************************************************************
 //

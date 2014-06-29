@@ -386,6 +386,13 @@ void __OS_Entry()
 
 #endif  //__CFG_SYS_LOGCAT.
 
+#ifdef __CFG_NET_IPv4  //IPv4 network protocol is enabled.
+	if(!IPv4_Entry(NULL))
+	{
+		goto __TERMINAL;
+	}
+#endif
+
 	System.EndInitialize((__COMMON_OBJECT*)&System);
 	//Enter a dead loop to wait for the scheduling of kernel threads.
 	DeadLoop();

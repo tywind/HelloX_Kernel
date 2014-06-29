@@ -14,17 +14,13 @@
 //***********************************************************************/
 
 #ifndef __STDAFX_H__
-#include "..\INCLUDE\StdAfx.h"
+#include "StdAfx.h"
 #endif
 
-#ifndef __MODMGR_H__
-#include "..\INCLUDE\MODMGR.H"
-#endif
-
-#include "..\INCLUDE\KAPI.H"
-
-#include "..\lib\string.h"
-#include "..\lib\stdio.h"
+#include "MODMGR.H"
+#include "KAPI.H"
+#include "string.h"
+#include "stdio.h"
 
 //Implementation of InitModule routine.
 static BOOL InitModule(__MODULE_INIT InitEntry)

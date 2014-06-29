@@ -14,7 +14,7 @@
 //***********************************************************************/
 
 #ifndef __STDAFX_H__
-#include "..\INCLUDE\StdAfx.h"
+#include "StdAfx.h"
 #endif
 
 //
@@ -55,8 +55,8 @@ BEGIN_DECLARE_INIT_DATA(ObjectInitData)
 	DrcbInitialize,DrcbUninitialize)
 #endif
 
-	//OBJECT_INIT_DATA(OBJECT_TYPE_MAILBOX,sizeof(__MAILBOX),
-	//MailBoxInitialize,MailBoxUninitialize)
+	OBJECT_INIT_DATA(OBJECT_TYPE_MAILBOX,sizeof(__MAIL_BOX),
+	MailboxInitialize,MailboxUninitialize)
 
 #ifdef __CFG_SYS_VMM
 	OBJECT_INIT_DATA(OBJECT_TYPE_PAGE_INDEX_MANAGER,sizeof(__PAGE_INDEX_MANAGER),
@@ -68,8 +68,8 @@ BEGIN_DECLARE_INIT_DATA(ObjectInitData)
 	//OBJECT_INIT_DATA(OBJECT_TYPE_COMMON_QUEUE,sizeof(__COMMON_QUEUE),
 	//CommQueueInit,CommQueueUninit)
 
-	//OBJECT_INIT_DATA(OBJECT_TYPE_SEMAPHORE,sizeof(__SEMAPHORE),
-	//SemaphoreInitialize,SemaphoreUninitialize)
+	OBJECT_INIT_DATA(OBJECT_TYPE_SEMAPHORE,sizeof(__SEMAPHORE),
+	SemInitialize,SemUninitialize)
 
 END_DECLARE_INIT_DATA()
 

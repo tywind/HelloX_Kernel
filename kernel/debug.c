@@ -15,16 +15,10 @@
 //    Lines number              :
 //***********************************************************************/
 
-#ifndef __STDAFX_H__
-#include "..\include\kapi.h"
-#endif
-
-#ifndef __DEBUG_H__
-#include "..\include\debug.h"
-#endif
-
-#include "..\lib\stdio.h"
-#include "..\lib\string.h"
+#include "kapi.h"
+#include "debug.h"
+#include "stdio.h"
+#include "string.h"
 
 //Enabled only the macro __CFG_SYS_LOGCAT is defined.
 #ifdef __CFG_SYS_LOGCAT

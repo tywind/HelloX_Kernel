@@ -14,12 +14,13 @@
 //***********************************************************************/
 
 #include "..\include\StdAfx.h"
-#include "EXTCMD.H"
-#include "HYPERTRM.H"  //For hypertrm application.
-#include "FDISK.H"
-#include "FS.H"        //For fs application.
-#include "HEDIT.H"     //For hedit application.
+#include "extcmd.h"
+#include "hypertrm.h"  //For hypertrm application.
+#include "fdisk.h"
+#include "fs.h"        //For fs application.
+#include "hedit.h"     //For hedit application.
 #include "fibonacci.h" //A test application to calculate Fibonacci sequence.
+#include "network.h"   //Network diagnostic application.
 
 __EXTERNAL_COMMAND ExtCmdArray[] = {
 	{"fibonacci",NULL,FALSE,Fibonacci},
@@ -28,6 +29,7 @@ __EXTERNAL_COMMAND ExtCmdArray[] = {
 	{"fdisk",NULL,FALSE,fdiskEntry},
 	{"fs",NULL,FALSE,fsEntry},
 	{"hedit",NULL,FALSE,heditEntry},
+	{"network",NULL,FALSE,networkEntry},
 	//Add your external command/application entry here.
 	//{"yourcmd",NULL,FALSE,cmdentry},
 	//The last entry of this array must be the following one,

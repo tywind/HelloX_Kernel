@@ -12,12 +12,10 @@
 //***********************************************************************/
 
 #ifndef __STDAFX_H__
-#include "..\include\StdAfx.h"
+#include "StdAfx.h"
 #endif
 
-#ifndef __CONSOLE_H__
-#include "..\include\console.h"
-#endif
+#include "console.h"
 
 //Available when and only when the __CFG_SYS_CONSOLE macro is defined.
 #ifdef __CFG_SYS_CONSOLE

@@ -16,7 +16,7 @@
 //***********************************************************************/
 
 #ifndef __STDAFX_H__
-#include "..\INCLUDE\StdAfx.h"
+#include "StdAfx.h"
 #endif
 
 //Only __CFG_SYS_MMFBL switch is defined the following code is available.

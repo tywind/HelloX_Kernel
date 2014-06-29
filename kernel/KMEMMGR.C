@@ -14,7 +14,7 @@
 //***********************************************************************/
 
 #ifndef __STDAFX_H__
-#include "..\INCLUDE\StdAfx.h"
+#include "StdAfx.h"
 #endif
 
 //KMEM_4K_START_ADDRESS = 0x00200000

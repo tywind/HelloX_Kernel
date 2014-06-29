@@ -384,7 +384,7 @@ static DWORD cd(__CMD_PARA_OBJ* pCmdObj)
 		PrintLine("  Bad target directory name.");
 		goto __TERMINAL;
 	}
-	if(dwFileAttr & FILE_ATTR_DIRECTORY == 0)   //Is not a directory,is a regular file.
+	if((dwFileAttr & FILE_ATTR_DIRECTORY) == 0)   //Is not a directory,is a regular file.
 	{
 		PrintLine("  Please specify a DIRECTORY name,not a file name.");
 		goto __TERMINAL;

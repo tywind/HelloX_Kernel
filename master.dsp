@@ -127,6 +127,10 @@ SOURCE=.\lib\stdio.c
 
 SOURCE=.\lib\string.c
 # End Source File
+# Begin Source File
+
+SOURCE=.\lib\sysmem.c
+# End Source File
 # End Group
 # Begin Group "kthread"
 
@@ -230,6 +234,10 @@ SOURCE=.\shell\HYPERTRM.C
 # Begin Source File
 
 SOURCE=.\shell\IOCTRL_S.C
+# End Source File
+# Begin Source File
+
+SOURCE=.\shell\network.c
 # End Source File
 # Begin Source File
 
@@ -365,6 +373,10 @@ SOURCE=.\kernel\SYNOBJ.C
 # End Source File
 # Begin Source File
 
+SOURCE=.\kernel\synobj2.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\kernel\SYSCALL.C
 # End Source File
 # Begin Source File
@@ -378,6 +390,150 @@ SOURCE=.\kernel\TYPES.C
 # Begin Source File
 
 SOURCE=.\kernel\VMM.C
+# End Source File
+# End Group
+# Begin Group "network"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\network\api\api_lib.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\api\api_msg.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\core\autoip.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\core\def.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\core\dhcp.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\core\dns.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\api\err.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\netif\etharp.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\netif\ethernetif.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\core\icmp.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\core\igmp.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\core\inet.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\core\inet_chksum.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\core\init.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\core\ip.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\core\ip_addr.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\core\ip_frag.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\core\mem.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\core\memp.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\api\netbuf.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\api\netdb.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\core\netif.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\api\netifapi.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\core\pbuf.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\core\raw.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\api\sockets.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\core\stats.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\core\sys.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\arch\sys_arch.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\core\tcp.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\core\tcp_in.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\core\tcp_out.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\api\tcpip.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\core\timers.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\core\udp.c
 # End Source File
 # End Group
 # End Group
@@ -445,6 +601,10 @@ SOURCE=.\INCLUDE\KTMGR.H
 # End Source File
 # Begin Source File
 
+SOURCE=.\include\ktmgr2.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\INCLUDE\KTMSG.H
 # End Source File
 # Begin Source File
@@ -490,6 +650,10 @@ SOURCE=.\INCLUDE\StdAfx.h
 # Begin Source File
 
 SOURCE=.\INCLUDE\SYSCALL.H
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\sysnet.h
 # End Source File
 # Begin Source File
 
@@ -577,7 +741,15 @@ SOURCE=.\fs\NTFS.H
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=.\lib\stddef.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\lib\stdio.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\lib\stdlib.h
 # End Source File
 # Begin Source File
 
@@ -617,6 +789,10 @@ SOURCE=.\shell\IOCTRL_S.H
 # End Source File
 # Begin Source File
 
+SOURCE=.\shell\network.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\shell\SHELL.H
 # End Source File
 # Begin Source File
@@ -634,6 +810,42 @@ SOURCE=.\shell\SYSD_S.H
 # Begin Source File
 
 SOURCE=.\config\config.h
+# End Source File
+# End Group
+# Begin Group "nethdr"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\include\arch\cc.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\lwipopts.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\lwip\netif.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\lwip\opt.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\arch\perf.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\lwip\sockets.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\lwip\sys.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\arch\sys_arch.h
 # End Source File
 # End Group
 # End Group

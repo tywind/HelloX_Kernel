@@ -15,7 +15,7 @@
 //***********************************************************************/
 
 #ifndef __KAPI_H__
-#include "..\INCLUDE\KAPI.H"
+#include "KAPI.H"
 #endif
 
 HANDLE CreateKernelThread(DWORD dwStackSize,
