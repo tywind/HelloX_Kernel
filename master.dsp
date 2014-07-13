@@ -241,6 +241,10 @@ SOURCE=.\shell\network.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\shell\network2.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\shell\SHELL.C
 # End Source File
 # Begin Source File

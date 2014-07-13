@@ -120,10 +120,10 @@
 
 //Include console object into kernel.COM input and output functions are implemented
 //in console object.
-#define __CFG_SYS_CONSOLE
+//#define __CFG_SYS_CONSOLE
 
 // Logcat service for debug subsystem
-#define __CFG_SYS_LOGCAT
+//#define __CFG_SYS_LOGCAT
 
 //************************************************************************
 //

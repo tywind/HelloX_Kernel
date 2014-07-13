@@ -13,6 +13,7 @@
 //    Lines number              :
 //***********************************************************************/
 
+#include "StdAfx.h"
 #include "stdio.h"
 
 //------------------------------------------------------------------------
@@ -618,4 +619,45 @@ int sprintf(char *buf, const char *fmt, ...)
   va_end(args);
 
   return n;
+}
+
+int printf(const char* fmt,...)
+{
+	//Define local buffer according kernel thread's stack size.
+#if DEFAULT_STACK_SIZE <= 2048
+	char buff[128];
+#else
+	char buff[256];
+#endif
+	va_list args;
+	int n;
+	int i = 0;
+	WORD wr = 0x0700;
+
+	va_start(args,fmt);
+	n = vsprintf(buff,fmt,args);
+	va_end(args);
+
+	//Print out the string buffer.
+	while(buff[i])
+	{
+		if('\n' == buff[i])
+		{
+			ChangeLine();
+			i ++;
+			continue;
+		}
+		if('\r' == buff[i])
+		{
+			GotoHome();
+			i ++;
+			continue;
+		}
+		wr += buff[i];
+		PrintCh(wr);
+		wr -= buff[i];
+		i ++;
+	}
+
+	return 0;
 }

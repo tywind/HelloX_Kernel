@@ -22,6 +22,16 @@
 //Entry point of network diagnostic application.
 DWORD networkEntry(LPVOID);
 
+//Transfer ping related parameters to ping's main routine.
+typedef struct{
+	ip_addr_t   targetAddr;
+	short       count;
+	short       size;
+}__PING_PARAM;
+
+//Entry point of ping command.
+void ping_Entry(void *arg);
+
 //Flags for command processing result.
 #define NET_CMD_TERMINAL     0x00000001
 #define NET_CMD_INVALID      0x00000002

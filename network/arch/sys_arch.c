@@ -99,7 +99,7 @@ u32_t sys_arch_mbox_fetch(sys_mbox_t* mbox,void** msg,u32_t timeout)
 }
 
 //Try to send a mail into mailbox.
-err_t sys_mbox_trypost(sys_mbox_t* mbox,void** msg)
+err_t sys_mbox_trypost(sys_mbox_t* mbox,void* msg)
 {
 	__MAIL_BOX*    pMailbox    = (__MAIL_BOX*)*mbox;
 	DWORD          dwRetVal    = OBJECT_WAIT_FAILED;
@@ -150,6 +150,10 @@ err_t sys_mbox_new(sys_mbox_t* mbox,int size)
 	}
 
 	//Set mailbox size accordingly.
+	if(0 == size)
+	{
+		size = 4;
+	}
 	if(!((__MAIL_BOX*)pMailbox)->SetMailboxSize(pMailbox,size))
 	{
 		ObjectManager.DestroyObject(&ObjectManager,pMailbox);
@@ -237,6 +241,12 @@ err_t sys_sem_new(sys_sem_t* sem,u8_t count)
 	}
 	*sem = (__COMMON_OBJECT*)pSem;  //Return semaphore object.
 	return ERR_OK;
+}
+
+//Get system tick counter.
+u32_t sys_now(void)
+{
+	return System.GetClockTickCounter((__COMMON_OBJECT*)&System);
 }
 
 //An empty sys_init routine to fit lwIP's requirement.

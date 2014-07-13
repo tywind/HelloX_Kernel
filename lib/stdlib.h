@@ -16,8 +16,8 @@
 #define __STDLIB_H__
 
 //Standard C malloc/free/calloc routine.
-void* _cdecl malloc(size_t size);
-void  _cdecl free(void* p);
-void* _cdecl calloc(size_t n,size_t s);
+void* malloc(size_t size);
+void  free(void* p);
+void* calloc(size_t n,size_t s);
 
 #endif  //__STDLIB_H__

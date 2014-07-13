@@ -6,7 +6,7 @@
 --------------------Configuration: master - Win32 Release--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating temporary file "C:\Users\ADMINI~1\AppData\Local\Temp\RSP1DF0.tmp" with contents
+Creating temporary file "C:\Users\Administrator\AppData\Local\Temp\RSPF9EE.tmp" with contents
 [
 /nologo /MT /W3 /GX /O1 /I ".\include" /I ".\arch\x86" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "MASTER_EXPORTS" /Fp"Release/master.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
 "G:\HelloX\HelloX_Kernel\drivers\x86\com.c"
@@ -110,9 +110,10 @@ Creating temporary file "C:\Users\ADMINI~1\AppData\Local\Temp\RSP1DF0.tmp" with 
 "G:\HelloX\HelloX_Kernel\network\api\tcpip.c"
 "G:\HelloX\HelloX_Kernel\network\core\timers.c"
 "G:\HelloX\HelloX_Kernel\network\core\udp.c"
+"G:\HelloX\HelloX_Kernel\shell\network2.c"
 ]
-Creating command line "cl.exe @C:\Users\ADMINI~1\AppData\Local\Temp\RSP1DF0.tmp" 
-Creating temporary file "C:\Users\ADMINI~1\AppData\Local\Temp\RSP1DF1.tmp" with contents
+Creating command line "cl.exe @C:\Users\Administrator\AppData\Local\Temp\RSPF9EE.tmp" 
+Creating temporary file "C:\Users\Administrator\AppData\Local\Temp\RSPF9EF.tmp" with contents
 [
 libcmt.lib /nologo /base:"0x110000" /entry:"__OS_Entry" /dll /incremental:no /pdb:"Release/master.pdb" /map:"Release/master.map" /machine:I386 /out:"Release/master.dll" /implib:"Release/master.lib" /ALIGN:16 
 .\Release\com.obj
@@ -216,8 +217,9 @@ libcmt.lib /nologo /base:"0x110000" /entry:"__OS_Entry" /dll /incremental:no /pd
 .\Release\tcpip.obj
 .\Release\timers.obj
 .\Release\udp.obj
+.\Release\network2.obj
 ]
-Creating command line "link.exe @C:\Users\ADMINI~1\AppData\Local\Temp\RSP1DF1.tmp"
+Creating command line "link.exe @C:\Users\Administrator\AppData\Local\Temp\RSPF9EF.tmp"
 <h3>Output Window</h3>
 Compiling...
 com.c
@@ -372,6 +374,7 @@ G:\HelloX\HelloX_Kernel\network\core\tcp_out.c(105) : warning C4761: integral si
 G:\HelloX\HelloX_Kernel\network\core\tcp_out.c(1445) : warning C4761: integral size mismatch in argument; conversion supplied
 timers.c
 udp.c
+network2.c
 G:\HelloX\HelloX_Kernel\network\core\udp.c(102) : warning C4761: integral size mismatch in argument; conversion supplied
 G:\HelloX\HelloX_Kernel\network\core\udp.c(345) : warning C4761: integral size mismatch in argument; conversion supplied
 Linking...

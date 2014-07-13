@@ -471,7 +471,7 @@ VOID ToCapital(LPSTR lpszString)
 }
 
 //string comparation code.
-int _cdecl strcmp (
+int strcmp (
         const char * src,
         const char * dst
         )
@@ -486,7 +486,7 @@ int _cdecl strcmp (
         return( ret );
 }
 
-int _cdecl memcmp(const void *buffer1,const void *buffer2,int count)
+int memcmp(const void *buffer1,const void *buffer2,int count)
 {
    if (!count)
       return(0);
@@ -498,7 +498,7 @@ int _cdecl memcmp(const void *buffer1,const void *buffer2,int count)
    return( *((unsigned char *)buffer1) - *((unsigned char *)buffer2) );
 }
 
-int _cdecl strlen(const char * s)
+int strlen(const char * s)
 {
    int i;
    for (i = 0; s[i]; i++) ;
@@ -513,7 +513,7 @@ char *strcpy(char * dst, const char * src)
     return( dst );
 }
 
-char * _cdecl strcat (
+char * strcat (
         char * dst,
         const char * src
         )

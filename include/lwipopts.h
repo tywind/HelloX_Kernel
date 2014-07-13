@@ -34,6 +34,9 @@
 //Enable loop back interface.
 #define LWIP_HAVE_LOOPIF     1
 
+//Enable receive timeout mechanism.
+#define LWIP_SO_RCVTIMEO     1
+
 //*-----------------------------------------------------------------------
 //*
 //*  Thread options for lwIP's internal threads.

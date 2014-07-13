@@ -20,6 +20,7 @@
 #include "fs.h"        //For fs application.
 #include "hedit.h"     //For hedit application.
 #include "fibonacci.h" //A test application to calculate Fibonacci sequence.
+#include "lwip/ip_addr.h"
 #include "network.h"   //Network diagnostic application.
 
 __EXTERNAL_COMMAND ExtCmdArray[] = {

@@ -61,11 +61,12 @@ __CMD_PARA_OBJ* FormParameterObj(LPSTR pszCmd)
 	__CMD_PARA_OBJ*     pObjBuffer = NULL;    //Local variables.
 	__CMD_PARA_OBJ*     pBasePtr   = NULL;
 	__CMD_PARA_OBJ*     pTmpObj    = NULL;
-	DWORD               dwCounter  = 0x0000;
-	DWORD               index      = 0x0000;
+	DWORD               dwCounter  = 0;
 
 	if(NULL == pszCmd)    //Parameter check.
+	{
 		return NULL;
+	}
 
 	pObjBuffer = (__CMD_PARA_OBJ*)KMemAlloc(sizeof(__CMD_PARA_OBJ),KMEM_SIZE_TYPE_ANY);
 	if(NULL == pObjBuffer)
@@ -80,9 +81,9 @@ __CMD_PARA_OBJ* FormParameterObj(LPSTR pszCmd)
 	{
 		if(' ' == *pszCmd)
 		{
-			pszCmd ++;
+			pszCmd ++;  //Skip space.
 			continue; 
-		}                                 //Filter the space.
+		}
 
 		if(('-' == *pszCmd) || ('/' == *pszCmd))
 		{
@@ -93,44 +94,61 @@ __CMD_PARA_OBJ* FormParameterObj(LPSTR pszCmd)
 		}
 		else
 		{
-			/*while((' ' != *pszCmd) && *pszCmd)  //To find the first parameter.
-			{
-			pszCmd ++;
-			}
-			if(!*pszCmd)
-			break;
-			while(' ' == *pszCmd)    //Filter the space.
-			pszCmd ++;
-
-			if(!*pszCmd)
-			break;*/
-			index = 0x0000;
 			while(('-' != *pszCmd) && ('/' != *pszCmd) && *pszCmd)
 			{
 				while((' ' != *pszCmd) && (*pszCmd) && (dwCounter <= CMD_PARAMETER_LEN))
 				{
-					pObjBuffer->Parameter[index][dwCounter] = *pszCmd;
+					pObjBuffer->Parameter[0][dwCounter] = *pszCmd;
 					pszCmd ++;
 					dwCounter ++;
 				}
-				pObjBuffer->Parameter[index][dwCounter] = 0x00;  //Set the terminal flag.
-				index ++;               //Ready to copy the next parameter to parameter object.
+				pObjBuffer->Parameter[0][dwCounter] = 0;  //Set the terminal flag.
+				pObjBuffer->byParameterNum          = 1;
 				dwCounter = 0;
 
-				if(!*pszCmd)
-					break;
 				while(' ' != *pszCmd)
-					pszCmd ++;          //Skip the no space characters if the parameter's length
-				//is longer than the const CMD_PARAMETER_LEN.
+				{
+					//Skip the no space characters if the parameter's length 
+					//is longer than the const CMD_PARAMETER_LEN.
+					pszCmd ++;
+				}
 				while(' ' == *pszCmd)
+				{
 					pszCmd ++;          //Skip the space character.
+				}
+
+				if((!*pszCmd) || ('-' == *pszCmd) || ('/' == *pszCmd))
+				{
+					break;
+				}
+
+				//Prepare another command object.
+				pTmpObj = pObjBuffer;
+				pObjBuffer = (__CMD_PARA_OBJ*)KMemAlloc(sizeof(__CMD_PARA_OBJ),KMEM_SIZE_TYPE_ANY);
+				if(NULL == pObjBuffer)  //Giveup.
+				{
+					goto __TERMINAL;
+				}
+				//Clear the whole object.
+				memzero(pObjBuffer,sizeof(__CMD_PARA_OBJ));
+				pTmpObj->pNext = pObjBuffer;	
+			}
+
+			pObjBuffer->byParameterNum = 1;
+			if(!*pszCmd)
+			{
+				break;
 			}
 
 			pTmpObj = pObjBuffer;       //Update the current parameter object.
-			pObjBuffer = (__CMD_PARA_OBJ*)NextParaAddr(pTmpObj,index);
-			pTmpObj->byParameterNum = (BYTE)(index);
-			if(!*pszCmd)
-				break;
+			//pObjBuffer = (__CMD_PARA_OBJ*)NextParaAddr(pTmpObj,index);
+			pObjBuffer = (__CMD_PARA_OBJ*)KMemAlloc(sizeof(__CMD_PARA_OBJ),KMEM_SIZE_TYPE_ANY);
+			if(NULL == pObjBuffer)  //Giveup.
+			{
+				goto __TERMINAL;
+			}
+			//Clear the whole object.
+			memzero(pObjBuffer,sizeof(__CMD_PARA_OBJ));
 			pTmpObj->pNext = pObjBuffer;
 		}
 	}
@@ -144,11 +162,18 @@ __TERMINAL:
 //
 VOID ReleaseParameterObj(__CMD_PARA_OBJ* lpParamObj)
 {
-	if(NULL == lpParamObj)  //Parameter check.
-		return;
+	__CMD_PARA_OBJ*     pNext = NULL;
 
-	KMemFree((LPVOID)lpParamObj,KMEM_SIZE_TYPE_ANY,0);  //Release the memory.
-	return;
+	if(NULL == lpParamObj)  //Parameter check.
+	{
+		return;
+	}
+
+	do{
+		pNext = lpParamObj->pNext;
+		KMemFree((LPVOID)lpParamObj,KMEM_SIZE_TYPE_ANY,0);
+		lpParamObj = pNext;
+	}while(pNext);
 }
 
 //The following handlers are moved to shell1.cpp.
