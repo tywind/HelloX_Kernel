@@ -20,9 +20,9 @@
 #include "StdAfx.h"
 #endif
 
-#include "lwip\ip_addr.h"
-#include "lwip\netif.h"
-#include "lwip\inet.h"
+#include "lwip/ip_addr.h"
+#include "lwip/netif.h"
+#include "lwip/inet.h"
 
 #include "kapi.h"
 #include "shell.h"
@@ -250,37 +250,47 @@ static DWORD route(__CMD_PARA_OBJ* lpCmdObj)
 //ping command's implementation.
 static DWORD ping(__CMD_PARA_OBJ* lpCmdObj)
 {
-	__PING_PARAM  PingParam;
-	int           count  = 3;    //Ping counter.
-	int           size   = 64;   //Ping packet size.
-	ip_addr_t     ipAddr;
+	__PING_PARAM     PingParam;
+	int              count    = 3;    //Ping counter.
+	int              size     = 64;   //Ping packet size.
+	ip_addr_t        ipAddr;
+	DWORD            dwRetVal = NET_CMD_FAILED;
+	//__CMD_PARA_OBJ*  pNext  = NULL;
 
 	//Set default IP address if user does not specified.
-	ipAddr.addr = inet_addr("127.0.0.1");
+	//ipAddr.addr = inet_addr("127.0.0.1");
 
-	/*
 	lpCmdObj = lpCmdObj->pNext;  //Skip the first parameter,since it is the command string itself.
 
 	while(lpCmdObj)
 	{
 		if(lpCmdObj->byFunctionLabel == 0)  //Default parameter as IP address.
 		{
-			//ipAddr.addr = inet_addr(lpCmdObj->Parameter[0]);
-			printf(" Ping target address is : %s\r\n",lpCmdObj->Parameter[0]);
+			ipAddr.addr = inet_addr(lpCmdObj->Parameter[0]);
+			//printf(" Ping target address is : %s\r\n",lpCmdObj->Parameter[0]);
 		}
 		if(lpCmdObj->byFunctionLabel == 'c')  //Ping counter.
 		{
-			//count = Str2Hex(lpCmdObj->Parameter[0]);
-			printf(" Ping counter is : %s\r\n",lpCmdObj->Parameter[0]);
+			if(NULL == lpCmdObj->pNext)
+			{
+				printf("  Invalid parameter.\r\n");
+				goto __TERMINAL;
+			}
+			lpCmdObj = lpCmdObj->pNext;
+			count = atoi(lpCmdObj->Parameter[0]);
 		}
 		if(lpCmdObj->byFunctionLabel == 'l')  //Packet size.
 		{
-			//size = Str2Hex(lpCmdObj->Parameter[0]);
-			printf(" Ping pkt size is : %s\r\n",lpCmdObj->Parameter[0]);
+			if(NULL == lpCmdObj->pNext)
+			{
+				printf("  Invalid parameter.\r\n");
+				goto __TERMINAL;
+			}
+			lpCmdObj = lpCmdObj->pNext;
+			size = atoi(lpCmdObj->Parameter[0]);
 		}
 		lpCmdObj = lpCmdObj->pNext;
 	}
-	*/
 
 	PingParam.count      = count;
 	PingParam.targetAddr = ipAddr;
@@ -288,7 +298,10 @@ static DWORD ping(__CMD_PARA_OBJ* lpCmdObj)
 
 	//Call ping entry routine.
 	ping_Entry((void*)&PingParam);
-	return NET_CMD_SUCCESS;
+	dwRetVal = NET_CMD_SUCCESS;
+
+__TERMINAL:
+	return dwRetVal;
 }
 
 //A helper routine used to dumpout a network interface.

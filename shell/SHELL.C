@@ -24,9 +24,6 @@
 #include "SYSD_S.H"
 #include "extcmd.h"
 
-//*******************
-#include "..\include\debug.h"
-
 #if defined(__I386__)
 #ifndef __BIOS_H__
 #include "..\arch\x86\BIOS.H"
@@ -36,10 +33,7 @@
 #include "..\INCLUDE\MODMGR.H"
 #include "..\include\console.h"
 #include "..\lib\stdio.h"
-
-//*******************
 #include "../include/debug.h"
-//*******************
 
 //Host name array of the system.
 #define MAX_HOSTNAME_LEN  16
@@ -60,22 +54,13 @@ __CMD_PARA_OBJ* FormParameterObj(LPSTR pszCmd)
 {
 	__CMD_PARA_OBJ*     pObjBuffer = NULL;    //Local variables.
 	__CMD_PARA_OBJ*     pBasePtr   = NULL;
-	__CMD_PARA_OBJ*     pTmpObj    = NULL;
+	__CMD_PARA_OBJ*     pPrevObj   = NULL;
 	DWORD               dwCounter  = 0;
 
 	if(NULL == pszCmd)    //Parameter check.
 	{
 		return NULL;
 	}
-
-	pObjBuffer = (__CMD_PARA_OBJ*)KMemAlloc(sizeof(__CMD_PARA_OBJ),KMEM_SIZE_TYPE_ANY);
-	if(NULL == pObjBuffer)
-	{
-		goto __TERMINAL;
-	}
-
-	pBasePtr = pObjBuffer;
-	memzero(pBasePtr,sizeof(__CMD_PARA_OBJ));
 
 	while(*pszCmd)
 	{
@@ -88,72 +73,69 @@ __CMD_PARA_OBJ* FormParameterObj(LPSTR pszCmd)
 		if(('-' == *pszCmd) || ('/' == *pszCmd))
 		{
 			pszCmd ++;
+			if(0 == *pszCmd)
+			{
+				break;
+			}
+			//Allocate a command parameter object to contain the command label.
+			pObjBuffer = (__CMD_PARA_OBJ*)KMemAlloc(sizeof(__CMD_PARA_OBJ),KMEM_SIZE_TYPE_ANY);
+			if(NULL == pObjBuffer)
+			{
+				break;
+			}
+			memzero(pObjBuffer,sizeof(__CMD_PARA_OBJ));
+			if(NULL == pPrevObj)  //First command parameter object,save it.
+			{
+				pPrevObj = pObjBuffer;
+				pBasePtr = pObjBuffer;
+			}
+			else
+			{
+				pPrevObj->pNext = pObjBuffer;  //Link the buffer to list.
+				pPrevObj        = pObjBuffer;
+			}
 			pObjBuffer->byFunctionLabel = *pszCmd;
 			pszCmd ++;                    //Skip the function label byte.
 			continue;
 		}
+		//Allocate a new command parameter object.
+		pObjBuffer = (__CMD_PARA_OBJ*)KMemAlloc(sizeof(__CMD_PARA_OBJ),KMEM_SIZE_TYPE_ANY);
+		if(NULL == pObjBuffer)
+		{
+			break;
+		}
+		memzero(pObjBuffer,sizeof(__CMD_PARA_OBJ));
+		if(NULL == pPrevObj)  //First command parameter object,save it.
+		{
+			pPrevObj = pObjBuffer;
+			pBasePtr = pObjBuffer;
+		}
 		else
 		{
-			while(('-' != *pszCmd) && ('/' != *pszCmd) && *pszCmd)
+			pPrevObj->pNext = pObjBuffer;  //Link to list.
+			pPrevObj        = pObjBuffer;
+		}
+		while((' ' != *pszCmd) && ('-' != *pszCmd) && ('/' != *pszCmd) && (*pszCmd))
+		{
+			while((' ' != *pszCmd) && (*pszCmd) && (dwCounter <= CMD_PARAMETER_LEN))
 			{
-				while((' ' != *pszCmd) && (*pszCmd) && (dwCounter <= CMD_PARAMETER_LEN))
-				{
-					pObjBuffer->Parameter[0][dwCounter] = *pszCmd;
-					pszCmd ++;
-					dwCounter ++;
-				}
-				pObjBuffer->Parameter[0][dwCounter] = 0;  //Set the terminal flag.
-				pObjBuffer->byParameterNum          = 1;
-				dwCounter = 0;
-
-				while(' ' != *pszCmd)
-				{
-					//Skip the no space characters if the parameter's length 
-					//is longer than the const CMD_PARAMETER_LEN.
-					pszCmd ++;
-				}
-				while(' ' == *pszCmd)
-				{
-					pszCmd ++;          //Skip the space character.
-				}
-
-				if((!*pszCmd) || ('-' == *pszCmd) || ('/' == *pszCmd))
-				{
-					break;
-				}
-
-				//Prepare another command object.
-				pTmpObj = pObjBuffer;
-				pObjBuffer = (__CMD_PARA_OBJ*)KMemAlloc(sizeof(__CMD_PARA_OBJ),KMEM_SIZE_TYPE_ANY);
-				if(NULL == pObjBuffer)  //Giveup.
-				{
-					goto __TERMINAL;
-				}
-				//Clear the whole object.
-				memzero(pObjBuffer,sizeof(__CMD_PARA_OBJ));
-				pTmpObj->pNext = pObjBuffer;	
+				pObjBuffer->Parameter[0][dwCounter] = *pszCmd;
+				pszCmd ++;
+				dwCounter ++;
 			}
+			pObjBuffer->Parameter[0][dwCounter] = 0;  //Set the terminal flag.
+			pObjBuffer->byParameterNum          = 1;
+			dwCounter = 0;
 
-			pObjBuffer->byParameterNum = 1;
-			if(!*pszCmd)
+			while((' ' != *pszCmd) && (*pszCmd))
 			{
-				break;
+				//Skip the no space characters if the parameter's length 
+				//is longer than the const CMD_PARAMETER_LEN.
+				pszCmd ++;
 			}
-
-			pTmpObj = pObjBuffer;       //Update the current parameter object.
-			//pObjBuffer = (__CMD_PARA_OBJ*)NextParaAddr(pTmpObj,index);
-			pObjBuffer = (__CMD_PARA_OBJ*)KMemAlloc(sizeof(__CMD_PARA_OBJ),KMEM_SIZE_TYPE_ANY);
-			if(NULL == pObjBuffer)  //Giveup.
-			{
-				goto __TERMINAL;
-			}
-			//Clear the whole object.
-			memzero(pObjBuffer,sizeof(__CMD_PARA_OBJ));
-			pTmpObj->pNext = pObjBuffer;
 		}
 	}
 
-__TERMINAL:
 	return pBasePtr;
 }
 

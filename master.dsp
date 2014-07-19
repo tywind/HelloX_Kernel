@@ -121,6 +121,10 @@ SOURCE=.\drivers\x86\MOUSE.C
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=.\lib\atox.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\lib\stdio.c
 # End Source File
 # Begin Source File

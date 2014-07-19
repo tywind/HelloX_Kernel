@@ -6,7 +6,7 @@
 --------------------Configuration: master - Win32 Release--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating temporary file "C:\Users\Administrator\AppData\Local\Temp\RSPF9EE.tmp" with contents
+Creating temporary file "C:\Users\ADMINI~1\AppData\Local\Temp\RSP4161.tmp" with contents
 [
 /nologo /MT /W3 /GX /O1 /I ".\include" /I ".\arch\x86" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "MASTER_EXPORTS" /Fp"Release/master.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
 "G:\HelloX\HelloX_Kernel\drivers\x86\com.c"
@@ -40,6 +40,7 @@ Creating temporary file "C:\Users\Administrator\AppData\Local\Temp\RSPF9EE.tmp" 
 "G:\HelloX\HelloX_Kernel\shell\HYPERTRM.C"
 "G:\HelloX\HelloX_Kernel\shell\IOCTRL_S.C"
 "G:\HelloX\HelloX_Kernel\shell\network.c"
+"G:\HelloX\HelloX_Kernel\shell\network2.c"
 "G:\HelloX\HelloX_Kernel\shell\SHELL.C"
 "G:\HelloX\HelloX_Kernel\shell\SHELL1.C"
 "G:\HelloX\HelloX_Kernel\shell\STAT_S.C"
@@ -110,10 +111,10 @@ Creating temporary file "C:\Users\Administrator\AppData\Local\Temp\RSPF9EE.tmp" 
 "G:\HelloX\HelloX_Kernel\network\api\tcpip.c"
 "G:\HelloX\HelloX_Kernel\network\core\timers.c"
 "G:\HelloX\HelloX_Kernel\network\core\udp.c"
-"G:\HelloX\HelloX_Kernel\shell\network2.c"
+"G:\HelloX\HelloX_Kernel\lib\atox.c"
 ]
-Creating command line "cl.exe @C:\Users\Administrator\AppData\Local\Temp\RSPF9EE.tmp" 
-Creating temporary file "C:\Users\Administrator\AppData\Local\Temp\RSPF9EF.tmp" with contents
+Creating command line "cl.exe @C:\Users\ADMINI~1\AppData\Local\Temp\RSP4161.tmp" 
+Creating temporary file "C:\Users\ADMINI~1\AppData\Local\Temp\RSP4162.tmp" with contents
 [
 libcmt.lib /nologo /base:"0x110000" /entry:"__OS_Entry" /dll /incremental:no /pdb:"Release/master.pdb" /map:"Release/master.map" /machine:I386 /out:"Release/master.dll" /implib:"Release/master.lib" /ALIGN:16 
 .\Release\com.obj
@@ -147,6 +148,7 @@ libcmt.lib /nologo /base:"0x110000" /entry:"__OS_Entry" /dll /incremental:no /pd
 .\Release\HYPERTRM.OBJ
 .\Release\IOCTRL_S.OBJ
 .\Release\network.obj
+.\Release\network2.obj
 .\Release\SHELL.OBJ
 .\Release\SHELL1.OBJ
 .\Release\STAT_S.OBJ
@@ -217,9 +219,9 @@ libcmt.lib /nologo /base:"0x110000" /entry:"__OS_Entry" /dll /incremental:no /pd
 .\Release\tcpip.obj
 .\Release\timers.obj
 .\Release\udp.obj
-.\Release\network2.obj
+.\Release\atox.obj
 ]
-Creating command line "link.exe @C:\Users\Administrator\AppData\Local\Temp\RSPF9EF.tmp"
+Creating command line "link.exe @C:\Users\ADMINI~1\AppData\Local\Temp\RSP4162.tmp"
 <h3>Output Window</h3>
 Compiling...
 com.c
@@ -282,6 +284,7 @@ G:\HelloX\HelloX_Kernel\shell\HYPERTRM.C(295) : warning C4761: integral size mis
 G:\HelloX\HelloX_Kernel\shell\HYPERTRM.C(391) : warning C4761: integral size mismatch in argument; conversion supplied
 G:\HelloX\HelloX_Kernel\shell\HYPERTRM.C(396) : warning C4761: integral size mismatch in argument; conversion supplied
 network.c
+network2.c
 SHELL.C
 SHELL1.C
 STAT_S.C
@@ -374,7 +377,7 @@ G:\HelloX\HelloX_Kernel\network\core\tcp_out.c(105) : warning C4761: integral si
 G:\HelloX\HelloX_Kernel\network\core\tcp_out.c(1445) : warning C4761: integral size mismatch in argument; conversion supplied
 timers.c
 udp.c
-network2.c
+atox.c
 G:\HelloX\HelloX_Kernel\network\core\udp.c(102) : warning C4761: integral size mismatch in argument; conversion supplied
 G:\HelloX\HelloX_Kernel\network\core\udp.c(345) : warning C4761: integral size mismatch in argument; conversion supplied
 Linking...
