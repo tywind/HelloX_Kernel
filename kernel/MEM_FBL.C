@@ -404,7 +404,6 @@ static VOID Free(__BUFFER_CONTROL_BLOCK* pControlBlock,LPVOID lpBuffer)
 static VOID AppendBuffer(__BUFFER_CONTROL_BLOCK* pControlBlock,LPVOID lpBuffer,DWORD dwBuffSize)
 {
 	__FREE_BUFFER_HEADER*       lpFreeHeader  = NULL;
-	DWORD                       dwFlags       = 0;
 
 	if(!(pControlBlock->dwFlags & OPERATIONS_INITIALIZED))  //Buffer control block is not initialized yet.
 	{

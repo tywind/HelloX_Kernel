@@ -21,19 +21,19 @@
 #endif
 
 //Implementation of C standard malloc routine.
-void* malloc(size_t size)
+void* _hx_malloc(size_t size)
 {
 	return KMemAlloc(size,KMEM_SIZE_TYPE_ANY);
 }
 
 //free.
-void free(void* p)
+void _hx_free(void* p)
 {
 	KMemFree(p,KMEM_SIZE_TYPE_ANY,0);
 }
 
 //calloc.
-void* calloc(size_t n,size_t s)
+void* _hx_calloc(size_t n,size_t s)
 {
 	void*    p = KMemAlloc(n * s,KMEM_SIZE_TYPE_ANY);
 	if(NULL == p)

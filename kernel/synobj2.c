@@ -160,7 +160,7 @@ static DWORD WaitForSemObjectEx(__COMMON_OBJECT* pSemaphore,DWORD dwMillionSecon
 	__KERNEL_THREAD_OBJECT*     pKernelThread    = NULL;
 	DWORD                       dwCalledTick     = System.dwClockTickCounter;  //Record the tick.
 	DWORD                       dwTimeOutTick    = 0;
-	DWORD                       dwTimeSpan       = 0;
+	//DWORD                       dwTimeSpan       = 0;
 	DWORD                       dwRetValue       = OBJECT_WAIT_FAILED;
 	DWORD                       dwFlags;
 
@@ -399,7 +399,7 @@ static DWORD GetMail(__COMMON_OBJECT* pMailboxObj,LPVOID* ppMessage,DWORD dwMill
 	DWORD                     dwFlags;
 	DWORD                     dwCalledTick  = System.dwClockTickCounter;
 	DWORD                     dwTimeOutTick = 0;
-	DWORD                     dwTimeSpan    = 0;
+	//DWORD                     dwTimeSpan    = 0;
 	DWORD                     dwTimeoutWait = 0;
 	DWORD                     dwRetValue    = OBJECT_WAIT_FAILED;
 
@@ -570,7 +570,7 @@ static DWORD SendMail(__COMMON_OBJECT* pMailboxObj,LPVOID pMessage,DWORD dwPrior
 	DWORD                     dwFlags;
 	DWORD                     dwCalledTick  = System.dwClockTickCounter;
 	DWORD                     dwTimeOutTick = 0;
-	DWORD                     dwTimeSpan    = 0;
+	//DWORD                     dwTimeSpan    = 0;
 	DWORD                     dwTimeoutWait = 0;
 	DWORD                     dwRetValue    = OBJECT_WAIT_FAILED;
 

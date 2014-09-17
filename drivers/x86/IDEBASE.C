@@ -266,7 +266,7 @@ BOOL ReadSector(int nHdNum,DWORD dwStartSector,DWORD dwSectorNum,BYTE* pBuffer)
 		return TRUE;
 	}
 	tmp = __inb(0x1f2);
-	sprintf(Buffer,"The error number is : %d",tmp);
+	_hx_sprintf(Buffer,"The error number is : %d",tmp);
 	PrintLine(Buffer);
 	return FALSE;
 }

@@ -15,10 +15,14 @@
 #ifndef __STDLIB_H__
 #define __STDLIB_H__
 
-//Standard C malloc/free/calloc routine.
-void* malloc(size_t size);
-void  free(void* p);
-void* calloc(size_t n,size_t s);
+//Standard C malloc/free/calloc routine.A dedicated prefix _hx_ is appended
+//before the standard name to distinguish the HX version and standard version.
+//The intention is to lead compiler link the code to the right version.It will
+//lead conflict if we use standard name here,in some developing environment
+//that has it's own lib source.
+void* _hx_malloc(size_t size);
+void  _hx_free(void* p);
+void* _hx_calloc(size_t n,size_t s);
 
 //Convert a string to long.
 long atol(const char *nptr);

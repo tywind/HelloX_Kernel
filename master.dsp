@@ -53,8 +53,8 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
-# ADD LINK32 libcmt.lib /nologo /base:"0x110000" /entry:"__OS_Entry" /dll /map /machine:I386 /ALIGN:16
-# SUBTRACT LINK32 /pdb:none /nodefaultlib
+# ADD LINK32 libcmt.lib /nologo /base:"0x110000" /entry:"__OS_Entry" /dll /map /machine:I386 /nodefaultlib /ALIGN:16
+# SUBTRACT LINK32 /pdb:none
 
 !ELSEIF  "$(CFG)" == "master - Win32 Debug"
 
@@ -441,6 +441,10 @@ SOURCE=.\network\netif\ethernetif.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\network\nicdrv\ethif.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\network\core\icmp.c
 # End Source File
 # Begin Source File
@@ -553,6 +557,10 @@ SOURCE=.\network\core\udp.c
 # PROP Default_Filter ".h"
 # Begin Source File
 
+SOURCE=.\include\arch\bpstruct.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\INCLUDE\BUFFMGR.H
 # End Source File
 # Begin Source File
@@ -578,6 +586,10 @@ SOURCE=.\INCLUDE\DEVMGR.H
 # Begin Source File
 
 SOURCE=.\INCLUDE\dim.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\arch\epstruct.h
 # End Source File
 # Begin Source File
 
@@ -826,6 +838,10 @@ SOURCE=.\config\config.h
 # Begin Source File
 
 SOURCE=.\include\arch\cc.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\network\nicdrv\ethif.h
 # End Source File
 # Begin Source File
 

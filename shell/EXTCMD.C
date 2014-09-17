@@ -30,7 +30,9 @@ __EXTERNAL_COMMAND ExtCmdArray[] = {
 	{"fdisk",NULL,FALSE,fdiskEntry},
 	{"fs",NULL,FALSE,fsEntry},
 	{"hedit",NULL,FALSE,heditEntry},
+#if defined(__CFG_NET_IPv4) || defined(__CFG_NET_IPv6)
 	{"network",NULL,FALSE,networkEntry},
+#endif
 	//Add your external command/application entry here.
 	//{"yourcmd",NULL,FALSE,cmdentry},
 	//The last entry of this array must be the following one,

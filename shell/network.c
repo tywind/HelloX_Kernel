@@ -273,7 +273,7 @@ static DWORD ping(__CMD_PARA_OBJ* lpCmdObj)
 		{
 			if(NULL == lpCmdObj->pNext)
 			{
-				printf("  Invalid parameter.\r\n");
+				_hx_printf("  Invalid parameter.\r\n");
 				goto __TERMINAL;
 			}
 			lpCmdObj = lpCmdObj->pNext;
@@ -283,7 +283,7 @@ static DWORD ping(__CMD_PARA_OBJ* lpCmdObj)
 		{
 			if(NULL == lpCmdObj->pNext)
 			{
-				printf("  Invalid parameter.\r\n");
+				_hx_printf("  Invalid parameter.\r\n");
 				goto __TERMINAL;
 			}
 			lpCmdObj = lpCmdObj->pNext;
@@ -311,15 +311,15 @@ static void ShowIf(struct netif* pIf)
 	
 	//Print out all information about this interface.
 	PrintLine("  --------------------------------------");
-	sprintf(buff,"  Inetface name : %c%c",pIf->name[0],pIf->name[1]);
+	_hx_sprintf(buff,"  Inetface name : %c%c",pIf->name[0],pIf->name[1]);
 	PrintLine(buff);
-	sprintf(buff,"      IPv4 address   : %s",inet_ntoa(pIf->ip_addr));
+	_hx_sprintf(buff,"      IPv4 address   : %s",inet_ntoa(pIf->ip_addr));
 	PrintLine(buff);
-	sprintf(buff,"      IPv4 mask      : %s",inet_ntoa(pIf->netmask));
+	_hx_sprintf(buff,"      IPv4 mask      : %s",inet_ntoa(pIf->netmask));
 	PrintLine(buff);
-	sprintf(buff,"      IPv4 gateway   : %s",inet_ntoa(pIf->gw));
+	_hx_sprintf(buff,"      IPv4 gateway   : %s",inet_ntoa(pIf->gw));
 	PrintLine(buff);
-	sprintf(buff,"      Interface MTU  : %d",pIf->mtu);
+	_hx_sprintf(buff,"      Interface MTU  : %d",pIf->mtu);
 	PrintLine(buff);
 }
 

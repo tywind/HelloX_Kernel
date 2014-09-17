@@ -25,6 +25,10 @@ typedef signed   long  s32_t;
 
 typedef unsigned long mem_ptr_t;
 
+//Structure packing method,use including.
+#define PACK_STRUCT_STRUCT
+#define PACK_STRUCT_USE_INCLUDES
+
 //For diagnostic output.
 #define LWIP_PLATFORM_ASSERT(x) { \
     PrintLine(x); \

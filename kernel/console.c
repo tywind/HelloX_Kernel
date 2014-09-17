@@ -89,7 +89,7 @@ static DWORD ConReadThread(LPVOID pData)
 				NULL); 
 		}
 	}
-	return 0;
+	//return 0;
 }
 
 //Initialization routine of Console object.
@@ -218,6 +218,7 @@ static VOID ConPrintCh(unsigned short ch)
 	if(IN_INTERRUPT() || IN_SYSINITIALIZATION())
 	{
 		__LL_Output(chTarg);
+		return;
 	}
 
 	if(!Console.bInitialized)

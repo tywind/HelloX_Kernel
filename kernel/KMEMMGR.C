@@ -314,6 +314,9 @@ LPVOID KMemAlloc(DWORD dwSize,DWORD dwSizeType)
 		return pMemAddress;               //Parameter check.
 	}
 
+	//Align size to alignment boundary,which is defined in config.h file.
+	dwSize = ((dwSize + SYSTEM_BYTE_ALIGN - 1) & ~(SYSTEM_BYTE_ALIGN - 1));
+
 	switch(dwSizeType)
 	{
 	case KMEM_SIZE_TYPE_ANY:

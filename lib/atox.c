@@ -1,4 +1,4 @@
-//***********************************************************************/
+//***********************************************************************
 //    Author                    : Garry
 //    Original Date             : Jun 26,2014
 //    Module Name               : atox.c
@@ -10,14 +10,14 @@
 //    Last modified Content     :
 //                                1. 
 //    Lines number              :
-//***********************************************************************/
+//***********************************************************************
 
-/************************************************************************
-/*
-/*    THE FOLLOWING CODE IS COPIED FROM MICROSOFT'S IMPLEMENTATION,PLEASE
-/*    REPLACE IT WHEN YOUR PURPUSE IS MERCHANT.
-/*
-/************************************************************************
+/************************************************************************/
+//
+//    THE FOLLOWING CODE IS COPIED FROM MICROSOFT'S IMPLEMENTATION,PLEASE
+//    REPLACE IT WHEN YOUR PURPUSE IS MERCHANT.
+//
+/************************************************************************/
 
 /************************************************************************
 *atox.c - atoi and atol conversion 
@@ -33,7 +33,7 @@
 #include "StdAfx.h"
 #endif
   
-#include <stdlib.h>  
+#include "stdlib.h"
   
 /*** 
 *long atol(char *nptr) - Convert string to long 
@@ -153,7 +153,7 @@ char* itoa(int value, char* string, int radix)
 	}  
 	
 	if (string == 0)  
-		string = (char*)malloc((tp-tmp)+sign+1);  
+		string = (char*)_hx_malloc((tp-tmp)+sign+1);  
 	sp = string;  
 	
 	if (sign)  

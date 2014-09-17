@@ -114,7 +114,7 @@ static void Logcat(__DEBUG_MANAGER *pThis, char *buf, int len)
 		StrCpy(p->tag, pMsg->tag);
 		StrCpy(p->name, pMsg->name);
 		StrCpy(p->msg, pMsg->msg);
-		sprintf(buf, "tag:%s name:%s time:%d pid:%d tid:%d msg:%s", 
+		_hx_sprintf(buf, "tag:%s name:%s time:%d pid:%d tid:%d msg:%s", 
 			pMsg->tag, pMsg->name, pMsg->time, 
 			pMsg->pid, pMsg->tid, pMsg->msg);	
 	}

@@ -135,7 +135,7 @@ BOOL GetFreeCluster(__FAT32_FS* pFat32Fs,DWORD dwStartToFind,DWORD* pdwFreeClust
 					1,
 					pBuffer);  //It is no matter if write to backup fat failed.
 				bResult = TRUE;
-				sprintf(Buffer,"  In GetFreeCluster,success,cluster = %d,next = %d",dwCurrCluster,*pCluster);
+				_hx_sprintf(Buffer,"  In GetFreeCluster,success,cluster = %d,next = %d",dwCurrCluster,*pCluster);
 				PrintLine(Buffer);
 				goto __TERMINAL;
 			}
@@ -331,7 +331,7 @@ BOOL InitDirectory(__FAT32_FS* pFat32Fs,DWORD dwParentCluster,DWORD dwDirCluster
 	if((NULL == pFat32Fs) || (dwParentCluster < 2) || (dwDirCluster < 2) || IS_EOC(dwParentCluster) ||
 	   IS_EOC(dwDirCluster))
 	{
-		sprintf(Buffer,"  In InitDirectory: parent clus = %d,dir clus = %d",
+		_hx_sprintf(Buffer,"  In InitDirectory: parent clus = %d,dir clus = %d",
 			dwParentCluster,
 			dwDirCluster);
 		PrintLine(Buffer);
@@ -518,7 +518,7 @@ BOOL CreateDirEntry(__FAT32_FS* pFat32Fs,DWORD dwStartCluster,__FAT32_SHORTENTRY
 		}
 	}
 	/*
-	sprintf(pBuffer,"In CreateDirEntry: dwSector = %d,dwCurrCluster = %d,offset = %d",
+	_hx_sprintf(pBuffer,"In CreateDirEntry: dwSector = %d,dwCurrCluster = %d,offset = %d",
 		dwSector,
 		dwCurrCluster,
 		(BYTE*)pfse - pBuffer);
@@ -903,7 +903,7 @@ BOOL GetDirEntry(__FAT32_FS* pFat32Fs,
 		{
 			/*
 			PrintLine("In GetDirEntry: GetShortEntry failed.");
-			sprintf(Buffer,"  Parameters: start clus = %d,SubDir = %s",dwStartClus,SubDir);
+			_hx_sprintf(Buffer,"  Parameters: start clus = %d,SubDir = %s",dwStartClus,SubDir);
 			PrintLine(Buffer);*/
 			goto __TERMINAL;
 		}
@@ -928,7 +928,7 @@ BOOL GetDirEntry(__FAT32_FS* pFat32Fs,
 	{
 		/*
 		PrintLine("  In GetDirEntry: GetShortEntry failed,next one.");
-		sprintf(Buffer,"  Parameters: start clus = %d,SubDir = %s",dwStartClus,SubDir);
+		_hx_sprintf(Buffer,"  Parameters: start clus = %d,SubDir = %s",dwStartClus,SubDir);
 		PrintLine(Buffer);*/
 		goto __TERMINAL;
 	}

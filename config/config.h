@@ -23,7 +23,7 @@
 //
 //************************************************************************
 
-#define VERSION_INFO "    HelloX [Version 1.760,build in 2014/07/19,by Garry.Xin]"
+#define VERSION_INFO "    HelloX [Version 1.760,build in 2014/08/24,by Garry.Xin]"
 #define SLOGAN_INFO  "    HelloX OS,through which you can talk to everything."
 
 //************************************************************************
@@ -52,6 +52,9 @@
 //hardware to keep same as this definition.
 #define SYSTEM_TIME_SLICE  55  //55 million seconds per tick.
 
+//CPU byte alignment,memory allocation will use this value to align block.
+#define SYSTEM_BYTE_ALIGN  4   //4 will work under most platforms.
+
 //************************************************************************
 //
 //  Common system level parameters that can fit any hardware platform.
@@ -75,7 +78,7 @@
 //if the user does not give a stack size in CreateKernelThread calling,then
 //use this value as stack size.
 //
-#define DEFAULT_STACK_SIZE 0x00004000 //16k bytes.
+#define DEFAULT_STACK_SIZE 0x00002000 //16k bytes.
 
 //************************************************************************
 //

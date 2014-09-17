@@ -27,5 +27,5 @@ typedef unsigned int     size_t;
 
 #define NOFLOAT  //Kernel does not support floating point number yet.
 
-int sprintf(char* buf,const char* fmt,...);
-int printf(const char* fmt,...);
+int _hx_sprintf(char* buf,const char* fmt,...);
+int _hx_printf(const char* fmt,...);

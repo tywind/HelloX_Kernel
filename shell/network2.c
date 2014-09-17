@@ -68,6 +68,8 @@
 /* ping variables */
 static u16_t ping_seq_num;
 static u32_t ping_time;
+static u32_t ping_pkt_seq = 0;
+
 #if !PING_USE_SOCKETS
 static struct raw_pcb *ping_pcb;
 #endif /* PING_USE_SOCKETS */
@@ -166,7 +168,7 @@ ping_recv(int s)
 	  {
 		  len = len - sizeof(struct ip_hdr) - sizeof(struct icmp_echo_hdr);  //Adjust received data's length,since it
 		                                                                     //includes IP and ICMP headers.
-		  printf("  Reply from %s,size = %d,time = %d(ms)\r\n",inet_ntoa(fromaddr),len,ms);
+		  _hx_printf("  [%d] Reply from %s,size = %d,time = %d(ms)\r\n",ping_pkt_seq,inet_ntoa(fromaddr),len,ms);
 		  bResult = TRUE;
 	  }
 	  else
@@ -194,6 +196,8 @@ void ping_Entry(void *arg)
   int timeout = PING_RCV_TIMEO;
   __PING_PARAM* pParam = (__PING_PARAM*)arg;
 
+  ping_pkt_seq = 0;  //Reset ping sequence number.
+
   if((s = lwip_socket(AF_INET, SOCK_RAW, IP_PROTO_ICMP)) < 0)
   {
 	PrintLine("  ping : Create raw socket failed,quit.");
@@ -201,7 +205,7 @@ void ping_Entry(void *arg)
   }
 
   lwip_setsockopt(s, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
-  printf("\r\n  Ping %s with %d bytes packet:\r\n",inet_ntoa(pParam->targetAddr),pParam->size);
+  _hx_printf("\r\n  Ping %s with %d bytes packet:\r\n",inet_ntoa(pParam->targetAddr),pParam->size);
   while (1) {
     //ping_target = PING_TARGET; //ping gw
 	//IP4_ADDR(&ping_target, 127,0,0,1); //ping loopback.
@@ -210,6 +214,7 @@ void ping_Entry(void *arg)
 	  //printf(" ping_Entry : Send out packet,addr = %s,size = %d\r\n",inet_ntoa(pParam->targetAddr),pParam->size);
       ping_time = sys_now();
       ping_recv(s);
+	  ping_pkt_seq ++;
     }
 	else
 	{

@@ -20,7 +20,15 @@
 #include "stdlib.h"      //For memory allocation.
 #endif
 
+#ifndef __STDIO_H__
+#include "stdio.h"
+#endif
+
 #ifndef __LWIPOPTS_H__
+
+//Swich of debugging functions.Only define the LWIP_DEBUG macro
+//to enable the debugging functions of lwIP.
+//#define LWIP_DEBUG           1
 
 //Use binary semaphore for mutex.
 #define LWIP_COMPAT_MUTEX    1
@@ -31,11 +39,17 @@
 //Use standard C memory manipulation routines,such as malloc/free.
 #define MEM_LIBC_MALLOC      1
 
+//Use HelloX's memory allocator to allocate memory pool.
+#define MEMP_MEM_MALLOC      1
+
 //Enable loop back interface.
 #define LWIP_HAVE_LOOPIF     1
 
 //Enable receive timeout mechanism.
 #define LWIP_SO_RCVTIMEO     1
+
+//Enable or disable TCP functions in lwIP.
+#define LWIP_TCP             1
 
 //*-----------------------------------------------------------------------
 //*
@@ -47,7 +61,7 @@
 #define TCPIP_THREAD_NAME                "tcpip_thread"
 
 //TCPIP thread's stack size,use default value.
-#define TCPIP_THREAD_STACKSIZE           0
+#define TCPIP_THREAD_STACKSIZE           0x00000800  //2K stack.
 
 //TCPIP thread's priority.
 #define TCPIP_THREAD_PRIO                PRIORITY_LEVEL_HIGH
@@ -77,6 +91,67 @@
 #define DEFAULT_THREAD_NAME              "lwIP stack"
 #define DEFAULT_THREAD_STACKSIZE         0
 #define DEFAULT_THREAD_PRIO              PRIORITY_LEVEL_NORMAL
+
+//*-----------------------------------------------------------------------
+//*
+//*  Debugging switchs for each function module in lwIP.
+//*
+//*-----------------------------------------------------------------------
+/**
+* NETIF_DEBUG: Enable debugging in netif.c.
+*/
+#ifndef NETIF_DEBUG
+#define NETIF_DEBUG                     LWIP_DBG_ON
+#endif
+
+/**
+* PBUF_DEBUG: Enable debugging in pbuf.c.
+*/
+#ifndef PBUF_DEBUG
+#define PBUF_DEBUG                      LWIP_DBG_ON
+#endif
+
+/**
+* API_LIB_DEBUG: Enable debugging in api_lib.c.
+*/
+#ifndef API_LIB_DEBUG
+#define API_LIB_DEBUG                   LWIP_DBG_ON
+#endif
+
+/**
+* API_MSG_DEBUG: Enable debugging in api_msg.c.
+*/
+#ifndef API_MSG_DEBUG
+#define API_MSG_DEBUG                   LWIP_DBG_ON
+#endif
+
+/**
+* SOCKETS_DEBUG: Enable debugging in sockets.c.
+*/
+#ifndef SOCKETS_DEBUG
+#define SOCKETS_DEBUG                   LWIP_DBG_ON
+#endif
+
+/**
+* IP_DEBUG: Enable debugging for IP.
+*/
+#ifndef IP_DEBUG
+#define IP_DEBUG                        LWIP_DBG_ON
+#endif
+
+//Debug output routine.
+#define LWIP_PLATFORM_DIAG(x) _hx_printf x
+
+//Format indicators of console output routine(_hx_printf).
+#define U8_F  "c"
+#define S8_F  "c"
+#define X8_F  "x"
+#define U16_F "u"
+#define S16_F "d"
+#define X16_F "x"
+#define U32_F "u"
+#define S32_F "d"
+#define X32_F "x"
 
 #endif  //__LWIPOPTS_H__
 

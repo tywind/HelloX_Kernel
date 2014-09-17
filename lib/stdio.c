@@ -423,7 +423,7 @@ static char *flt(char *str, double num, int size, int precision, char fmt, int f
 
 #endif
 
-int vsprintf(char *buf, const char *fmt, va_list args)
+int _hx_vsprintf(char *buf, const char *fmt, va_list args)
 {
   int len;
   unsigned long num;
@@ -609,19 +609,27 @@ repeat:
   return str - buf;
 }
 
-int sprintf(char *buf, const char *fmt, ...)
+int _hx_sprintf(char *buf, const char *fmt, ...)
 {
   va_list args;
   int n;
 
   va_start(args, fmt);
-  n = vsprintf(buf, fmt, args);
+  n = _hx_vsprintf(buf, fmt, args);
   va_end(args);
 
   return n;
 }
 
-int printf(const char* fmt,...)
+//A mutex object to sychronize the console accessing between
+//different kernel threads.If do not enforce the sychronization,
+//the output will mix when multiple threads are accessing the
+//output console concurrently.
+//The mutex object will be initialized when the _hx_sprintf is
+//first called.
+static __MUTEX* mtx = NULL;
+
+int _hx_printf(const char* fmt,...)
 {
 	//Define local buffer according kernel thread's stack size.
 #if DEFAULT_STACK_SIZE <= 2048
@@ -634,8 +642,37 @@ int printf(const char* fmt,...)
 	int i = 0;
 	WORD wr = 0x0700;
 
+	//Try to acquire the synchronizing mutex object,create it
+	//if it is not exist.
+	//We will ignore this step if in process of system initialization
+	//or in interrupt context.
+	if(!(IN_INTERRUPT() || IN_SYSINITIALIZATION()))
+	{
+		if(NULL == mtx)
+		{
+			mtx = (__MUTEX*)ObjectManager.CreateObject(
+				&ObjectManager,
+				NULL,
+				OBJECT_TYPE_MUTEX);
+			if(NULL == mtx)
+			{
+				return -1;
+			}
+			//Initialize it.
+			if(!mtx->Initialize((__COMMON_OBJECT*)mtx))  //Can not initialize.
+			{
+				ObjectManager.DestroyObject(
+					&ObjectManager,
+					(__COMMON_OBJECT*)mtx);
+				return -1;
+			}
+		}
+		//Try to acquire the mutex object.
+		mtx->WaitForThisObject((__COMMON_OBJECT*)mtx);
+	}
+
 	va_start(args,fmt);
-	n = vsprintf(buff,fmt,args);
+	n = _hx_vsprintf(buff,fmt,args);
 	va_end(args);
 
 	//Print out the string buffer.
@@ -643,6 +680,7 @@ int printf(const char* fmt,...)
 	{
 		if('\n' == buff[i])
 		{
+			GotoHome();
 			ChangeLine();
 			i ++;
 			continue;
@@ -657,6 +695,11 @@ int printf(const char* fmt,...)
 		PrintCh(wr);
 		wr -= buff[i];
 		i ++;
+	}
+	//Release the mutex object.
+	if(!(IN_INTERRUPT() || IN_SYSINITIALIZATION()))
+	{
+		mtx->ReleaseMutex((__COMMON_OBJECT*)mtx);
 	}
 
 	return 0;

@@ -6,122 +6,124 @@
 --------------------Configuration: master - Win32 Release--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating temporary file "C:\Users\ADMINI~1\AppData\Local\Temp\RSP4161.tmp" with contents
+Creating temporary file "C:\Users\garry\AppData\Local\Temp\RSP9898.tmp" with contents
 [
 /nologo /MT /W3 /GX /O1 /I ".\include" /I ".\arch\x86" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "MASTER_EXPORTS" /Fp"Release/master.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
-"G:\HelloX\HelloX_Kernel\drivers\x86\com.c"
-"G:\HelloX\HelloX_Kernel\drivers\x86\IDEBASE.C"
-"G:\HelloX\HelloX_Kernel\drivers\x86\IDEHD.C"
-"G:\HelloX\HelloX_Kernel\drivers\x86\KEYBRD.C"
-"G:\HelloX\HelloX_Kernel\drivers\x86\MOUSE.C"
-"G:\HelloX\HelloX_Kernel\lib\stdio.c"
-"G:\HelloX\HelloX_Kernel\lib\string.c"
-"G:\HelloX\HelloX_Kernel\lib\sysmem.c"
-"G:\HelloX\HelloX_Kernel\kthread\idle.c"
-"G:\HelloX\HelloX_Kernel\kthread\logcat.c"
-"G:\HelloX\HelloX_Kernel\arch\x86\ARCH_X86.C"
-"G:\HelloX\HelloX_Kernel\arch\x86\BIOS.C"
-"G:\HelloX\HelloX_Kernel\arch\x86\HELLOCN.C"
-"G:\HelloX\HelloX_Kernel\fs\FAT32.C"
-"G:\HelloX\HelloX_Kernel\fs\FAT322.C"
-"G:\HelloX\HelloX_Kernel\fs\FATMGR.C"
-"G:\HelloX\HelloX_Kernel\fs\FATMGR2.C"
-"G:\HelloX\HelloX_Kernel\fs\FATSTR.C"
-"G:\HelloX\HelloX_Kernel\fs\fsstr.c"
-"G:\HelloX\HelloX_Kernel\fs\NTFS.C"
-"G:\HelloX\HelloX_Kernel\fs\NTFS2.C"
-"G:\HelloX\HelloX_Kernel\fs\NTFSDRV.C"
-"G:\HelloX\HelloX_Kernel\shell\EXTCMD.C"
-"G:\HelloX\HelloX_Kernel\shell\FDISK.C"
-"G:\HelloX\HelloX_Kernel\shell\FDISK2.C"
-"G:\HelloX\HelloX_Kernel\shell\FIBONACCI.C"
-"G:\HelloX\HelloX_Kernel\shell\FS.C"
-"G:\HelloX\HelloX_Kernel\shell\HEDIT.C"
-"G:\HelloX\HelloX_Kernel\shell\HYPERTRM.C"
-"G:\HelloX\HelloX_Kernel\shell\IOCTRL_S.C"
-"G:\HelloX\HelloX_Kernel\shell\network.c"
-"G:\HelloX\HelloX_Kernel\shell\network2.c"
-"G:\HelloX\HelloX_Kernel\shell\SHELL.C"
-"G:\HelloX\HelloX_Kernel\shell\SHELL1.C"
-"G:\HelloX\HelloX_Kernel\shell\STAT_S.C"
-"G:\HelloX\HelloX_Kernel\shell\SYSD_S.C"
-"G:\HelloX\HelloX_Kernel\osentry\DRVENTRY.C"
-"G:\HelloX\HelloX_Kernel\osentry\mem_scat.c"
-"G:\HelloX\HelloX_Kernel\osentry\OS_ENTRY.C"
-"G:\HelloX\HelloX_Kernel\kernel\COMQUEUE.C"
-"G:\HelloX\HelloX_Kernel\kernel\console.c"
-"G:\HelloX\HelloX_Kernel\kernel\debug.c"
-"G:\HelloX\HelloX_Kernel\kernel\DEVMGR.C"
-"G:\HelloX\HelloX_Kernel\kernel\DIM.C"
-"G:\HelloX\HelloX_Kernel\kernel\HEAP.C"
-"G:\HelloX\HelloX_Kernel\kernel\IOMGR.C"
-"G:\HelloX\HelloX_Kernel\kernel\IOMGR2.C"
-"G:\HelloX\HelloX_Kernel\kernel\KAPI.C"
-"G:\HelloX\HelloX_Kernel\kernel\KERMOD.C"
-"G:\HelloX\HelloX_Kernel\kernel\KMEMMGR.C"
-"G:\HelloX\HelloX_Kernel\kernel\KTMGR.C"
-"G:\HelloX\HelloX_Kernel\kernel\KTMGR2.C"
-"G:\HelloX\HelloX_Kernel\kernel\MEM_FBL.C"
-"G:\HelloX\HelloX_Kernel\kernel\MEMMGR.C"
-"G:\HelloX\HelloX_Kernel\kernel\MODMGR.C"
-"G:\HelloX\HelloX_Kernel\kernel\OBJMGR.C"
-"G:\HelloX\HelloX_Kernel\kernel\OBJQUEUE.C"
-"G:\HelloX\HelloX_Kernel\kernel\PAGEIDX.C"
-"G:\HelloX\HelloX_Kernel\kernel\PCI_DRV.C"
-"G:\HelloX\HelloX_Kernel\kernel\PERF.C"
-"G:\HelloX\HelloX_Kernel\kernel\STATCPU.C"
-"G:\HelloX\HelloX_Kernel\kernel\SYNOBJ.C"
-"G:\HelloX\HelloX_Kernel\kernel\synobj2.c"
-"G:\HelloX\HelloX_Kernel\kernel\SYSCALL.C"
-"G:\HelloX\HelloX_Kernel\kernel\SYSTEM.C"
-"G:\HelloX\HelloX_Kernel\kernel\TYPES.C"
-"G:\HelloX\HelloX_Kernel\kernel\VMM.C"
-"G:\HelloX\HelloX_Kernel\network\api\api_lib.c"
-"G:\HelloX\HelloX_Kernel\network\api\api_msg.c"
-"G:\HelloX\HelloX_Kernel\network\core\autoip.c"
-"G:\HelloX\HelloX_Kernel\network\core\def.c"
-"G:\HelloX\HelloX_Kernel\network\core\dhcp.c"
-"G:\HelloX\HelloX_Kernel\network\core\dns.c"
-"G:\HelloX\HelloX_Kernel\network\api\err.c"
-"G:\HelloX\HelloX_Kernel\network\netif\etharp.c"
-"G:\HelloX\HelloX_Kernel\network\netif\ethernetif.c"
-"G:\HelloX\HelloX_Kernel\network\core\icmp.c"
-"G:\HelloX\HelloX_Kernel\network\core\igmp.c"
-"G:\HelloX\HelloX_Kernel\network\core\inet.c"
-"G:\HelloX\HelloX_Kernel\network\core\inet_chksum.c"
-"G:\HelloX\HelloX_Kernel\network\core\init.c"
-"G:\HelloX\HelloX_Kernel\network\core\ip.c"
-"G:\HelloX\HelloX_Kernel\network\core\ip_addr.c"
-"G:\HelloX\HelloX_Kernel\network\core\ip_frag.c"
-"G:\HelloX\HelloX_Kernel\network\core\mem.c"
-"G:\HelloX\HelloX_Kernel\network\core\memp.c"
-"G:\HelloX\HelloX_Kernel\network\api\netbuf.c"
-"G:\HelloX\HelloX_Kernel\network\api\netdb.c"
-"G:\HelloX\HelloX_Kernel\network\core\netif.c"
-"G:\HelloX\HelloX_Kernel\network\api\netifapi.c"
-"G:\HelloX\HelloX_Kernel\network\core\pbuf.c"
-"G:\HelloX\HelloX_Kernel\network\core\raw.c"
-"G:\HelloX\HelloX_Kernel\network\api\sockets.c"
-"G:\HelloX\HelloX_Kernel\network\core\stats.c"
-"G:\HelloX\HelloX_Kernel\network\core\sys.c"
-"G:\HelloX\HelloX_Kernel\network\arch\sys_arch.c"
-"G:\HelloX\HelloX_Kernel\network\core\tcp.c"
-"G:\HelloX\HelloX_Kernel\network\core\tcp_in.c"
-"G:\HelloX\HelloX_Kernel\network\core\tcp_out.c"
-"G:\HelloX\HelloX_Kernel\network\api\tcpip.c"
-"G:\HelloX\HelloX_Kernel\network\core\timers.c"
-"G:\HelloX\HelloX_Kernel\network\core\udp.c"
-"G:\HelloX\HelloX_Kernel\lib\atox.c"
+"E:\HelloX\HelloX_Kernel\drivers\x86\com.c"
+"E:\HelloX\HelloX_Kernel\drivers\x86\IDEBASE.C"
+"E:\HelloX\HelloX_Kernel\drivers\x86\IDEHD.C"
+"E:\HelloX\HelloX_Kernel\drivers\x86\KEYBRD.C"
+"E:\HelloX\HelloX_Kernel\drivers\x86\MOUSE.C"
+"E:\HelloX\HelloX_Kernel\lib\atox.c"
+"E:\HelloX\HelloX_Kernel\lib\stdio.c"
+"E:\HelloX\HelloX_Kernel\lib\string.c"
+"E:\HelloX\HelloX_Kernel\lib\sysmem.c"
+"E:\HelloX\HelloX_Kernel\kthread\idle.c"
+"E:\HelloX\HelloX_Kernel\kthread\logcat.c"
+"E:\HelloX\HelloX_Kernel\arch\x86\ARCH_X86.C"
+"E:\HelloX\HelloX_Kernel\arch\x86\BIOS.C"
+"E:\HelloX\HelloX_Kernel\arch\x86\HELLOCN.C"
+"E:\HelloX\HelloX_Kernel\fs\FAT32.C"
+"E:\HelloX\HelloX_Kernel\fs\FAT322.C"
+"E:\HelloX\HelloX_Kernel\fs\FATMGR.C"
+"E:\HelloX\HelloX_Kernel\fs\FATMGR2.C"
+"E:\HelloX\HelloX_Kernel\fs\FATSTR.C"
+"E:\HelloX\HelloX_Kernel\fs\fsstr.c"
+"E:\HelloX\HelloX_Kernel\fs\NTFS.C"
+"E:\HelloX\HelloX_Kernel\fs\NTFS2.C"
+"E:\HelloX\HelloX_Kernel\fs\NTFSDRV.C"
+"E:\HelloX\HelloX_Kernel\shell\EXTCMD.C"
+"E:\HelloX\HelloX_Kernel\shell\FDISK.C"
+"E:\HelloX\HelloX_Kernel\shell\FDISK2.C"
+"E:\HelloX\HelloX_Kernel\shell\FIBONACCI.C"
+"E:\HelloX\HelloX_Kernel\shell\FS.C"
+"E:\HelloX\HelloX_Kernel\shell\HEDIT.C"
+"E:\HelloX\HelloX_Kernel\shell\HYPERTRM.C"
+"E:\HelloX\HelloX_Kernel\shell\IOCTRL_S.C"
+"E:\HelloX\HelloX_Kernel\shell\network.c"
+"E:\HelloX\HelloX_Kernel\shell\network2.c"
+"E:\HelloX\HelloX_Kernel\shell\SHELL.C"
+"E:\HelloX\HelloX_Kernel\shell\SHELL1.C"
+"E:\HelloX\HelloX_Kernel\shell\STAT_S.C"
+"E:\HelloX\HelloX_Kernel\shell\SYSD_S.C"
+"E:\HelloX\HelloX_Kernel\osentry\DRVENTRY.C"
+"E:\HelloX\HelloX_Kernel\osentry\mem_scat.c"
+"E:\HelloX\HelloX_Kernel\osentry\OS_ENTRY.C"
+"E:\HelloX\HelloX_Kernel\kernel\COMQUEUE.C"
+"E:\HelloX\HelloX_Kernel\kernel\console.c"
+"E:\HelloX\HelloX_Kernel\kernel\debug.c"
+"E:\HelloX\HelloX_Kernel\kernel\DEVMGR.C"
+"E:\HelloX\HelloX_Kernel\kernel\DIM.C"
+"E:\HelloX\HelloX_Kernel\kernel\HEAP.C"
+"E:\HelloX\HelloX_Kernel\kernel\IOMGR.C"
+"E:\HelloX\HelloX_Kernel\kernel\IOMGR2.C"
+"E:\HelloX\HelloX_Kernel\kernel\KAPI.C"
+"E:\HelloX\HelloX_Kernel\kernel\KERMOD.C"
+"E:\HelloX\HelloX_Kernel\kernel\KMEMMGR.C"
+"E:\HelloX\HelloX_Kernel\kernel\KTMGR.C"
+"E:\HelloX\HelloX_Kernel\kernel\KTMGR2.C"
+"E:\HelloX\HelloX_Kernel\kernel\MEM_FBL.C"
+"E:\HelloX\HelloX_Kernel\kernel\MEMMGR.C"
+"E:\HelloX\HelloX_Kernel\kernel\MODMGR.C"
+"E:\HelloX\HelloX_Kernel\kernel\OBJMGR.C"
+"E:\HelloX\HelloX_Kernel\kernel\OBJQUEUE.C"
+"E:\HelloX\HelloX_Kernel\kernel\PAGEIDX.C"
+"E:\HelloX\HelloX_Kernel\kernel\PCI_DRV.C"
+"E:\HelloX\HelloX_Kernel\kernel\PERF.C"
+"E:\HelloX\HelloX_Kernel\kernel\STATCPU.C"
+"E:\HelloX\HelloX_Kernel\kernel\SYNOBJ.C"
+"E:\HelloX\HelloX_Kernel\kernel\synobj2.c"
+"E:\HelloX\HelloX_Kernel\kernel\SYSCALL.C"
+"E:\HelloX\HelloX_Kernel\kernel\SYSTEM.C"
+"E:\HelloX\HelloX_Kernel\kernel\TYPES.C"
+"E:\HelloX\HelloX_Kernel\kernel\VMM.C"
+"E:\HelloX\HelloX_Kernel\network\api\api_lib.c"
+"E:\HelloX\HelloX_Kernel\network\api\api_msg.c"
+"E:\HelloX\HelloX_Kernel\network\core\autoip.c"
+"E:\HelloX\HelloX_Kernel\network\core\def.c"
+"E:\HelloX\HelloX_Kernel\network\core\dhcp.c"
+"E:\HelloX\HelloX_Kernel\network\core\dns.c"
+"E:\HelloX\HelloX_Kernel\network\api\err.c"
+"E:\HelloX\HelloX_Kernel\network\netif\etharp.c"
+"E:\HelloX\HelloX_Kernel\network\netif\ethernetif.c"
+"E:\HelloX\HelloX_Kernel\network\nicdrv\ethif.c"
+"E:\HelloX\HelloX_Kernel\network\core\icmp.c"
+"E:\HelloX\HelloX_Kernel\network\core\igmp.c"
+"E:\HelloX\HelloX_Kernel\network\core\inet.c"
+"E:\HelloX\HelloX_Kernel\network\core\inet_chksum.c"
+"E:\HelloX\HelloX_Kernel\network\core\init.c"
+"E:\HelloX\HelloX_Kernel\network\core\ip.c"
+"E:\HelloX\HelloX_Kernel\network\core\ip_addr.c"
+"E:\HelloX\HelloX_Kernel\network\core\ip_frag.c"
+"E:\HelloX\HelloX_Kernel\network\core\mem.c"
+"E:\HelloX\HelloX_Kernel\network\core\memp.c"
+"E:\HelloX\HelloX_Kernel\network\api\netbuf.c"
+"E:\HelloX\HelloX_Kernel\network\api\netdb.c"
+"E:\HelloX\HelloX_Kernel\network\core\netif.c"
+"E:\HelloX\HelloX_Kernel\network\api\netifapi.c"
+"E:\HelloX\HelloX_Kernel\network\core\pbuf.c"
+"E:\HelloX\HelloX_Kernel\network\core\raw.c"
+"E:\HelloX\HelloX_Kernel\network\api\sockets.c"
+"E:\HelloX\HelloX_Kernel\network\core\stats.c"
+"E:\HelloX\HelloX_Kernel\network\core\sys.c"
+"E:\HelloX\HelloX_Kernel\network\arch\sys_arch.c"
+"E:\HelloX\HelloX_Kernel\network\core\tcp.c"
+"E:\HelloX\HelloX_Kernel\network\core\tcp_in.c"
+"E:\HelloX\HelloX_Kernel\network\core\tcp_out.c"
+"E:\HelloX\HelloX_Kernel\network\api\tcpip.c"
+"E:\HelloX\HelloX_Kernel\network\core\timers.c"
+"E:\HelloX\HelloX_Kernel\network\core\udp.c"
 ]
-Creating command line "cl.exe @C:\Users\ADMINI~1\AppData\Local\Temp\RSP4161.tmp" 
-Creating temporary file "C:\Users\ADMINI~1\AppData\Local\Temp\RSP4162.tmp" with contents
+Creating command line "cl.exe @C:\Users\garry\AppData\Local\Temp\RSP9898.tmp" 
+Creating temporary file "C:\Users\garry\AppData\Local\Temp\RSP9899.tmp" with contents
 [
-libcmt.lib /nologo /base:"0x110000" /entry:"__OS_Entry" /dll /incremental:no /pdb:"Release/master.pdb" /map:"Release/master.map" /machine:I386 /out:"Release/master.dll" /implib:"Release/master.lib" /ALIGN:16 
+libcmt.lib /nologo /base:"0x110000" /entry:"__OS_Entry" /dll /incremental:no /pdb:"Release/master.pdb" /map:"Release/master.map" /machine:I386 /nodefaultlib /out:"Release/master.dll" /implib:"Release/master.lib" /ALIGN:16 
 .\Release\com.obj
 .\Release\IDEBASE.OBJ
 .\Release\IDEHD.OBJ
 .\Release\KEYBRD.OBJ
 .\Release\MOUSE.OBJ
+.\Release\atox.obj
 .\Release\stdio.obj
 .\Release\string.obj
 .\Release\sysmem.obj
@@ -193,6 +195,7 @@ libcmt.lib /nologo /base:"0x110000" /entry:"__OS_Entry" /dll /incremental:no /pd
 .\Release\err.obj
 .\Release\etharp.obj
 .\Release\ethernetif.obj
+.\Release\ethif.obj
 .\Release\icmp.obj
 .\Release\igmp.obj
 .\Release\inet.obj
@@ -219,32 +222,32 @@ libcmt.lib /nologo /base:"0x110000" /entry:"__OS_Entry" /dll /incremental:no /pd
 .\Release\tcpip.obj
 .\Release\timers.obj
 .\Release\udp.obj
-.\Release\atox.obj
 ]
-Creating command line "link.exe @C:\Users\ADMINI~1\AppData\Local\Temp\RSP4162.tmp"
+Creating command line "link.exe @C:\Users\garry\AppData\Local\Temp\RSP9899.tmp"
 <h3>Output Window</h3>
 Compiling...
 com.c
 IDEBASE.C
-G:\HelloX\HelloX_Kernel\drivers\x86\com.c(47) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\drivers\x86\com.c(49) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\drivers\x86\com.c(50) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\drivers\x86\com.c(51) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\drivers\x86\com.c(54) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\drivers\x86\com.c(58) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\drivers\x86\com.c(184) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\drivers\x86\com.c(189) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\drivers\x86\com.c(194) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\drivers\x86\com.c(98) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\drivers\x86\com.c(109) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\drivers\x86\com.c(137) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\drivers\x86\com.c(154) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\drivers\x86\com.c(168) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\drivers\x86\com.c(407) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\drivers\x86\com.c(321) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\drivers\x86\com.c(47) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\drivers\x86\com.c(49) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\drivers\x86\com.c(50) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\drivers\x86\com.c(51) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\drivers\x86\com.c(54) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\drivers\x86\com.c(58) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\drivers\x86\com.c(184) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\drivers\x86\com.c(189) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\drivers\x86\com.c(194) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\drivers\x86\com.c(98) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\drivers\x86\com.c(109) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\drivers\x86\com.c(137) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\drivers\x86\com.c(154) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\drivers\x86\com.c(168) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\drivers\x86\com.c(407) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\drivers\x86\com.c(321) : warning C4761: integral size mismatch in argument; conversion supplied
 IDEHD.C
 KEYBRD.C
 MOUSE.C
+atox.c
 stdio.c
 string.c
 sysmem.c
@@ -263,6 +266,10 @@ NTFS.C
 NTFS2.C
 NTFSDRV.C
 EXTCMD.C
+.\include\lwip/ip_addr.h(51) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(59) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(72) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(80) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
 FDISK.C
 FDISK2.C
 FIBONACCI.C
@@ -270,21 +277,33 @@ FS.C
 HEDIT.C
 HYPERTRM.C
 IOCTRL_S.C
-G:\HelloX\HelloX_Kernel\shell\HYPERTRM.C(38) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\shell\HYPERTRM.C(40) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\shell\HYPERTRM.C(41) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\shell\HYPERTRM.C(42) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\shell\HYPERTRM.C(55) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\shell\HYPERTRM.C(76) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\shell\HYPERTRM.C(289) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\shell\HYPERTRM.C(291) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\shell\HYPERTRM.C(292) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\shell\HYPERTRM.C(294) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\shell\HYPERTRM.C(295) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\shell\HYPERTRM.C(391) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\shell\HYPERTRM.C(396) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\shell\HYPERTRM.C(38) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\shell\HYPERTRM.C(40) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\shell\HYPERTRM.C(41) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\shell\HYPERTRM.C(42) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\shell\HYPERTRM.C(55) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\shell\HYPERTRM.C(76) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\shell\HYPERTRM.C(289) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\shell\HYPERTRM.C(291) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\shell\HYPERTRM.C(292) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\shell\HYPERTRM.C(294) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\shell\HYPERTRM.C(295) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\shell\HYPERTRM.C(391) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\shell\HYPERTRM.C(396) : warning C4761: integral size mismatch in argument; conversion supplied
 network.c
+.\include\lwip/ip_addr.h(51) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(59) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(72) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(80) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
 network2.c
+.\include\lwip/ip_addr.h(51) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(59) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(72) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(80) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(113) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(141) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/icmp.h(71) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
+.\include\lwip/icmp.h(88) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
 SHELL.C
 SHELL1.C
 STAT_S.C
@@ -321,65 +340,305 @@ SYSTEM.C
 TYPES.C
 VMM.C
 api_lib.c
+.\include\lwip/ip_addr.h(51) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(59) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(72) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(80) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(113) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(141) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/udp.h(52) : warning C4103: '.\include\lwip/udp.h' : used #pragma pack to change alignment
+.\include\lwip/udp.h(63) : warning C4103: '.\include\lwip/udp.h' : used #pragma pack to change alignment
+.\include\lwip/icmp.h(71) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
+.\include\lwip/icmp.h(88) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
 api_msg.c
-G:\HelloX\HelloX_Kernel\network\api\api_lib.c(664) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\network\api\api_lib.c(664) : warning C4761: integral size mismatch in argument; conversion supplied
+.\include\lwip/ip_addr.h(51) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(59) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(72) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(80) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(113) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(141) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/udp.h(52) : warning C4103: '.\include\lwip/udp.h' : used #pragma pack to change alignment
+.\include\lwip/udp.h(63) : warning C4103: '.\include\lwip/udp.h' : used #pragma pack to change alignment
+.\include\lwip/icmp.h(71) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
+.\include\lwip/icmp.h(88) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
 autoip.c
 def.c
 dhcp.c
 dns.c
 err.c
 etharp.c
+.\include\lwip/ip_addr.h(51) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(59) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(72) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(80) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(113) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(141) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(56) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(64) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(68) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(82) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(111) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(128) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
 ethernetif.c
-G:\HelloX\HelloX_Kernel\network\netif\etharp.c(1277) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\network\netif\etharp.c(742) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\network\netif\etharp.c(1277) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\network\netif\etharp.c(742) : warning C4761: integral size mismatch in argument; conversion supplied
+ethif.c
+.\include\lwip/ip_addr.h(51) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(59) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(72) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(80) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(113) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(141) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(56) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(64) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(68) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(82) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(111) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(128) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
 icmp.c
+.\include\lwip/ip_addr.h(51) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(59) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(72) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(80) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/icmp.h(71) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
+.\include\lwip/icmp.h(88) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(113) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(141) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
 igmp.c
-G:\HelloX\HelloX_Kernel\network\core\icmp.c(93) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\network\core\icmp.c(170) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\network\core\icmp.c(259) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\network\core\icmp.c(273) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\network\core\icmp.c(93) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\network\core\icmp.c(170) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\network\core\icmp.c(259) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\network\core\icmp.c(273) : warning C4761: integral size mismatch in argument; conversion supplied
 inet.c
+.\include\lwip/ip_addr.h(51) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(59) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(72) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(80) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
 inet_chksum.c
+.\include\lwip/ip_addr.h(51) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(59) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(72) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(80) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
 init.c
+.\include\lwip/ip_addr.h(51) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(59) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(72) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(80) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(113) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(141) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/udp.h(52) : warning C4103: '.\include\lwip/udp.h' : used #pragma pack to change alignment
+.\include\lwip/udp.h(63) : warning C4103: '.\include\lwip/udp.h' : used #pragma pack to change alignment
+.\include\lwip/icmp.h(71) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
+.\include\lwip/icmp.h(88) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
+.\include\lwip/tcp_impl.h(155) : warning C4103: '.\include\lwip/tcp_impl.h' : used #pragma pack to change alignment
+.\include\lwip/tcp_impl.h(170) : warning C4103: '.\include\lwip/tcp_impl.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(56) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(64) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(68) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(82) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(111) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(128) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
 ip.c
-G:\HelloX\HelloX_Kernel\network\core\ip.c(688) : warning C4244: '=' : conversion from 'unsigned long ' to 'unsigned short ', possible loss of data
+.\include\lwip/ip_addr.h(51) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(59) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(72) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(80) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(113) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(141) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/icmp.h(71) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
+.\include\lwip/icmp.h(88) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
+.\include\lwip/udp.h(52) : warning C4103: '.\include\lwip/udp.h' : used #pragma pack to change alignment
+.\include\lwip/udp.h(63) : warning C4103: '.\include\lwip/udp.h' : used #pragma pack to change alignment
+.\include\lwip/tcp_impl.h(155) : warning C4103: '.\include\lwip/tcp_impl.h' : used #pragma pack to change alignment
+.\include\lwip/tcp_impl.h(170) : warning C4103: '.\include\lwip/tcp_impl.h' : used #pragma pack to change alignment
+E:\HelloX\HelloX_Kernel\network\core\ip.c(688) : warning C4244: '=' : conversion from 'unsigned long ' to 'unsigned short ', possible loss of data
 ip_addr.c
-G:\HelloX\HelloX_Kernel\network\core\ip.c(660) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\network\core\ip.c(660) : warning C4761: integral size mismatch in argument; conversion supplied
+.\include\lwip/ip_addr.h(51) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(59) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(72) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(80) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
 ip_frag.c
+.\include\lwip/ip_addr.h(51) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(59) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(72) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(80) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(113) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(141) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/icmp.h(71) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
+.\include\lwip/icmp.h(88) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
+E:\HelloX\HelloX_Kernel\network\core\ip_frag.c(89) : warning C4103: 'E:\HelloX\HelloX_Kernel\network\core\ip_frag.c' : used #pragma pack to change alignment
+E:\HelloX\HelloX_Kernel\network\core\ip_frag.c(99) : warning C4103: 'E:\HelloX\HelloX_Kernel\network\core\ip_frag.c' : used #pragma pack to change alignment
 mem.c
-G:\HelloX\HelloX_Kernel\network\core\ip_frag.c(812) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\network\core\ip_frag.c(812) : warning C4761: integral size mismatch in argument; conversion supplied
 memp.c
+.\include\lwip/ip_addr.h(51) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(59) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(72) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(80) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(113) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(141) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/udp.h(52) : warning C4103: '.\include\lwip/udp.h' : used #pragma pack to change alignment
+.\include\lwip/udp.h(63) : warning C4103: '.\include\lwip/udp.h' : used #pragma pack to change alignment
+.\include\lwip/icmp.h(71) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
+.\include\lwip/icmp.h(88) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
+.\include\lwip/tcp_impl.h(155) : warning C4103: '.\include\lwip/tcp_impl.h' : used #pragma pack to change alignment
+.\include\lwip/tcp_impl.h(170) : warning C4103: '.\include\lwip/tcp_impl.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(56) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(64) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(68) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(82) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(111) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(128) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
 netbuf.c
+.\include\lwip/ip_addr.h(51) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(59) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(72) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(80) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
 netdb.c
 netif.c
+.\include\lwip/ip_addr.h(51) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(59) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(72) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(80) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(113) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(141) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/icmp.h(71) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
+.\include\lwip/icmp.h(88) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
+.\include\lwip/tcp_impl.h(155) : warning C4103: '.\include\lwip/tcp_impl.h' : used #pragma pack to change alignment
+.\include\lwip/tcp_impl.h(170) : warning C4103: '.\include\lwip/tcp_impl.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(56) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(64) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(68) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(82) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(111) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(128) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
 netifapi.c
 pbuf.c
+.\include\lwip/ip_addr.h(51) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(59) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(72) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(80) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(113) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(141) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/icmp.h(71) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
+.\include\lwip/icmp.h(88) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
+.\include\lwip/tcp_impl.h(155) : warning C4103: '.\include\lwip/tcp_impl.h' : used #pragma pack to change alignment
+.\include\lwip/tcp_impl.h(170) : warning C4103: '.\include\lwip/tcp_impl.h' : used #pragma pack to change alignment
 raw.c
-G:\HelloX\HelloX_Kernel\network\core\pbuf.c(1095) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\network\core\pbuf.c(1095) : warning C4761: integral size mismatch in argument; conversion supplied
+.\include\lwip/ip_addr.h(51) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(59) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(72) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(80) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(113) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(141) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
 sockets.c
+.\include\lwip/ip_addr.h(51) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(59) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(72) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(80) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(113) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(141) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/icmp.h(71) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
+.\include\lwip/icmp.h(88) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
+.\include\lwip/udp.h(52) : warning C4103: '.\include\lwip/udp.h' : used #pragma pack to change alignment
+.\include\lwip/udp.h(63) : warning C4103: '.\include\lwip/udp.h' : used #pragma pack to change alignment
 stats.c
 sys.c
 sys_arch.c
+.\include\lwip/ip_addr.h(51) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(59) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(72) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(80) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
 tcp.c
+.\include\lwip/ip_addr.h(51) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(59) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(72) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(80) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(113) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(141) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/icmp.h(71) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
+.\include\lwip/icmp.h(88) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
+.\include\lwip/tcp_impl.h(155) : warning C4103: '.\include\lwip/tcp_impl.h' : used #pragma pack to change alignment
+.\include\lwip/tcp_impl.h(170) : warning C4103: '.\include\lwip/tcp_impl.h' : used #pragma pack to change alignment
 tcp_in.c
-G:\HelloX\HelloX_Kernel\network\core\tcp_in.c(1450) : warning C4244: '=' : conversion from 'unsigned long ' to 'unsigned short ', possible loss of data
+.\include\lwip/ip_addr.h(51) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(59) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(72) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(80) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(113) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(141) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/icmp.h(71) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
+.\include\lwip/icmp.h(88) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
+.\include\lwip/tcp_impl.h(155) : warning C4103: '.\include\lwip/tcp_impl.h' : used #pragma pack to change alignment
+.\include\lwip/tcp_impl.h(170) : warning C4103: '.\include\lwip/tcp_impl.h' : used #pragma pack to change alignment
+E:\HelloX\HelloX_Kernel\network\core\tcp_in.c(1450) : warning C4244: '=' : conversion from 'unsigned long ' to 'unsigned short ', possible loss of data
 tcp_out.c
-G:\HelloX\HelloX_Kernel\network\core\tcp_in.c(116) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\network\core\tcp_in.c(157) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\network\core\tcp_in.c(1201) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\network\core\tcp_in.c(1447) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\network\core\tcp_in.c(116) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\network\core\tcp_in.c(157) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\network\core\tcp_in.c(1201) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\network\core\tcp_in.c(1447) : warning C4761: integral size mismatch in argument; conversion supplied
+.\include\lwip/ip_addr.h(51) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(59) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(72) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(80) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(113) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(141) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/icmp.h(71) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
+.\include\lwip/icmp.h(88) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
+.\include\lwip/tcp_impl.h(155) : warning C4103: '.\include\lwip/tcp_impl.h' : used #pragma pack to change alignment
+.\include\lwip/tcp_impl.h(170) : warning C4103: '.\include\lwip/tcp_impl.h' : used #pragma pack to change alignment
 tcpip.c
-G:\HelloX\HelloX_Kernel\network\core\tcp_out.c(530) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\network\core\tcp_out.c(530) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\network\core\tcp_out.c(193) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\network\core\tcp_out.c(96) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\network\core\tcp_out.c(105) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\network\core\tcp_out.c(1445) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\network\core\tcp_out.c(530) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\network\core\tcp_out.c(530) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\network\core\tcp_out.c(193) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\network\core\tcp_out.c(96) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\network\core\tcp_out.c(105) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\network\core\tcp_out.c(1445) : warning C4761: integral size mismatch in argument; conversion supplied
+.\include\lwip/ip_addr.h(51) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(59) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(72) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(80) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(113) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(141) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(56) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(64) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(68) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(82) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(111) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(128) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
 timers.c
+.\include\lwip/ip_addr.h(51) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(59) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(72) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(80) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(113) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(141) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/icmp.h(71) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
+.\include\lwip/icmp.h(88) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
+.\include\lwip/tcp_impl.h(155) : warning C4103: '.\include\lwip/tcp_impl.h' : used #pragma pack to change alignment
+.\include\lwip/tcp_impl.h(170) : warning C4103: '.\include\lwip/tcp_impl.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(56) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(64) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(68) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(82) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(111) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
+.\include\netif/etharp.h(128) : warning C4103: '.\include\netif/etharp.h' : used #pragma pack to change alignment
 udp.c
-atox.c
-G:\HelloX\HelloX_Kernel\network\core\udp.c(102) : warning C4761: integral size mismatch in argument; conversion supplied
-G:\HelloX\HelloX_Kernel\network\core\udp.c(345) : warning C4761: integral size mismatch in argument; conversion supplied
+.\include\lwip/ip_addr.h(51) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(59) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(72) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip_addr.h(80) : warning C4103: '.\include\lwip/ip_addr.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(113) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/ip.h(141) : warning C4103: '.\include\lwip/ip.h' : used #pragma pack to change alignment
+.\include\lwip/udp.h(52) : warning C4103: '.\include\lwip/udp.h' : used #pragma pack to change alignment
+.\include\lwip/udp.h(63) : warning C4103: '.\include\lwip/udp.h' : used #pragma pack to change alignment
+.\include\lwip/icmp.h(71) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
+.\include\lwip/icmp.h(88) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
+E:\HelloX\HelloX_Kernel\network\core\udp.c(102) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\network\core\udp.c(345) : warning C4761: integral size mismatch in argument; conversion supplied
 Linking...
 LINK : warning LNK4108: /ALIGN specified without /DRIVER or /VXD; image may not run
 Release/master.dll : warning LNK4086: entrypoint "___OS_Entry" is not __stdcall with 12 bytes of arguments; image may not run
@@ -388,7 +647,7 @@ LINK : warning LNK4096: /BASE value "110000" is invalid for Windows 95; image ma
 
 
 <h3>Results</h3>
-master.dll - 0 error(s), 56 warning(s)
+master.dll - 0 error(s), 312 warning(s)
 </pre>
 </body>
 </html>
