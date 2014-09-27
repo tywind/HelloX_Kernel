@@ -236,6 +236,9 @@ typedef struct tag__DRIVER_OBJECT{
     DWORD          (*DeviceWrite)(__COMMON_OBJECT*  lpDrv,   //Write routine.
 		                          __COMMON_OBJECT*  lpDev,
 								  __DRCB*           lpDrcb);
+	DWORD          (*DeviceSize)(__COMMON_OBJECT*   lpDrv,
+		                         __COMMON_OBJECT*   lpDev,
+		                         __DRCB*            lpDrcb);
 
 	DWORD          (*DeviceCtrl)(__COMMON_OBJECT*  lpDrv,
 		                         __COMMON_OBJECT*  lpDev,
