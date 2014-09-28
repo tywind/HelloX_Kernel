@@ -191,7 +191,12 @@ DWORD FatDeviceWrite(__COMMON_OBJECT* lpDrv,
 		}
 		//Adjust file object's status.
 		pFat32File->dwClusOffset += dwOnceSize;
-		pFat32File->dwFileSize   += dwOnceSize;
+
+		//2014.9.28 modified by tywind
+		if(pFat32File->dwCurrPos >= pFat32File->dwFileSize)
+		{
+			pFat32File->dwFileSize = pFat32File->dwCurrPos;
+		}
 
 		if(0 == (pFat32File->dwClusOffset % pFat32Fs->dwClusterSize))
 		{

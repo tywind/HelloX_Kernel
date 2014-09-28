@@ -854,7 +854,7 @@ static DWORD FatDeviceSeek(__COMMON_OBJECT* lpDrv,
 		//是否溢出
 		if(pFatFile->dwCurrPos >= pFatFile->dwFileSize)
 		{
-			pFatFile->dwCurrPos = pFatFile->dwFileSize-1;		
+			pFatFile->dwCurrPos = pFatFile->dwFileSize;		
 		}
 
 		//得到 Cluster 个数
