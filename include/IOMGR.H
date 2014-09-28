@@ -171,6 +171,7 @@ VOID DrcbUninitialize(__COMMON_OBJECT*);
 #define DRCB_REQUEST_MODE_CREATE      0x00000040        //Create operations.
 #define DRCB_REQUEST_MODE_DESTROY     0x00000080        //Destroy operations.
 #define DRCB_REQUEST_MODE_IOCTRL      0x00000100        //IOControl operations.
+#define DRCB_REQUEST_MODE_SIZE        0x00000200        //GetFileSize
 
 //
 //The following definitions are used to indicate the appropriate I/O control command.
