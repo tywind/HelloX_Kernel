@@ -20,12 +20,15 @@
 //***********************************************************************/
 
 #ifndef __STDAFX_H__
-#include "StdAfx.h"
+#include "..\INCLUDE\StdAfx.h"
 #endif
 
-#include "idebase.h"
-#include "stdio.h"
+#ifndef __IDEBASE_H__
+#include "IDEBASE.H"
+#endif
+
 #include "..\arch\x86\BIOS.H"
+#include "..\lib\stdio.h"
 
 /*
 BOOL ReadHDSector(LPVOID lpBuffer,
@@ -214,7 +217,7 @@ BOOL ReadSector(int nHdNum,DWORD dwStartSector,DWORD dwSectorNum,BYTE* pBuffer)
 	return FALSE;
 #endif
 
-	if((nHdNum > 1) || (NULL == pBuffer) || (0 == dwSectorNum))
+	/*if((nHdNum > 1) || (NULL == pBuffer) || (0 == dwSectorNum))
 	{
 		return FALSE;
 	}
@@ -266,16 +269,22 @@ BOOL ReadSector(int nHdNum,DWORD dwStartSector,DWORD dwSectorNum,BYTE* pBuffer)
 		return TRUE;
 	}
 	tmp = __inb(0x1f2);
-	_hx_sprintf(Buffer,"The error number is : %d",tmp);
+	sprintf(Buffer,"The error number is : %d",tmp);
 	PrintLine(Buffer);
-	return FALSE;
+	return FALSE;*/
 }
 
 //Write one or several sector(s) from a specified hard disk.
 //Please make sure the pBuffer is long enough to contain the sectors write.
 BOOL WriteSector(int nHdNum,DWORD dwStartSector,DWORD dwSectorNum,BYTE* pBuffer)
 {
-	BYTE        DrvHdr  = (BYTE)IDE_DRV0_LBA;
+#ifdef __I386__
+	return BIOSWriteSector(nHdNum,dwStartSector,dwSectorNum,pBuffer);
+#else
+	return FALSE;
+#endif
+
+	/*BYTE        DrvHdr  = (BYTE)IDE_DRV0_LBA;
 	BYTE        LbaLow;
 	BYTE        LbaMid;
 	BYTE        LbaHigh;
@@ -325,7 +334,7 @@ BOOL WriteSector(int nHdNum,DWORD dwStartSector,DWORD dwSectorNum,BYTE* pBuffer)
 	//Wait for completion.
 	WaitForBsy(IDE_CTRL0_PORT_STATUS,0);
 	WaitForRdy(IDE_CTRL0_PORT_STATUS,0);
-	return TRUE;
+	return TRUE;*/
 }
 
 //Issue the IDENTIFY command and return the result.

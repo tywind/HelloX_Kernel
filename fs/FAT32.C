@@ -815,7 +815,82 @@ static DWORD FatDeviceSeek(__COMMON_OBJECT* lpDrv,
 		                   __COMMON_OBJECT* lpDev,
 						   __DRCB* lpDrcb)
 {
-	return 0;
+	__FAT32_FILE*    pFatFile  = NULL;
+	DWORD	         dwSeekRet = FALSE;
+
+	if((NULL == lpDrv) || (NULL == lpDev) || (NULL == lpDrcb))
+	{
+		return dwSeekRet;
+	}
+
+	pFatFile = (__FAT32_FILE*)(((__DEVICE_OBJECT*)lpDev)->lpDevExtension);
+	if( NULL != pFatFile)
+	{
+		__FAT32_FS* pFatFs       = pFatFile->pFileSystem;
+		DWORD       dwWhereBegin = (DWORD)lpDrcb->lpInputBuffer;//((DWORD*)lpDrcb->lpInputBuffer);
+		DWORD       dwOffsetPos  = *((DWORD*)lpDrcb->dwExtraParam1);
+		DWORD       dwClusterNum = 0;		
+		DWORD       i            = 0;
+
+
+		switch(dwWhereBegin)
+		{
+		case FILE_FROM_BEGIN:
+			{
+				pFatFile->dwCurrPos = dwOffsetPos;
+			}
+			break;
+		case FILE_FROM_CURRENT:
+			{			
+				pFatFile->dwCurrPos += dwOffsetPos;				
+			}
+			break;
+		default:
+			{
+				return dwSeekRet;
+			}
+		}
+
+		//是否溢出
+		if(pFatFile->dwCurrPos >= pFatFile->dwFileSize)
+		{
+			pFatFile->dwCurrPos = pFatFile->dwFileSize;		
+		}
+
+		//得到 Cluster 个数
+		if(pFatFile->dwCurrPos < pFatFs->dwClusterSize )
+		{
+			dwClusterNum = 1;
+		}
+		else{
+			dwClusterNum = pFatFile->dwCurrPos/pFatFs->dwClusterSize;
+			if(pFatFile->dwCurrPos%pFatFs->dwClusterSize)
+			{
+				dwClusterNum ++;
+			}
+		}	
+
+		//根据Cluster个数 计算出 文件Cluster 实际位置
+		pFatFile->dwCurrClusNum = pFatFile->dwStartClusNum;
+		for(i=0; i< (dwClusterNum-1); i++)
+		{
+			DWORD dwNextNum = pFatFile->dwCurrClusNum;
+
+			if(!GetNextCluster(pFatFs,&dwNextNum))
+			{
+				return dwSeekRet;
+			}
+
+			pFatFile->dwCurrClusNum = dwNextNum;
+		}
+
+		//计算 Cluster 内偏移
+		pFatFile->dwClusOffset = pFatFile->dwCurrPos % pFatFs->dwClusterSize;
+		dwSeekRet = TRUE;
+	}
+
+	return dwSeekRet;	
+
 }
 
 //Implementation of DeviceCtrl routine.
@@ -921,6 +996,7 @@ BOOL FatDriverEntry(__DRIVER_OBJECT* lpDriverObject)
 	lpDriverObject->DeviceSeek    = FatDeviceSeek;
 	lpDriverObject->DeviceWrite   = FatDeviceWrite;
 	lpDriverObject->DeviceCreate  = FatDeviceCreate;
+	lpDriverObject->DeviceSize    = FatDeviceSize;
 
 	//Create FAT file system driver object now.
 	pFatObject = IOManager.CreateDevice((__COMMON_OBJECT*)&IOManager,
