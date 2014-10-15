@@ -108,6 +108,11 @@
 #include "iomgr.h"
 #endif
 
+#ifndef __DPMGR_H__
+#include "dpmgr.h"
+#endif
+
+
 #ifndef __BUFFMGR_H__
 #include "buffmgr.h"
 #endif

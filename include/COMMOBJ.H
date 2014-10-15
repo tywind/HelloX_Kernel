@@ -170,6 +170,7 @@ extern __OBJECT_MANAGER ObjectManager;
 #define OBJECT_TYPE_VIRTUAL_MEMORY_MANAGER  0x00000019
 #define OBJECT_TYPE_COMMON_QUEUE            0x0000001A
 #define OBJECT_TYPE_RING_BUFFER             0x0000001B
+#define OBJECT_TYPE_DISPLAY                 0x0000001C
 
 // Please define your object type here,and increment the type value.
 //The maximal object type value should not exceed 63.

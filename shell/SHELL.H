@@ -33,10 +33,19 @@ typedef struct{
 	__CMD_HANDLER  CmdHandler;           //Command handler.
 } __CMD_OBJ;
 
+typedef struct HIS_CMD_OBJ
+{
+	CHAR    CmdStr[64];  //Command text.
+
+} HIS_CMD_OBJ;
+
 
 #define CMD_PARAMETER_LEN 31            //The max length of one parameter.
 
-//
+#define CMD_MAX_LEN       64            //The max length of one command input. 
+
+#define HISCMD_MAX_COUNT  16             //The max Count of one history command . 
+
 //Command paramter object,countains the parameters and function labels of one
 //command.
 //
@@ -66,5 +75,12 @@ VOID ReleaseParameterObj(__CMD_PARA_OBJ* lpParamObj);
 
 //Text mode shell's entry point.
 DWORD ShellEntryPoint(LPVOID pData);
+
+typedef VOID* HISOBJ;
+//history command routine;
+HISOBJ His_CreateHisObj(INT nHisCount);
+VOID   His_DeleteHisObj(HISOBJ hHisObj);
+BOOL   His_SaveCmd(HISOBJ hHisObj,LPCSTR pCmdStr);
+BOOL   His_LoadHisCmd(HISOBJ hHisObj,BOOL bUp,LPSTR pCmdBuf,INT nBufLen);
 
 #endif //shell.h

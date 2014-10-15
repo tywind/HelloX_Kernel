@@ -42,6 +42,9 @@ extern "C" {
                                         //it sends this message to the task.
 #define MSG_TIMER               0x000a  //Time message.
 
+#define MSG_VK_KEY_DOWN         0x0010  //
+#define MSG_VK_KEY_UP           0x0011  //
+
 //User defined messages can be append here,please note
 //the message value should begin from 0x0100.
 #define MSG_USER_START          0x0100

@@ -383,6 +383,18 @@
     <ClCompile Include="network\core\udp.c">
       <Filter>Source Files\network</Filter>
     </ClCompile>
+    <ClCompile Include="dispaly\BIOSVGA.C">
+      <Filter>Source Files\drivers</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\CharDisplay .C">
+      <Filter>Source Files\kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\DPMGR.C">
+      <Filter>Source Files\kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="shell\HISCMD .C">
+      <Filter>Source Files\shell</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\arch\bpstruct.h">
@@ -597,6 +609,15 @@
     </ClInclude>
     <ClInclude Include="include\arch\sys_arch.h">
       <Filter>Header Files\nethdr</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CharDisplay.H">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DPMGR.H">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="dispaly\BIOSVGA.H">
+      <Filter>Header Files\drv_hdr</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
