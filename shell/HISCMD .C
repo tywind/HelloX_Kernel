@@ -64,7 +64,6 @@ BOOL His_SaveCmd(HISOBJ hHisObj,LPCSTR pCmdStr)
 	HISTORY_CMD_INFO*  pHisInfo = (HISTORY_CMD_INFO*)hHisObj;
 	INT           nEndHisIndex  = 0;//HISCMD_MAX_COUNT-1;
 
-
 	if(NULL == pHisInfo)
 	{
 		return FALSE;
@@ -104,7 +103,6 @@ BOOL His_LoadHisCmd(HISOBJ hHisObj,BOOL bUp,LPSTR pCmdBuf,INT nBufLen)
 	HISTORY_CMD_INFO*  pHisInfo = (HISTORY_CMD_INFO*)hHisObj;	
 	INT                nInc     = 0;
 
-
 	if(NULL == pHisInfo)
 	{
 		return FALSE;
@@ -136,5 +134,5 @@ BOOL His_LoadHisCmd(HISOBJ hHisObj,BOOL bUp,LPSTR pCmdBuf,INT nBufLen)
 	CD_SetCursorPos(SHELL_INPUT_START_X,CursorY);
 	CD_DelString(SHELL_INPUT_START_X,CursorY,CMD_MAX_LEN);
 	CD_PrintString(s_szHisCmdArry[s_nExecHisIndex].CmdStr,FALSE);*/
-
 }
+

@@ -6,7 +6,7 @@
 --------------------Configuration: master - Win32 Release--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating temporary file "C:\Users\garry\AppData\Local\Temp\RSP9898.tmp" with contents
+Creating temporary file "C:\Users\garry\AppData\Local\Temp\RSPEC0C.tmp" with contents
 [
 /nologo /MT /W3 /GX /O1 /I ".\include" /I ".\arch\x86" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "MASTER_EXPORTS" /Fp"Release/master.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
 "E:\HelloX\HelloX_Kernel\drivers\x86\com.c"
@@ -113,11 +113,15 @@ Creating temporary file "C:\Users\garry\AppData\Local\Temp\RSP9898.tmp" with con
 "E:\HelloX\HelloX_Kernel\network\api\tcpip.c"
 "E:\HelloX\HelloX_Kernel\network\core\timers.c"
 "E:\HelloX\HelloX_Kernel\network\core\udp.c"
+"E:\HelloX\HelloX_Kernel\kernel\DPMGR.C"
+"E:\HelloX\HelloX_Kernel\kernel\CharDisplay .C"
+"E:\HelloX\HelloX_Kernel\shell\HISCMD .C"
+"E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C"
 ]
-Creating command line "cl.exe @C:\Users\garry\AppData\Local\Temp\RSP9898.tmp" 
-Creating temporary file "C:\Users\garry\AppData\Local\Temp\RSP9899.tmp" with contents
+Creating command line "cl.exe @C:\Users\garry\AppData\Local\Temp\RSPEC0C.tmp" 
+Creating temporary file "C:\Users\garry\AppData\Local\Temp\RSPEC0D.tmp" with contents
 [
-libcmt.lib /nologo /base:"0x110000" /entry:"__OS_Entry" /dll /incremental:no /pdb:"Release/master.pdb" /map:"Release/master.map" /machine:I386 /nodefaultlib /out:"Release/master.dll" /implib:"Release/master.lib" /ALIGN:16 
+/nologo /base:"0x110000" /entry:"__OS_Entry" /dll /incremental:no /pdb:"Release/master.pdb" /map:"Release/master.map" /machine:I386 /nodefaultlib /out:"Release/master.dll" /implib:"Release/master.lib" /ALIGN:16 
 .\Release\com.obj
 .\Release\IDEBASE.OBJ
 .\Release\IDEHD.OBJ
@@ -222,8 +226,12 @@ libcmt.lib /nologo /base:"0x110000" /entry:"__OS_Entry" /dll /incremental:no /pd
 .\Release\tcpip.obj
 .\Release\timers.obj
 .\Release\udp.obj
+.\Release\DPMGR.OBJ
+".\Release\CharDisplay .obj"
+".\Release\HISCMD .OBJ"
+.\Release\BIOSVGA.OBJ
 ]
-Creating command line "link.exe @C:\Users\garry\AppData\Local\Temp\RSP9899.tmp"
+Creating command line "link.exe @C:\Users\garry\AppData\Local\Temp\RSPEC0D.tmp"
 <h3>Output Window</h3>
 Compiling...
 com.c
@@ -244,6 +252,11 @@ E:\HelloX\HelloX_Kernel\drivers\x86\com.c(154) : warning C4761: integral size mi
 E:\HelloX\HelloX_Kernel\drivers\x86\com.c(168) : warning C4761: integral size mismatch in argument; conversion supplied
 E:\HelloX\HelloX_Kernel\drivers\x86\com.c(407) : warning C4761: integral size mismatch in argument; conversion supplied
 E:\HelloX\HelloX_Kernel\drivers\x86\com.c(321) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\drivers\x86\IDEBASE.C(194) : warning C4101: 'LbaHigh' : unreferenced local variable
+E:\HelloX\HelloX_Kernel\drivers\x86\IDEBASE.C(196) : warning C4101: 'Buffer' : unreferenced local variable
+E:\HelloX\HelloX_Kernel\drivers\x86\IDEBASE.C(195) : warning C4101: 'tmp' : unreferenced local variable
+E:\HelloX\HelloX_Kernel\drivers\x86\IDEBASE.C(192) : warning C4101: 'LbaLow' : unreferenced local variable
+E:\HelloX\HelloX_Kernel\drivers\x86\IDEBASE.C(193) : warning C4101: 'LbaMid' : unreferenced local variable
 IDEHD.C
 KEYBRD.C
 MOUSE.C
@@ -274,7 +287,13 @@ FDISK.C
 FDISK2.C
 FIBONACCI.C
 FS.C
+E:\HelloX\HelloX_Kernel\shell\FS.C(307) : warning C4090: 'function' : different 'const' qualifiers
+E:\HelloX\HelloX_Kernel\shell\FS.C(307) : warning C4024: 'FormParameterObj' : different types for formal and actual parameter 1
 HEDIT.C
+E:\HelloX\HelloX_Kernel\shell\FS.C(117) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\shell\FS.C(219) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\shell\FS.C(186) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\shell\FS.C(187) : warning C4761: integral size mismatch in argument; conversion supplied
 HYPERTRM.C
 IOCTRL_S.C
 E:\HelloX\HelloX_Kernel\shell\HYPERTRM.C(38) : warning C4761: integral size mismatch in argument; conversion supplied
@@ -306,6 +325,10 @@ network2.c
 .\include\lwip/icmp.h(88) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
 SHELL.C
 SHELL1.C
+E:\HelloX\HelloX_Kernel\shell\SHELL.C(674) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\shell\SHELL.C(642) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\shell\SHELL.C(643) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\shell\SHELL.C(508) : warning C4761: integral size mismatch in argument; conversion supplied
 STAT_S.C
 SYSD_S.C
 DRVENTRY.C
@@ -637,8 +660,30 @@ udp.c
 .\include\lwip/udp.h(63) : warning C4103: '.\include\lwip/udp.h' : used #pragma pack to change alignment
 .\include\lwip/icmp.h(71) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
 .\include\lwip/icmp.h(88) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
+DPMGR.C
 E:\HelloX\HelloX_Kernel\network\core\udp.c(102) : warning C4761: integral size mismatch in argument; conversion supplied
 E:\HelloX\HelloX_Kernel\network\core\udp.c(345) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\kernel\DPMGR.C(69) : warning C4018: '==' : signed/unsigned mismatch
+E:\HelloX\HelloX_Kernel\kernel\DPMGR.C(257) : warning C4133: '=' : incompatible types - from 'struct tag__DRIVER_OBJECT *' to 'struct tag__DISPLAY_OBJECT *'
+CharDisplay .C
+HISCMD .C
+E:\HelloX\HelloX_Kernel\shell\HISCMD .C(89) : warning C4090: 'function' : different 'const' qualifiers
+E:\HelloX\HelloX_Kernel\shell\HISCMD .C(89) : warning C4024: 'StrCpy' : different types for formal and actual parameter 1
+BIOSVGA.C
+E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(110) : warning C4047: '>=' : 'unsigned short *' differs in levels of indirection from 'const int '
+E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(123) : warning C4013: 'VGA_SetCursorPos' undefined; assuming extern returning int
+E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(167) : warning C4047: '>=' : 'unsigned short *' differs in levels of indirection from 'const int '
+E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(178) : warning C4013: 'VGA_ChangeLine' undefined; assuming extern returning int
+E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(200) : warning C4142: benign redefinition of type
+E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(247) : warning C4142: benign redefinition of type
+E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(282) : warning C4047: '>=' : 'unsigned short *' differs in levels of indirection from 'const int '
+E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(306) : warning C4047: '>=' : 'unsigned short *' differs in levels of indirection from 'const int '
+E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(354) : warning C4047: '>=' : 'unsigned short *' differs in levels of indirection from 'const int '
+E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(390) : warning C4113: 'int (__cdecl *)()' differs in parameter lists from 'int (__cdecl *)(unsigned short ,unsigned short )'
+E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(403) : warning C4133: 'function' : incompatible types - from 'struct tag__DISPLAY_MANAGER *' to 'struct tag__COMMON_OBJECT *'
+E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(403) : warning C4133: 'function' : incompatible types - from 'struct tag__DISPLAY_OBJECT *' to 'struct tag__COMMON_OBJECT *'
+E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(348) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(348) : warning C4761: integral size mismatch in argument; conversion supplied
 Linking...
 LINK : warning LNK4108: /ALIGN specified without /DRIVER or /VXD; image may not run
 Release/master.dll : warning LNK4086: entrypoint "___OS_Entry" is not __stdcall with 12 bytes of arguments; image may not run
@@ -647,7 +692,7 @@ LINK : warning LNK4096: /BASE value "110000" is invalid for Windows 95; image ma
 
 
 <h3>Results</h3>
-master.dll - 0 error(s), 312 warning(s)
+master.dll - 0 error(s), 345 warning(s)
 </pre>
 </body>
 </html>

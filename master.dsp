@@ -53,7 +53,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
-# ADD LINK32 libcmt.lib /nologo /base:"0x110000" /entry:"__OS_Entry" /dll /map /machine:I386 /nodefaultlib /ALIGN:16
+# ADD LINK32 /nologo /base:"0x110000" /entry:"__OS_Entry" /dll /map /machine:I386 /nodefaultlib /ALIGN:16
 # SUBTRACT LINK32 /pdb:none
 
 !ELSEIF  "$(CFG)" == "master - Win32 Debug"
@@ -161,6 +161,10 @@ SOURCE=.\arch\x86\BIOS.C
 # End Source File
 # Begin Source File
 
+SOURCE=.\arch\x86\BIOSVGA.C
+# End Source File
+# Begin Source File
+
 SOURCE=.\arch\x86\HELLOCN.C
 # End Source File
 # End Group
@@ -233,6 +237,10 @@ SOURCE=.\shell\HEDIT.C
 # End Source File
 # Begin Source File
 
+SOURCE=".\shell\HISCMD .C"
+# End Source File
+# Begin Source File
+
 SOURCE=.\shell\HYPERTRM.C
 # End Source File
 # Begin Source File
@@ -289,6 +297,10 @@ SOURCE=.\osentry\OS_ENTRY.C
 # PROP Default_Filter ".cpp"
 # Begin Source File
 
+SOURCE=".\kernel\CharDisplay .C"
+# End Source File
+# Begin Source File
+
 SOURCE=.\kernel\COMQUEUE.C
 # End Source File
 # Begin Source File
@@ -306,6 +318,10 @@ SOURCE=.\kernel\DEVMGR.C
 # Begin Source File
 
 SOURCE=.\kernel\DIM.C
+# End Source File
+# Begin Source File
+
+SOURCE=.\kernel\DPMGR.C
 # End Source File
 # Begin Source File
 
@@ -565,6 +581,10 @@ SOURCE=.\INCLUDE\BUFFMGR.H
 # End Source File
 # Begin Source File
 
+SOURCE=.\include\CharDisplay.H
+# End Source File
+# Begin Source File
+
 SOURCE=.\INCLUDE\COMMOBJ.H
 # End Source File
 # Begin Source File
@@ -586,6 +606,10 @@ SOURCE=.\INCLUDE\DEVMGR.H
 # Begin Source File
 
 SOURCE=.\INCLUDE\dim.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\include\DPMGR.H
 # End Source File
 # Begin Source File
 

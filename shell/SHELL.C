@@ -420,7 +420,7 @@ VOID RunTimeHandler(LPSTR pstr)
 	}
 
 	//Show out the result.
-	sprintf(Buffer,"System has running %d week(s), %d day(s), %d hour(s), %d minute(s), %d second(s).",
+	_hx_sprintf(Buffer,"System has running %d week(s), %d day(s), %d hour(s), %d minute(s), %d second(s).",
 		week,day,hour,minute,second);
 	PrintLine(Buffer);
 }

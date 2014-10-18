@@ -10,10 +10,10 @@
 //***********************************************************************/
 
 #ifndef __STDAFX_H__
-#include "..\INCLUDE\StdAfx.h"
+#include "StdAfx.h"
 #endif
 
-#include "..\lib\string.h"
+#include "string.h"
 
 
 //RegisterDisplay,this routine add one display controller into system.

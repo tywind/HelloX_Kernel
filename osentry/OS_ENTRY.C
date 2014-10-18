@@ -30,17 +30,9 @@
 #include "..\kthread\idle.h"
 #include "..\include\MODMGR.H"
 #include "..\include\console.h"
+#include "nicdrv\ethif.h"
 
 #include "..\lib\stdio.h"
-
-//**********ERWIN********
-// FOR LOG TEST
-#ifndef __DEBUG_H__
-#include "..\include\debug.h"
-#endif
-#ifndef __LOGCAT_H__
-#include "..\kthread\logcat.h"
-#endif
 
 //Welcome information.
 char* pszStartMsg1 = "Hello China is running now.If you have any question,";
@@ -52,7 +44,7 @@ char* pszHelpInfo = "Any help please press 'help' + return.";
 
 //Driver entry point array,this array resides in drventry.cpp file in the 
 //same directory as os_entry.cpp,which is OSENTRY in current version.
-extern __DRIVER_ENTRY        DriverEntryArray[];
+extern __DRIVER_ENTRY DriverEntryArray[];
 extern __DISPLAYDRIVER_ENTRY DisplayEntryArray[];
 
 //A dead loop routine.
@@ -77,8 +69,6 @@ extern DWORD _HCNMain(LPVOID);
 //But the dead loop codes only run a short time since the kernel thread(s) will be 
 //scheduled once system clock occurs and the dead loop will end.
 //
-
-
 void __OS_Entry()
 {
 	__KERNEL_THREAD_OBJECT*       lpIdleThread     = NULL;
@@ -88,19 +78,26 @@ void __OS_Entry()
 #endif
 	DWORD                         dwIndex          = 0;
 	CHAR                          strInfo[64];
+	char*                         pszErrorMsg      = "INIT: OK";
 
-	//*****************ERWIN********
-	//FOR DEBUG LOG TEST
-	//__KERNEL_THREAD_OBJECT *lpTA = NULL;
-	//__KERNEL_THREAD_OBJECT *lpTB = NULL;
-	//__KERNEL_THREAD_OBJECT *lpTC = NULL;
-	//__KERNEL_THREAD_OBJECT *lpTD = NULL;
-	__KERNEL_THREAD_OBJECT *lpLogcatDaemonThread = NULL;
+	//Print out welcome message.
+	//Please note the output should put here that before the System.BeginInitialization routine,
+	//since it may cause the interrupt enable,which will lead the failure of system initialization.
+	ClearScreen();
+	PrintStr(pszStartMsg1);
+	PrintStr(pszStartMsg2);
+	GotoHome();
+	ChangeLine();
+
+	PrintStr(pszHelpInfo); //Print out help information.
+	GotoHome();
+	ChangeLine();
 
 	//Prepare the OS initialization environment.It's worth noting that even the System
 	//object self is not initialized yet.
 	if(!System.BeginInitialize((__COMMON_OBJECT*)&System))
 	{
+		pszErrorMsg = "INIT ERROR: System.BeginInitialization routine failed.";
 		goto __TERMINAL;
 	}
 
@@ -108,6 +105,7 @@ void __OS_Entry()
 	//system level objects since it's function maybe required by them.
 	if(!AnySizeBuffer.Initialize(&AnySizeBuffer))
 	{
+		pszErrorMsg = "INIT ERROR: Failed to initialize AnySizeBuffer object.";
 		goto __TERMINAL;
 	}
 
@@ -122,19 +120,7 @@ void __OS_Entry()
 		}
 		dwIndex ++;  //Continue to load.
 	}
-
 	CD_InitDisplay(0);
-
-	//Print out welcome message.
-	ClearScreen();
-	PrintStr(pszStartMsg1);
-	PrintStr(pszStartMsg2);
-	GotoHome();
-	ChangeLine();
-
-	PrintStr(pszHelpInfo); //Print out help information.
-	GotoHome();
-	ChangeLine();
 
 #ifdef __CFG_SYS_VMM  //Enable VMM.
 	*(__PDE*)PD_START = NULL_PDE;    //Set the first page directory entry to NULL,to indicate
@@ -154,11 +140,13 @@ void __OS_Entry()
 		OBJECT_TYPE_VIRTUAL_MEMORY_MANAGER);    //Create virtual memory manager object.
 	if(NULL == lpVirtualMemoryMgr)    //Failed to create this object.
 	{
+		pszErrorMsg = "INIT ERROR: Can not create VirtualMemoryManager object.";
 		goto __TERMINAL;
 	}
 
 	if(!lpVirtualMemoryMgr->Initialize((__COMMON_OBJECT*)lpVirtualMemoryMgr))
 	{
+		pszErrorMsg = "INIT ERROR: Can not initialize VirtualMemoryManager object.";
 		goto __TERMINAL;
 	}
 #endif
@@ -166,12 +154,14 @@ void __OS_Entry()
 	//Initialize Kernel Thread Manager object.
 	if(!KernelThreadManager.Initialize((__COMMON_OBJECT*)&KernelThreadManager))
 	{
+		pszErrorMsg = "INIT ERROR: Can not initialize KernelThreadManager object.";
 		goto __TERMINAL;
 	}
 
 	//Initialize System object.
 	if(!System.Initialize((__COMMON_OBJECT*)&System))
 	{
+		pszErrorMsg = "INIT ERROR: Can not initialize System object.";
 		goto __TERMINAL;
 	}
 
@@ -189,24 +179,24 @@ void __OS_Entry()
 		(LPVOID)0x02000000,
 		(LPVOID)0x09FFFFFF))
 	{
+		pszErrorMsg = "INIT ERROR: Can not initialize PageFrameManager object.";
 		goto __TERMINAL;
 	}
 #endif
-
-
-
 
 	//Device Driver Framework related global functions.
 #ifdef __CFG_SYS_DDF
 	//Initialize IOManager object.
 	if(!IOManager.Initialize((__COMMON_OBJECT*)&IOManager))
 	{
+		pszErrorMsg = "INIT ERROR: Can not initialize IOManager object.";
 		goto __TERMINAL;
 	}
 
 	//Initialize DeviceManager object.
 	if(!DeviceManager.Initialize(&DeviceManager))
 	{
+		pszErrorMsg = "INIT ERROR: Can not initialize DeviceManager object.";
 		goto __TERMINAL;
 	}
 #endif
@@ -215,6 +205,7 @@ void __OS_Entry()
 #ifdef __CFG_SYS_CPUSTAT
 	if(!StatCpuObject.Initialize(&StatCpuObject))
 	{
+		pszErrorMsg = "INIT ERROR: Can not initialize StatCpuObject.";
 		goto __TERMINAL;
 	}
 #endif
@@ -236,37 +227,22 @@ void __OS_Entry()
 	{
 		if(!IOManager.LoadDriver(DriverEntryArray[dwIndex])) //Failed to load.
 		{
-			sprintf(strInfo,"Failed to load the %dth driver.",dwIndex); //Show an error.
+			_hx_sprintf(strInfo,"Failed to load the %dth driver.",dwIndex); //Show an error.
 			PrintLine(strInfo);
 		}
 		dwIndex ++;  //Continue to load.
 	}
-
-	//Initialize module manager object.
-	//if(!ModuleMgr.Initialize(&ModuleMgr))
-	//{
-	//	PrintLine("  Can not initialize module manager object.");
-	//	goto __TERMINAL;
-	//}
 #endif
-
-
 
 	//Initialize Console object if necessary.
 #ifdef __CFG_SYS_CONSOLE
 	if(!Console.Initialize(&Console))
 	{
-		PrintLine("Can not initialize Console object.");
-	}
-	else
-	{
-		//PrintLine("Initialize Console object successfully.");
+		pszErrorMsg = "INIT ERROR: Can not initialize Console object.";
+		goto __TERMINAL;
 	}
 #endif
 	//BISStartup();
-	//Load external modules.
-	//ModuleMgr.LoadExternalMod("MODCFG.INI");     //MODCFG.INI is the module's configure file.
-	//PrintLine("Load external module is disabled for debugging.");
 
 	//********************************************************************************
 	//
@@ -289,8 +265,7 @@ void __OS_Entry()
 		"IDLE");
 	if(NULL == lpIdleThread)
 	{
-		//PrintLine("Can not create idle kernel thread,please restart the system.");
-		__ERROR_HANDLER(ERROR_LEVEL_FATAL,0,NULL);
+		pszErrorMsg = "INIT ERROR: Can not create SystemIdle kernel thread.";
 		goto __TERMINAL;
 	}
 
@@ -307,8 +282,7 @@ void __OS_Entry()
 		"CPU STAT");
 	if(NULL == lpStatKernelThread)
 	{
-		//PrintLine("Can not create idle kernel thread,please restart the system.");
-		__ERROR_HANDLER(ERROR_LEVEL_FATAL,0,NULL);
+		pszErrorMsg = "INIT ERROR: Can not create CPU_Stat kernel thread.";
 		goto __TERMINAL;
 	}
 #endif
@@ -329,7 +303,7 @@ void __OS_Entry()
 			"SHELL");
 		if(NULL == lpShellThread)
 		{
-			__ERROR_HANDLER(ERROR_LEVEL_FATAL,0,NULL);
+			pszErrorMsg = "INIT ERROR: Can not create Shell kernel thread.";
 			goto __TERMINAL;
 		}
 	}
@@ -346,13 +320,14 @@ void __OS_Entry()
 			"SHELL");
 		if(NULL == lpShellThread)
 		{
-			__ERROR_HANDLER(ERROR_LEVEL_FATAL,0,NULL);
+			pszErrorMsg = "INIT ERROR: Can not create Shell kernel thread.";
 			goto __TERMINAL;
 		}
 	}
 	g_lpShellThread = lpShellThread;     //Initialize the shell thread global variable.
 
-	//Print out the default system prompt,which can be changed by 'sysname' command.	
+	//Print out the default system prompt,which can be changed by 'sysname' command.
+	//strcpy(&HostName[0],"[system-view]");
 #endif
 
 	//Initialize DeviceInputManager object.
@@ -360,7 +335,7 @@ void __OS_Entry()
 		NULL,
 		(__COMMON_OBJECT*)lpShellThread))
 	{
-		__ERROR_HANDLER(ERROR_LEVEL_FATAL,0,NULL);
+		pszErrorMsg = "INIT ERROR: Can not initialize DeviceInputManager object.";
 		goto __TERMINAL;
 	}
 
@@ -383,102 +358,14 @@ void __OS_Entry()
 		__HCNMAIN_NAME);
 	if(NULL == lpUserThread)
 	{
-		__ERROR_HANDLER(ERROR_LEVEL_FATAL,0,NULL);
+		pszErrorMsg = "INIT ERROR: Can not create User_Main kernel thread.";
 		goto __TERMINAL;
 	}
 #endif
 
-	//Finish OS initialization phase by calling EndInitialize routine of System object,coresponding the
-	//BeginInitialize routine call before initialization.
-	//System.EndInitialize((__COMMON_OBJECT*)&System);
-
-
-
-	//***********************************************************************/
-	//    Author                    : Erwin
-	//    Original Date             : 29th May, 2014
-	//    Module Name               : logcat.h
-	//    Module Funciton           : 
-	//                                This module contains the logcat daemon thread declaration code.the logcat daemon thread
-	//                                is one of the kernel level threads and will print the log messages from other threads to the console.
-	//
-	//    Last modified Author      : 
-	//    Last modified Date        : 
-	//    Last modified Content     : 
-	//                                1. 
-	//                                2.
-	//    Lines number              :
-	//***********************************************************************/
+	//If log debugging functions is enabled.
 #ifdef __CFG_SYS_LOGCAT
-
-	//*********************************
-	// For log
-	//Author :	Erwin
-	//Email  :	erwin.wang@qq.com
-	//Date	 :  7th June, 2014
-	//********************************
-
-	//**************************
-	//	Debug subsystem
-	//**************************
 	DebugManager.Initialize(&DebugManager);
-
-	//lpTD = KernelThreadManager.CreateKernelThread(   //Create shell thread.
-	//	(__COMMON_OBJECT*)&KernelThreadManager,
-	//	0,
-	//	KERNEL_THREAD_STATUS_READY,
-	//	PRIORITY_LEVEL_HIGH_4,
-	//	TDEntry,
-	//	NULL,
-	//	NULL,
-	//	"Kernel ThreadD");
-	//if(NULL == lpTD)
-	//{
-	//	goto __TERMINAL;
-	//}
-
-	//lpTC = KernelThreadManager.CreateKernelThread(   //Create shell thread.
-	//	(__COMMON_OBJECT*)&KernelThreadManager,
-	//	0,
-	//	KERNEL_THREAD_STATUS_READY,
-	//	PRIORITY_LEVEL_HIGH_3,
-	//	TCEntry,
-	//	NULL,
-	//	NULL,
-	//	"Kernel ThreadC");
-	//if(NULL == lpTC)
-	//{
-	//	goto __TERMINAL;
-	//}
-
-
-	//lpTB = KernelThreadManager.CreateKernelThread(   //Create shell thread.
-	//	(__COMMON_OBJECT*)&KernelThreadManager,
-	//	0,
-	//	KERNEL_THREAD_STATUS_READY,
-	//	PRIORITY_LEVEL_HIGH_2,
-	//	TBEntry,
-	//	NULL,
-	//	NULL,
-	//	"ThreadB");
-	//if(NULL == lpTB)
-	//{
-	//	goto __TERMINAL;
-	//}
-
-	//lpTA = KernelThreadManager.CreateKernelThread(   //Create shell thread.
-	//	(__COMMON_OBJECT*)&KernelThreadManager,
-	//	0,
-	//	KERNEL_THREAD_STATUS_READY,
-	//	PRIORITY_LEVEL_HIGH,
-	//	TAEntry,
-	//	NULL,
-	//	NULL,
-	//	"ThreadA");
-	//if(NULL == lpTA)
-	//{
-	//	goto __TERMINAL;
-	//}
 	lpLogcatDaemonThread = KernelThreadManager.CreateKernelThread(   //Create logcat daemon thread.
 		(__COMMON_OBJECT*)&KernelThreadManager,
 		0,
@@ -490,9 +377,23 @@ void __OS_Entry()
 		"Logcat Daemon");
 	if(NULL == lpLogcatDaemonThread)
 	{
+		pszErrorMsg = "INIT ERROR: Can not create Logcat_Daemon object.";
 		goto __TERMINAL;
 	}
 
+#endif  //__CFG_SYS_LOGCAT.
+
+#ifdef __CFG_NET_IPv4  //IPv4 network protocol is enabled.
+	if(!IPv4_Entry(NULL))
+	{
+		pszErrorMsg = "INIT ERROR: Can not initialize IPv4 protocol function.";
+		goto __TERMINAL;
+	}
+	if(!InitializeEthernetIf())
+	{
+		pszErrorMsg = "INIT ERROR: Can not initialize Ethernet interface.";
+		goto __TERMINAL;
+	}
 #endif
 
 	System.EndInitialize((__COMMON_OBJECT*)&System);
@@ -503,14 +404,8 @@ void __OS_Entry()
 __TERMINAL:
 	GotoHome();
 	ChangeLine();
-	__ERROR_HANDLER(ERROR_LEVEL_FATAL,0,"Initializing process failed!");
+	PrintLine(pszErrorMsg);  //Show error msg.
 	DeadLoop();
-}
-
-int main(int argc, char **argv)
-{
-	__OS_Entry();
-	//while(1){};
 }
 
 //------------------------------------------------------------------------------

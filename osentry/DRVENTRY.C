@@ -32,7 +32,9 @@
 #include "..\fs\NTFS.H"
 #endif
 
-#include "..\dispaly\biosvga.H"
+#ifdef __I386__
+#include "..\arch\x86\biosvga.h"
+#endif
 
 #ifdef __CFG_DRV_IDE
 #include "..\drivers\x86\IDEHD.H"      //IDE interface harddisk controller driver.
