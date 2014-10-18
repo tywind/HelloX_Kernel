@@ -32,6 +32,8 @@
 #include "..\fs\NTFS.H"
 #endif
 
+#include "..\dispaly\biosvga.H"
+
 #ifdef __CFG_DRV_IDE
 #include "..\drivers\x86\IDEHD.H"      //IDE interface harddisk controller driver.
 #endif
@@ -43,6 +45,8 @@
 #ifdef __CFG_DRV_COM
 #include "..\drivers\x86\com.h"
 #endif
+
+
 
 #ifdef __CFG_DRV_USART
 #include "..\drivers\stm32\usart.h"
@@ -91,3 +95,9 @@ __DRIVER_ENTRY DriverEntryArray[] = {
 	NULL               //Terminator of the driver entry array.
 };
 
+
+__DISPLAYDRIVER_ENTRY DisplayEntryArray[] = 
+{
+	BiosVgaDriverEntry,
+	NULL
+};

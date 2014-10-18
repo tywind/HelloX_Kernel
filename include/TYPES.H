@@ -49,6 +49,7 @@ typedef double              DOUBLE;
 typedef float               FLOAT;
 
 typedef char*               LPSTR;
+typedef const char*         LPCSTR;
 typedef const char*         LPCTSTR;
 
 typedef void                VOID;

@@ -84,7 +84,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <LinkDLL>true</LinkDLL>
       <SubSystem>Console</SubSystem>
-      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <OutputFile>.\Release\master.dll</OutputFile>
       <ImportLibrary>.\Release\master.lib</ImportLibrary>
       <AdditionalOptions> /ALIGN:32</AdditionalOptions>
@@ -139,11 +139,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="dispaly\BIOSVGA.C" />
     <ClCompile Include="drivers\x86\com.c" />
     <ClCompile Include="drivers\x86\IDEBASE.C" />
     <ClCompile Include="drivers\x86\IDEHD.C" />
     <ClCompile Include="drivers\x86\KEYBRD.C" />
     <ClCompile Include="drivers\x86\MOUSE.C" />
+    <ClCompile Include="kernel\CharDisplay .C" />
+    <ClCompile Include="kernel\DPMGR.C" />
     <ClCompile Include="lib\atox.c" />
     <ClCompile Include="lib\stdio.c" />
     <ClCompile Include="lib\string.c" />
@@ -168,6 +171,7 @@
     <ClCompile Include="shell\FIBONACCI.C" />
     <ClCompile Include="shell\FS.C" />
     <ClCompile Include="shell\HEDIT.C" />
+    <ClCompile Include="shell\HISCMD .C" />
     <ClCompile Include="shell\HYPERTRM.C" />
     <ClCompile Include="shell\IOCTRL_S.C" />
     <ClCompile Include="shell\network.c" />
@@ -245,8 +249,10 @@
     <ClCompile Include="network\core\udp.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="dispaly\BIOSVGA.H" />
     <ClInclude Include="include\arch\bpstruct.h" />
     <ClInclude Include="INCLUDE\BUFFMGR.H" />
+    <ClInclude Include="include\CharDisplay.H" />
     <ClInclude Include="INCLUDE\COMMOBJ.H" />
     <ClInclude Include="INCLUDE\COMQUEUE.H" />
     <ClInclude Include="include\console.h" />
@@ -254,6 +260,7 @@
     <ClInclude Include="INCLUDE\DEVMGR.H" />
     <ClInclude Include="INCLUDE\dim.h" />
     <ClInclude Include="include\arch\epstruct.h" />
+    <ClInclude Include="include\DPMGR.H" />
     <ClInclude Include="INCLUDE\GLOBVAR.H" />
     <ClInclude Include="INCLUDE\HEAP.H" />
     <ClInclude Include="INCLUDE\HELLOCN.H" />

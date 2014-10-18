@@ -98,6 +98,12 @@
 #include "IOMGR.H"
 #endif
 
+#ifndef __DPMGR_H__
+#include "DPMGR.H"
+#endif
+#include "..\INCLUDE\CharDisPlay.H"
+
+
 #ifndef __DEBUG_H__
 #include "..\include\debug.h"
 #endif
