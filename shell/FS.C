@@ -4,8 +4,8 @@
 //    Module Name               : FS.CPP
 //    Module Funciton           : 
 //    Description               : Implementation code of fs application.
-//    Last modified Author      : Tywind
-//    Last modified Date        : 2014.10.15
+//    Last modified Author      :
+//    Last modified Date        : 
 //    Last modified Content     :
 //                                1.
 //                                2.
@@ -25,7 +25,7 @@
 #include "..\lib\stdio.h"
 
 
-#define  FS_PROMPT_STR   "#"
+#define  FS_PROMPT_STR   "[fs_view]"
 
 static HISOBJ            s_hHiscmdInoObj   = NULL;
 
@@ -115,31 +115,34 @@ static INT OnKeyControl(BYTE   bt )
 			//µÃµ½ÃüÁîÊäÈë´®
 			CD_GetCursorPos(&CursorX,&CursorY);		
 			CD_GetString(strlen(FS_PROMPT_STR),CursorY,szCmdBuffer,sizeof(szCmdBuffer));
+			strtrim(szCmdBuffer,TRIM_LEFT|TRIM_RIGHT);
 			CD_ChangeLine();
 
-			His_SaveCmd(s_hHiscmdInoObj,szCmdBuffer);
-
-			switch(CommandParser(szCmdBuffer))
+			if(strlen(szCmdBuffer) > 0)
 			{
-				case FS_CMD_TERMINAL: //Exit command is entered.
+				His_SaveCmd(s_hHiscmdInoObj,szCmdBuffer);
+				switch(CommandParser(szCmdBuffer))
 				{
-					return FALSE;
+					case FS_CMD_TERMINAL: //Exit command is entered.
+					{
+						return FALSE;
+					}
+					break;
+					case FS_CMD_INVALID:  //Can not parse the command.
+					{
+						CD_PrintString("Invalid command.",TRUE);
+					}							
+					break;
+					case FS_CMD_FAILED:
+					{
+						CD_PrintString("Failed to process the command.",TRUE);
+					}
+					break;
+				default:
+					break;
 				}
-				break;
-				case FS_CMD_INVALID:  //Can not parse the command.
-				{
-					CD_PrintString("Invalid command.",TRUE);
-				}							
-				break;
-			case FS_CMD_FAILED:
-				{
-					CD_PrintString("Failed to process the command.",TRUE);
-				}
-				break;
-			default:
-				break;
 			}
-		
+					
 		PrintPound();
 		}
 		break;
@@ -230,10 +233,26 @@ static BOOL OnVkKeyControl(BYTE bt)
 			LoadHisCmd(FALSE);
 		}
 		break;
-	case VK_DELETE:
+		case VK_DELETE:
 		{
 			CD_DelChar(DISPLAY_DELCHAR_CURR);
 		}
+		break;
+		case VK_HOME:
+		{			
+			CD_SetCursorPos(strlen(FS_PROMPT_STR),CursorY);
+		}
+		break;
+		case VK_END:
+		{
+			CHAR szCmdBuf[CMD_MAX_LEN] = {0};
+
+			CursorX = strlen(FS_PROMPT_STR);
+			CD_GetString(CursorX,CursorY,szCmdBuf,sizeof(szCmdBuf));
+
+			CursorX += strlen(szCmdBuf);
+			CD_SetCursorPos(CursorX,CursorY);
+			}
 		break;
 	default:
 		return FALSE;

@@ -4,8 +4,8 @@
 //    Module Name               : shell.cpp
 //    Module Funciton           : 
 //                                This module countains shell procedures.
-//    Last modified Author      : Tywind
-//    Last modified Date        : 2014.10.15
+//    Last modified Author      :
+//    Last modified Date        :
 //    Last modified Content     :
 //                                1.
 //                                2.
@@ -46,8 +46,9 @@
 #define  ERROR_STR        "You entered incorrect command name."
 
 //shell input pos
-#define  SHELL_INPUT_START_X (strlen(s_szPrompt))   // 
-#define  SHELL_INPUT_START_Y 4 
+#define  SHELL_INPUT_START_X       (strlen(s_szPrompt))   // 
+#define  SHELL_INPUT_START_Y       1 
+#define  SHELL_INPUT_START_Y_FIRST 4 
 
 //Host name array of the system.
 #define MAX_HOSTNAME_LEN     16
@@ -506,6 +507,7 @@ static BOOL  DoCommand()
 	CD_GetCursorPos(&CursorX,&CursorY);		
 	memset(szCmdBuffer,0,sizeof(szCmdBuffer));
 	CD_GetString(SHELL_INPUT_START_X,CursorY,szCmdBuffer,sizeof(szCmdBuffer));
+	strtrim(szCmdBuffer,TRIM_LEFT|TRIM_RIGHT);
 	if(strlen(szCmdBuffer) <= 0)
 	{
 		return FALSE;
@@ -580,7 +582,7 @@ static VOID  PrintPrompt()
 {	
 	WORD  CursorX    = 0;
 	WORD  CursorY    = 0;
-
+	
 	CD_GetCursorPos(&CursorX,&CursorY);
 	if(CursorX != 0)
 	{
@@ -591,7 +593,6 @@ static VOID  PrintPrompt()
 	CD_PrintString(s_szPrompt,FALSE);
 	CursorX = strlen(s_szPrompt);
 	CD_SetCursorPos(CursorX,CursorY);
-
 }
 
 //save curcmd to history list
@@ -632,7 +633,8 @@ static  void LoadHisCmd(BOOL bUp)
 	CHAR   szHisCmd[CMD_MAX_LEN] = {0};
 	WORD   CursorX               = 0;
 	WORD   CursorY               = 0;
-	
+		
+
 	if(His_LoadHisCmd(s_hHiscmdInoObj,bUp,szHisCmd,sizeof(szHisCmd)) == FALSE)
 	{
 		return; 
@@ -644,10 +646,11 @@ static  void LoadHisCmd(BOOL bUp)
 	CD_PrintString(szHisCmd,FALSE);		
 }
 
+
 static BOOL OnVkKeyControl(BYTE bt)
 {
-	WORD CursorX = 0;
-	WORD CursorY = 0;
+	WORD CursorX   = 0;
+	WORD CursorY   = 0;
 	
 	CD_GetCursorPos(&CursorX,&CursorY);
 
@@ -691,11 +694,26 @@ static BOOL OnVkKeyControl(BYTE bt)
 			CD_DelChar(DISPLAY_DELCHAR_CURR);
 		}
 		break;
+		case VK_HOME:
+		{			
+			CD_SetCursorPos(SHELL_INPUT_START_X,CursorY);
+		}
+		break;
+		case VK_END:
+		{
+			CHAR szCmdBuf[CMD_MAX_LEN] = {0};
+			
+			CursorX = SHELL_INPUT_START_X;
+			CD_GetString(CursorX,CursorY,szCmdBuf,sizeof(szCmdBuf));
+
+			CursorX += strlen(szCmdBuf);
+			CD_SetCursorPos(CursorX,CursorY);
+		}
+		break;
 	default:
 		return FALSE;
 	}
 	
-
 	return TRUE;
 }
 
@@ -705,8 +723,7 @@ static BOOL OnKeyControl(BYTE bt)
 	{
 		case VK_RETURN:
 		{
-			DoCommand();
-			
+			DoCommand();			
 			PrintPrompt();
 		}
 		break;
@@ -726,7 +743,7 @@ static BOOL OnKeyControl(BYTE bt)
 		break;	
 		default:
 		{
-		CD_PrintChar(bt);
+			CD_PrintChar(bt);
 		}
 	}
 
@@ -736,6 +753,7 @@ static BOOL OnKeyControl(BYTE bt)
 //Shell thread's event handler.
 static BOOL EventHandler(WORD wCommand,WORD wParam,DWORD dwParam)
 {
+	WORD wr = 0x0700;
 	BYTE bt = (BYTE)(dwParam);
 	
 	switch(wCommand)
@@ -774,7 +792,7 @@ DWORD ShellEntryPoint(LPVOID pData)
 	StrCpy(DEF_PROMPT_STR,&s_szPrompt[0]);
 
 	CD_PrintString(VERSION_INFO,FALSE);
-	CD_SetCursorPos(0,SHELL_INPUT_START_Y);
+	CD_SetCursorPos(0,SHELL_INPUT_START_Y_FIRST);
 	PrintPrompt();
 
 	while(TRUE)

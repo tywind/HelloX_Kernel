@@ -173,9 +173,10 @@ BOOL Int2Str(DWORD dwNum,LPSTR pszResult)
 //
 VOID PrintLine(LPSTR pszStr)
 {
-	GotoHome();
+	CD_PrintString(pszStr,TRUE);
+	/*GotoHome();
 	ChangeLine();
-	PrintStr(pszStr);
+	PrintStr(pszStr);*/		
 }
 
 //
@@ -448,4 +449,65 @@ char * strcat (
  
         return( dst );                  /* return dst */
  
+}
+
+void strtrim(char * dst,int flag)
+{
+	char* pos   = dst;
+	int   len   = 0;
+	int   i     = 0;
+	
+	if(NULL == dst)
+	{
+		return;
+	}
+
+	len = strlen(dst);
+	if(len <= 0)
+	{
+		return; 
+	}
+	if(flag&TRIM_LEFT)
+	{
+		while(i < len)
+		{
+			if(*pos != 0x20) 
+			{
+				break;
+			}
+
+			pos ++;
+			i   ++;
+		}
+
+		//È«ÊÇ¿Õ¸ñ
+		if(len == i)
+		{
+			dst[0] = 0;
+			return;
+		}
+
+		if(i > 0) 
+		{
+			len -=  i;
+			memcpy(dst,pos,len);
+			dst[len] = 0;
+		}
+	}
+	
+	if(flag&TRIM_RIGHT)
+	{
+		for(i = len-1; i >= 0;i--)
+		{
+			if(dst[i] == 0x20)
+			{
+				dst[i] = 0;
+			}
+			else
+			{
+				break;
+			}
+		}
+	}
+	
 }

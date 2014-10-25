@@ -6,7 +6,7 @@
 --------------------Configuration: master - Win32 Release--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating temporary file "C:\Users\garry\AppData\Local\Temp\RSPEC0C.tmp" with contents
+Creating temporary file "C:\Users\garry\AppData\Local\Temp\RSPC2F0.tmp" with contents
 [
 /nologo /MT /W3 /GX /O1 /I ".\include" /I ".\arch\x86" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "MASTER_EXPORTS" /Fp"Release/master.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
 "E:\HelloX\HelloX_Kernel\drivers\x86\com.c"
@@ -22,6 +22,7 @@ Creating temporary file "C:\Users\garry\AppData\Local\Temp\RSPEC0C.tmp" with con
 "E:\HelloX\HelloX_Kernel\kthread\logcat.c"
 "E:\HelloX\HelloX_Kernel\arch\x86\ARCH_X86.C"
 "E:\HelloX\HelloX_Kernel\arch\x86\BIOS.C"
+"E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C"
 "E:\HelloX\HelloX_Kernel\arch\x86\HELLOCN.C"
 "E:\HelloX\HelloX_Kernel\fs\FAT32.C"
 "E:\HelloX\HelloX_Kernel\fs\FAT322.C"
@@ -38,6 +39,7 @@ Creating temporary file "C:\Users\garry\AppData\Local\Temp\RSPEC0C.tmp" with con
 "E:\HelloX\HelloX_Kernel\shell\FIBONACCI.C"
 "E:\HelloX\HelloX_Kernel\shell\FS.C"
 "E:\HelloX\HelloX_Kernel\shell\HEDIT.C"
+"E:\HelloX\HelloX_Kernel\shell\HISCMD .C"
 "E:\HelloX\HelloX_Kernel\shell\HYPERTRM.C"
 "E:\HelloX\HelloX_Kernel\shell\IOCTRL_S.C"
 "E:\HelloX\HelloX_Kernel\shell\network.c"
@@ -49,11 +51,13 @@ Creating temporary file "C:\Users\garry\AppData\Local\Temp\RSPEC0C.tmp" with con
 "E:\HelloX\HelloX_Kernel\osentry\DRVENTRY.C"
 "E:\HelloX\HelloX_Kernel\osentry\mem_scat.c"
 "E:\HelloX\HelloX_Kernel\osentry\OS_ENTRY.C"
+"E:\HelloX\HelloX_Kernel\kernel\CharDisplay .C"
 "E:\HelloX\HelloX_Kernel\kernel\COMQUEUE.C"
 "E:\HelloX\HelloX_Kernel\kernel\console.c"
 "E:\HelloX\HelloX_Kernel\kernel\debug.c"
 "E:\HelloX\HelloX_Kernel\kernel\DEVMGR.C"
 "E:\HelloX\HelloX_Kernel\kernel\DIM.C"
+"E:\HelloX\HelloX_Kernel\kernel\DPMGR.C"
 "E:\HelloX\HelloX_Kernel\kernel\HEAP.C"
 "E:\HelloX\HelloX_Kernel\kernel\IOMGR.C"
 "E:\HelloX\HelloX_Kernel\kernel\IOMGR2.C"
@@ -113,13 +117,9 @@ Creating temporary file "C:\Users\garry\AppData\Local\Temp\RSPEC0C.tmp" with con
 "E:\HelloX\HelloX_Kernel\network\api\tcpip.c"
 "E:\HelloX\HelloX_Kernel\network\core\timers.c"
 "E:\HelloX\HelloX_Kernel\network\core\udp.c"
-"E:\HelloX\HelloX_Kernel\kernel\DPMGR.C"
-"E:\HelloX\HelloX_Kernel\kernel\CharDisplay .C"
-"E:\HelloX\HelloX_Kernel\shell\HISCMD .C"
-"E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C"
 ]
-Creating command line "cl.exe @C:\Users\garry\AppData\Local\Temp\RSPEC0C.tmp" 
-Creating temporary file "C:\Users\garry\AppData\Local\Temp\RSPEC0D.tmp" with contents
+Creating command line "cl.exe @C:\Users\garry\AppData\Local\Temp\RSPC2F0.tmp" 
+Creating temporary file "C:\Users\garry\AppData\Local\Temp\RSPC301.tmp" with contents
 [
 /nologo /base:"0x110000" /entry:"__OS_Entry" /dll /incremental:no /pdb:"Release/master.pdb" /map:"Release/master.map" /machine:I386 /nodefaultlib /out:"Release/master.dll" /implib:"Release/master.lib" /ALIGN:16 
 .\Release\com.obj
@@ -135,6 +135,7 @@ Creating temporary file "C:\Users\garry\AppData\Local\Temp\RSPEC0D.tmp" with con
 .\Release\logcat.obj
 .\Release\ARCH_X86.OBJ
 .\Release\BIOS.OBJ
+.\Release\BIOSVGA.OBJ
 .\Release\HELLOCN.OBJ
 .\Release\FAT32.OBJ
 .\Release\FAT322.OBJ
@@ -151,6 +152,7 @@ Creating temporary file "C:\Users\garry\AppData\Local\Temp\RSPEC0D.tmp" with con
 .\Release\FIBONACCI.OBJ
 .\Release\FS.OBJ
 .\Release\HEDIT.OBJ
+".\Release\HISCMD .OBJ"
 .\Release\HYPERTRM.OBJ
 .\Release\IOCTRL_S.OBJ
 .\Release\network.obj
@@ -162,11 +164,13 @@ Creating temporary file "C:\Users\garry\AppData\Local\Temp\RSPEC0D.tmp" with con
 .\Release\DRVENTRY.OBJ
 .\Release\mem_scat.obj
 .\Release\OS_ENTRY.OBJ
+".\Release\CharDisplay .obj"
 .\Release\COMQUEUE.OBJ
 .\Release\console.obj
 .\Release\debug.obj
 .\Release\DEVMGR.OBJ
 .\Release\DIM.OBJ
+.\Release\DPMGR.OBJ
 .\Release\HEAP.OBJ
 .\Release\IOMGR.OBJ
 .\Release\IOMGR2.OBJ
@@ -226,12 +230,8 @@ Creating temporary file "C:\Users\garry\AppData\Local\Temp\RSPEC0D.tmp" with con
 .\Release\tcpip.obj
 .\Release\timers.obj
 .\Release\udp.obj
-.\Release\DPMGR.OBJ
-".\Release\CharDisplay .obj"
-".\Release\HISCMD .OBJ"
-.\Release\BIOSVGA.OBJ
 ]
-Creating command line "link.exe @C:\Users\garry\AppData\Local\Temp\RSPEC0D.tmp"
+Creating command line "link.exe @C:\Users\garry\AppData\Local\Temp\RSPC301.tmp"
 <h3>Output Window</h3>
 Compiling...
 com.c
@@ -268,7 +268,22 @@ idle.c
 logcat.c
 ARCH_X86.C
 BIOS.C
+BIOSVGA.C
+E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(110) : warning C4047: '>=' : 'unsigned short *' differs in levels of indirection from 'const int '
+E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(123) : warning C4013: 'VGA_SetCursorPos' undefined; assuming extern returning int
+E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(167) : warning C4047: '>=' : 'unsigned short *' differs in levels of indirection from 'const int '
+E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(178) : warning C4013: 'VGA_ChangeLine' undefined; assuming extern returning int
+E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(200) : warning C4142: benign redefinition of type
+E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(247) : warning C4142: benign redefinition of type
+E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(282) : warning C4047: '>=' : 'unsigned short *' differs in levels of indirection from 'const int '
+E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(306) : warning C4047: '>=' : 'unsigned short *' differs in levels of indirection from 'const int '
+E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(354) : warning C4047: '>=' : 'unsigned short *' differs in levels of indirection from 'const int '
+E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(390) : warning C4113: 'int (__cdecl *)()' differs in parameter lists from 'int (__cdecl *)(unsigned short ,unsigned short )'
+E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(403) : warning C4133: 'function' : incompatible types - from 'struct tag__DISPLAY_MANAGER *' to 'struct tag__COMMON_OBJECT *'
+E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(403) : warning C4133: 'function' : incompatible types - from 'struct tag__DISPLAY_OBJECT *' to 'struct tag__COMMON_OBJECT *'
 HELLOCN.C
+E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(348) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(348) : warning C4761: integral size mismatch in argument; conversion supplied
 FAT32.C
 FAT322.C
 FATMGR.C
@@ -287,13 +302,17 @@ FDISK.C
 FDISK2.C
 FIBONACCI.C
 FS.C
-E:\HelloX\HelloX_Kernel\shell\FS.C(307) : warning C4090: 'function' : different 'const' qualifiers
-E:\HelloX\HelloX_Kernel\shell\FS.C(307) : warning C4024: 'FormParameterObj' : different types for formal and actual parameter 1
+E:\HelloX\HelloX_Kernel\shell\FS.C(326) : warning C4090: 'function' : different 'const' qualifiers
+E:\HelloX\HelloX_Kernel\shell\FS.C(326) : warning C4024: 'FormParameterObj' : different types for formal and actual parameter 1
 HEDIT.C
 E:\HelloX\HelloX_Kernel\shell\FS.C(117) : warning C4761: integral size mismatch in argument; conversion supplied
-E:\HelloX\HelloX_Kernel\shell\FS.C(219) : warning C4761: integral size mismatch in argument; conversion supplied
-E:\HelloX\HelloX_Kernel\shell\FS.C(186) : warning C4761: integral size mismatch in argument; conversion supplied
-E:\HelloX\HelloX_Kernel\shell\FS.C(187) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\shell\FS.C(222) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\shell\FS.C(243) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\shell\FS.C(189) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\shell\FS.C(190) : warning C4761: integral size mismatch in argument; conversion supplied
+HISCMD .C
+E:\HelloX\HelloX_Kernel\shell\HISCMD .C(89) : warning C4090: 'function' : different 'const' qualifiers
+E:\HelloX\HelloX_Kernel\shell\HISCMD .C(89) : warning C4024: 'StrCpy' : different types for formal and actual parameter 1
 HYPERTRM.C
 IOCTRL_S.C
 E:\HelloX\HelloX_Kernel\shell\HYPERTRM.C(38) : warning C4761: integral size mismatch in argument; conversion supplied
@@ -325,20 +344,25 @@ network2.c
 .\include\lwip/icmp.h(88) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
 SHELL.C
 SHELL1.C
-E:\HelloX\HelloX_Kernel\shell\SHELL.C(674) : warning C4761: integral size mismatch in argument; conversion supplied
-E:\HelloX\HelloX_Kernel\shell\SHELL.C(642) : warning C4761: integral size mismatch in argument; conversion supplied
-E:\HelloX\HelloX_Kernel\shell\SHELL.C(643) : warning C4761: integral size mismatch in argument; conversion supplied
-E:\HelloX\HelloX_Kernel\shell\SHELL.C(508) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\shell\SHELL.C(677) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\shell\SHELL.C(699) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\shell\SHELL.C(644) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\shell\SHELL.C(645) : warning C4761: integral size mismatch in argument; conversion supplied
+E:\HelloX\HelloX_Kernel\shell\SHELL.C(509) : warning C4761: integral size mismatch in argument; conversion supplied
 STAT_S.C
 SYSD_S.C
 DRVENTRY.C
 mem_scat.c
 OS_ENTRY.C
+CharDisplay .C
 COMQUEUE.C
 console.c
 debug.c
 DEVMGR.C
 DIM.C
+DPMGR.C
+E:\HelloX\HelloX_Kernel\kernel\DPMGR.C(69) : warning C4018: '==' : signed/unsigned mismatch
+E:\HelloX\HelloX_Kernel\kernel\DPMGR.C(257) : warning C4133: '=' : incompatible types - from 'struct tag__DRIVER_OBJECT *' to 'struct tag__DISPLAY_OBJECT *'
 HEAP.C
 IOMGR.C
 IOMGR2.C
@@ -660,30 +684,8 @@ udp.c
 .\include\lwip/udp.h(63) : warning C4103: '.\include\lwip/udp.h' : used #pragma pack to change alignment
 .\include\lwip/icmp.h(71) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
 .\include\lwip/icmp.h(88) : warning C4103: '.\include\lwip/icmp.h' : used #pragma pack to change alignment
-DPMGR.C
 E:\HelloX\HelloX_Kernel\network\core\udp.c(102) : warning C4761: integral size mismatch in argument; conversion supplied
 E:\HelloX\HelloX_Kernel\network\core\udp.c(345) : warning C4761: integral size mismatch in argument; conversion supplied
-E:\HelloX\HelloX_Kernel\kernel\DPMGR.C(69) : warning C4018: '==' : signed/unsigned mismatch
-E:\HelloX\HelloX_Kernel\kernel\DPMGR.C(257) : warning C4133: '=' : incompatible types - from 'struct tag__DRIVER_OBJECT *' to 'struct tag__DISPLAY_OBJECT *'
-CharDisplay .C
-HISCMD .C
-E:\HelloX\HelloX_Kernel\shell\HISCMD .C(89) : warning C4090: 'function' : different 'const' qualifiers
-E:\HelloX\HelloX_Kernel\shell\HISCMD .C(89) : warning C4024: 'StrCpy' : different types for formal and actual parameter 1
-BIOSVGA.C
-E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(110) : warning C4047: '>=' : 'unsigned short *' differs in levels of indirection from 'const int '
-E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(123) : warning C4013: 'VGA_SetCursorPos' undefined; assuming extern returning int
-E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(167) : warning C4047: '>=' : 'unsigned short *' differs in levels of indirection from 'const int '
-E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(178) : warning C4013: 'VGA_ChangeLine' undefined; assuming extern returning int
-E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(200) : warning C4142: benign redefinition of type
-E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(247) : warning C4142: benign redefinition of type
-E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(282) : warning C4047: '>=' : 'unsigned short *' differs in levels of indirection from 'const int '
-E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(306) : warning C4047: '>=' : 'unsigned short *' differs in levels of indirection from 'const int '
-E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(354) : warning C4047: '>=' : 'unsigned short *' differs in levels of indirection from 'const int '
-E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(390) : warning C4113: 'int (__cdecl *)()' differs in parameter lists from 'int (__cdecl *)(unsigned short ,unsigned short )'
-E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(403) : warning C4133: 'function' : incompatible types - from 'struct tag__DISPLAY_MANAGER *' to 'struct tag__COMMON_OBJECT *'
-E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(403) : warning C4133: 'function' : incompatible types - from 'struct tag__DISPLAY_OBJECT *' to 'struct tag__COMMON_OBJECT *'
-E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(348) : warning C4761: integral size mismatch in argument; conversion supplied
-E:\HelloX\HelloX_Kernel\arch\x86\BIOSVGA.C(348) : warning C4761: integral size mismatch in argument; conversion supplied
 Linking...
 LINK : warning LNK4108: /ALIGN specified without /DRIVER or /VXD; image may not run
 Release/master.dll : warning LNK4086: entrypoint "___OS_Entry" is not __stdcall with 12 bytes of arguments; image may not run
@@ -692,7 +694,7 @@ LINK : warning LNK4096: /BASE value "110000" is invalid for Windows 95; image ma
 
 
 <h3>Results</h3>
-master.dll - 0 error(s), 345 warning(s)
+master.dll - 0 error(s), 347 warning(s)
 </pre>
 </body>
 </html>
