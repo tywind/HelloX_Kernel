@@ -576,10 +576,10 @@ static VOID DispatchInterrupt(__COMMON_OBJECT* lpThis,
 #ifdef __CFG_SYS_INTNEST  //Interupt nest is enabled.
 		//Do nothing.
 #else
-		BUG();
-		_hx_printf("The BUG information(vector,nestlevel):%d,%d\r\n",
+		_hx_printf("Fatal error,interrupt nested(enter-int,vector = %d,nestlevel = %d)\r\n",
 			ucVector,
 			lpSystem->ucIntNestLevel);
+		BUG();
 #endif
 	}
 	lpIntObject = lpSystem->lpInterruptVector[ucVector];
@@ -612,10 +612,10 @@ __RETFROMINT:
 #ifdef __CFG_SYS_INTNEST  //Interrupt nest is enabled.
 		//Do nothing.
 #else
-		BUG();
-		_hx_printf("The BUG information(vector,nestlevel):%d,%d\r\n",
+		_hx_printf("Fatal error,interrupt nested(leave-int,vector = %d,nestlevel = %d)\r\n",
 			ucVector,
 			lpSystem->ucIntNestLevel);
+		BUG();
 #endif  //__CFG_SYS_INTNEST
 	}
 	return;
