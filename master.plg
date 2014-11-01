@@ -6,7 +6,7 @@
 --------------------Configuration: master - Win32 Release--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating temporary file "C:\Users\garry\AppData\Local\Temp\RSPB678.tmp" with contents
+Creating temporary file "C:\Users\garry\AppData\Local\Temp\RSP64DE.tmp" with contents
 [
 /nologo /MT /W3 /GX /O1 /I ".\include" /I ".\arch\x86" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "MASTER_EXPORTS" /Fp"Release/master.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
 "E:\HelloX\HelloX_Kernel\drivers\x86\com.c"
@@ -117,8 +117,8 @@ Creating temporary file "C:\Users\garry\AppData\Local\Temp\RSPB678.tmp" with con
 "E:\HelloX\HelloX_Kernel\network\core\timers.c"
 "E:\HelloX\HelloX_Kernel\network\core\udp.c"
 ]
-Creating command line "cl.exe @C:\Users\garry\AppData\Local\Temp\RSPB678.tmp" 
-Creating temporary file "C:\Users\garry\AppData\Local\Temp\RSPB679.tmp" with contents
+Creating command line "cl.exe @C:\Users\garry\AppData\Local\Temp\RSP64DE.tmp" 
+Creating temporary file "C:\Users\garry\AppData\Local\Temp\RSP64DF.tmp" with contents
 [
 /nologo /base:"0x110000" /entry:"__OS_Entry" /dll /incremental:no /pdb:"Release/master.pdb" /map:"Release/master.map" /machine:I386 /nodefaultlib /out:"Release/master.dll" /implib:"Release/master.lib" /ALIGN:16 
 .\Release\com.obj
@@ -229,7 +229,7 @@ Creating temporary file "C:\Users\garry\AppData\Local\Temp\RSPB679.tmp" with con
 .\Release\timers.obj
 .\Release\udp.obj
 ]
-Creating command line "link.exe @C:\Users\garry\AppData\Local\Temp\RSPB679.tmp"
+Creating command line "link.exe @C:\Users\garry\AppData\Local\Temp\RSP64DF.tmp"
 <h3>Output Window</h3>
 Compiling...
 com.c
