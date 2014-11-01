@@ -26,8 +26,7 @@
 
 #ifndef __LWIPOPTS_H__
 
-//Swich of debugging functions.Only define the LWIP_DEBUG macro
-//to enable the debugging functions of lwIP.
+//Swich of debugging functions.
 //#define LWIP_DEBUG           1
 
 //Use binary semaphore for mutex.
@@ -50,6 +49,21 @@
 
 //Enable or disable TCP functions in lwIP.
 #define LWIP_TCP             1
+
+//Enable or disable DHCP client functions.
+#define LWIP_DHCP            1
+
+//Enable or disable DNS client functions.
+#define LWIP_DNS             1
+
+//Change the default value(3) to larger number,since DHCP and DNS functions
+//are enabled.
+#define MEMP_NUM_SYS_TIMEOUT 8
+
+//Disable the "purge oldest pbuf function" in IP fragment,since it
+//will lead ASSERT failed in ip_reass_free_complete_datagram routine,
+//in ip_frag.c file.
+#define IP_REASS_FREE_OLDEST 0
 
 //*-----------------------------------------------------------------------
 //*
@@ -137,6 +151,11 @@
 */
 #ifndef IP_DEBUG
 #define IP_DEBUG                        LWIP_DBG_ON
+#endif
+
+//Turn DHCP debugging one.
+#ifndef DHCP_DEBUG
+#define DHCP_DEBUG                      LWIP_DBG_ON
 #endif
 
 //Debug output routine.

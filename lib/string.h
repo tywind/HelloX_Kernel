@@ -53,6 +53,9 @@ char* strchr(const char* string,int ch);
 int strcmp(const char* src,const char* dst);
 int strlen(const char* s);
 
+//Secured string manipulation functions.
+char* strncpy(char *dest,char *src,unsigned int n);
+
 //清除空格符标志
 #define TRIM_LEFT    0x1
 #define TRIM_RIGHT   0x2

@@ -15,5 +15,10 @@ All authors have contribution to the Kernel module of HelloX operating system wi
               About 1000 lines code.           erwin.wang@qq.com              N/A
 
  tywind.huang modified about fat32 Files       370543742@qq.com               N/A
-                      
+
+ tywind.huang Implements a standard VGA        370543742@qq.com               N/A
+              driver in C language,and
+              optimized shell mechanism,
+              about 2000 LOC.
+
 

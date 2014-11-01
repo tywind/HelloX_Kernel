@@ -13,7 +13,13 @@ Here is the steps to run HelloX kernel in Virtual Machines(Such as Virtual PC,Vi
 NOTE:PLEASE DO NOT DELETE ANY FILE UNDER BIN DIRECTORY.
 
 Here is the include directory configuration for your IDE:
-1. Set /include and /lib directory as default include directory;
+1. Set the following directories as include directory:
+   a) /lib
+   b) /include
+   c) /shell
+   d) /network
+   e) /network/nicdrv
+   f) /include/lwip
 2. Delete the default include directory set by your IDE,since it may conflict with source files under /lib.
 
 Wish you good luck!:-),please contact garryxin@gmail.com or QQ/WeChat:89007638 for assistance.

@@ -77,6 +77,7 @@ BOOL CD_ChangeLine()
 	return DisplayManager.ChangeLine((__COMMON_OBJECT*)&DisplayManager,
 		                            (__COMMON_OBJECT*)s_hDisplayObj);
 }
+
 //设置当前光标位置
 INT  CD_SetCursorPos(WORD nCursorX,WORD nCursorY)
 {

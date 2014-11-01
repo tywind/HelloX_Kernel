@@ -24,11 +24,6 @@
 #include "..\lib\string.h"
 #include "..\lib\stdio.h"
 
-
-#define  FS_PROMPT_STR   "[fs_view]"
-
-static HISOBJ            s_hHiscmdInoObj   = NULL;
-
 static struct __FS_GLOBAL_DATA{
 	__FS_ARRAY_ELEMENT  FsArray[FILE_SYSTEM_NUM];
 	BYTE                CurrentFs;                 //Current file system identifier.
@@ -40,7 +35,7 @@ static CHAR   Buffer[256] = {0};                   //Local buffer used by this t
 //
 //Pre-declare routines.
 //
-static DWORD CommandParser(LPCSTR);
+static DWORD CommandParser(LPSTR);
 static DWORD help(__CMD_PARA_OBJ*);        //help sub-command's handler.
 static DWORD exit(__CMD_PARA_OBJ*);        //exit sub-command's handler.
 static DWORD fslist(__CMD_PARA_OBJ*);
@@ -56,6 +51,8 @@ static DWORD type(__CMD_PARA_OBJ*);
 static DWORD copy(__CMD_PARA_OBJ*);
 static DWORD use(__CMD_PARA_OBJ*);
 static DWORD init();                     //Initialize routine.
+
+
 
 //
 //The following is a map between command and it's handler.
@@ -87,234 +84,110 @@ static struct __FDISK_CMD_MAP{
 //
 static VOID PrintPound()
 {
-	/*WORD  wr = 0x0700;	
+	WORD  wr = 0x0700;
+	
 	wr += '#';
 	GotoHome();
 	ChangeLine();
-	PrintCh(wr);*/
-	//CD_ChangeLine();
-
-	CD_PrintString(FS_PROMPT_STR,FALSE);
-
+	PrintCh(wr);
 }
 
 //
-//This is the keybord entry point.
+//This is the application's entry point.
 //
-static INT OnKeyControl(BYTE   bt )
-{
-
-	switch(bt)
-	{
-		case VK_RETURN:
-		{
-			CHAR   szCmdBuffer[CMD_MAX_LEN] = {0};			
-			WORD   CursorX                  = 0;
-			WORD   CursorY                  = 0;
-
-			//µÃµ½ÃüÁîÊäÈë´®
-			CD_GetCursorPos(&CursorX,&CursorY);		
-			CD_GetString(strlen(FS_PROMPT_STR),CursorY,szCmdBuffer,sizeof(szCmdBuffer));
-			strtrim(szCmdBuffer,TRIM_LEFT|TRIM_RIGHT);
-			CD_ChangeLine();
-
-			if(strlen(szCmdBuffer) > 0)
-			{
-				His_SaveCmd(s_hHiscmdInoObj,szCmdBuffer);
-				switch(CommandParser(szCmdBuffer))
-				{
-					case FS_CMD_TERMINAL: //Exit command is entered.
-					{
-						return FALSE;
-					}
-					break;
-					case FS_CMD_INVALID:  //Can not parse the command.
-					{
-						CD_PrintString("Invalid command.",TRUE);
-					}							
-					break;
-					case FS_CMD_FAILED:
-					{
-						CD_PrintString("Failed to process the command.",TRUE);
-					}
-					break;
-				default:
-					break;
-				}
-			}
-					
-		PrintPound();
-		}
-		break;
-		case VK_BACKSPACE:
-		{
-			WORD CursorX = 0;
-			WORD CursorY = 0;
-
-			CD_GetCursorPos(&CursorX,&CursorY);
-			if(CursorX <= strlen(FS_PROMPT_STR))
-			{
-				break;
-			}
-
-			CD_DelChar(DISPLAY_DELCHAR_PREV);
-		}
-		break;
-		default:
-		{
-			CD_PrintChar(bt);
-		}
-			
-	}
-
-	return TRUE;
-}
-
-
-//load history cmd to current cmd line
-static 	void LoadHisCmd(BOOL bUp)
-{
-	CHAR   szHisCmd[CMD_MAX_LEN] = {0};
-	WORD   CursorX               = 0;
-	WORD   CursorY               = 0;
-	INT    nInc                  = 0;
-
-
-	if(His_LoadHisCmd(s_hHiscmdInoObj,bUp,szHisCmd,sizeof(szHisCmd)) == FALSE)
-	{
-		return; 
-	}
-
-	CD_GetCursorPos(&CursorX,&CursorY);
-	CD_SetCursorPos(strlen(FS_PROMPT_STR),CursorY);
-	CD_DelString(strlen(FS_PROMPT_STR),CursorY,CMD_MAX_LEN);
-	CD_PrintString(szHisCmd,FALSE);		
-}
-
-
-static BOOL OnVkKeyControl(BYTE bt)
-{
-	WORD CursorX = 0;
-	WORD CursorY = 0;
-
-	CD_GetCursorPos(&CursorX,&CursorY);
-
-	switch(bt)
-	{
-		case VK_LEFTARROW:
-		{
-			if(CursorX <= strlen(FS_PROMPT_STR))
-			{
-				break;
-			}
-
-			CursorX --;
-			CD_SetCursorPos(CursorX,CursorY);
-		}
-		break;
-		case VK_RIGHTARROW:
-		{
-			CHAR szCurChar[2] = {0};
-
-			CD_GetString(CursorX,CursorY,szCurChar,1);
-			if(szCurChar[0] > 0)
-			{
-				CD_SetCursorPos(CursorX+1,CursorY);
-			}
-		}
-		break;
-		case VK_UPARROW:
-		{			
-			LoadHisCmd(TRUE);
-		}
-		break;
-		case VK_DOWNARROW:
-		{
-			LoadHisCmd(FALSE);
-		}
-		break;
-		case VK_DELETE:
-		{
-			CD_DelChar(DISPLAY_DELCHAR_CURR);
-		}
-		break;
-		case VK_HOME:
-		{			
-			CD_SetCursorPos(strlen(FS_PROMPT_STR),CursorY);
-		}
-		break;
-		case VK_END:
-		{
-			CHAR szCmdBuf[CMD_MAX_LEN] = {0};
-
-			CursorX = strlen(FS_PROMPT_STR);
-			CD_GetString(CursorX,CursorY,szCmdBuf,sizeof(szCmdBuf));
-
-			CursorX += strlen(szCmdBuf);
-			CD_SetCursorPos(CursorX,CursorY);
-			}
-		break;
-	default:
-		return FALSE;
-	}
-
-
-	return TRUE;
-}
 DWORD fsEntry(LPVOID p)
 {
+	CHAR                        strCmdBuffer[MAX_BUFFER_LEN];
+	BYTE                        ucCurrentPtr                  = 0;
+	BYTE                        bt;
+	WORD                        wr                            = 0x0700;
 	__KERNEL_THREAD_MESSAGE     Msg;
+	DWORD                       dwRetVal;
 
-	
 	if(0 == init())  //Can not finish the initialization work.
 	{
 		PrintLine("  Can not initialize the FS thread.");
 		return 0;
 	}
-
-	s_hHiscmdInoObj = His_CreateHisObj(HISCMD_MAX_COUNT);
 	PrintPound();    //Print out the prompt.
 
 	while(TRUE)
 	{
 		if(GetMessage(&Msg))
 		{
-			BYTE bt = (BYTE)(Msg.dwParam);
-
-			switch(Msg.wCommand)
+			if(MSG_KEY_DOWN == Msg.wCommand)    //This is a key down message.
 			{
-				case MSG_KEY_DOWN:
+				bt = (BYTE)Msg.dwParam;
+				switch(bt)
 				{
-					if(OnKeyControl(bt) == FALSE)
+				case VK_RETURN:                //This is a return key.
+					if(0 == ucCurrentPtr)      //There is not any character before this key.
 					{
-						goto __TERMINAL;
+						PrintPound();
+						break;
 					}
+					else
+					{
+						strCmdBuffer[ucCurrentPtr] = 0;    //Set the terminal flag.
+						dwRetVal = CommandParser(strCmdBuffer);
+						switch(dwRetVal)
+						{
+						case FS_CMD_TERMINAL: //Exit command is entered.
+							goto __TERMINAL;
+						case FS_CMD_INVALID:  //Can not parse the command.
+							PrintLine("    Invalid command.");
+							//PrintPound();
+							break;
+						case FS_CMD_FAILED:
+							PrintLine("Failed to process the command.");
+							break;
+						case FS_CMD_SUCCESS:      //Process the command successfully.
+							//PrintPound();
+							break;
+						default:
+							break;
+						}
+						ucCurrentPtr = 0;    //Re-initialize the buffer pointer.
+						PrintPound();
+					}
+					break;
+				case VK_BACKSPACE:
+					if(ucCurrentPtr)
+					{
+						ucCurrentPtr --;
+						GotoPrev();
+					}
+					break;
+				default:
+					if(ucCurrentPtr < MAX_BUFFER_LEN)    //The command buffer is not overflow.
+					{
+						strCmdBuffer[ucCurrentPtr] = bt;
+						ucCurrentPtr ++;
+						wr += bt;
+						PrintCh(wr);
+						wr  = 0x0700;
+					}
+					break;
 				}
-				case MSG_VK_KEY_DOWN:
-				{
-					OnVkKeyControl(bt);
-				}
-				break;
-				case KERNEL_MESSAGE_TIMER:
+			}
+			else
+			{
+				if(Msg.wCommand == KERNEL_MESSAGE_TIMER)
 				{
 					PrintLine("Timer message received.");
 				}
-				break;
 			}
 		}
 	}
 
 __TERMINAL:
-
-	His_DeleteHisObj(s_hHiscmdInoObj);
-
 	return 0;
 }
 
 //
 //The following routine processes the input command string.
 //
-static DWORD CommandParser(LPCSTR lpszCmdLine)
+static DWORD CommandParser(LPSTR lpszCmdLine)
 {
 	DWORD                  dwRetVal          = FS_CMD_INVALID;
 	DWORD                  dwIndex           = 0;
@@ -417,14 +290,13 @@ static DWORD fslist(__CMD_PARA_OBJ* pcpo)
 //A local helper routine to print the directory list,used by dir command.
 static VOID PrintDir(FS_FIND_DATA* pFindData)
 {
-	CHAR    Buffer[128] = {0};
+	CHAR    Buffer[128];
 
 	_hx_sprintf(Buffer,"    %16s    %16d    %4s",
-			pFindData->cAlternateFileName,
+		pFindData->cAlternateFileName,
 		pFindData->nFileSizeLow,
 		(pFindData->dwFileAttribute & FILE_ATTR_DIRECTORY) ? "DIR" : "FILE");
-
-	PrintLine(Buffer);	
+	PrintLine(Buffer);
 }
 
 static DWORD dir(__CMD_PARA_OBJ* pCmdObj)
@@ -433,7 +305,7 @@ static DWORD dir(__CMD_PARA_OBJ* pCmdObj)
 	FS_FIND_DATA      ffd;
 	__COMMON_OBJECT*  pFindHandle = NULL;
 	BOOL              bFindNext   = FALSE;
-	
+
 	strcpy(Buffer,FsGlobalData.CurrentDir);
 	if(pCmdObj->byParameterNum >= 2)  //Target directory specified.
 	{
@@ -457,7 +329,6 @@ static DWORD dir(__CMD_PARA_OBJ* pCmdObj)
 			Buffer,
 			pFindHandle,
 			&ffd);
-
 	}while(bFindNext);
 
 	//Close the find handle.

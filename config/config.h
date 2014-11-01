@@ -23,7 +23,7 @@
 //
 //************************************************************************
 
-#define VERSION_INFO "    HelloX [Version 1.760,build in 2014/08/24,by Garry.Xin]"
+#define VERSION_INFO "    HelloX [Version 1.770,build in 2014/10/31,by Garry.Xin]"
 #define SLOGAN_INFO  "    HelloX OS,through which you can talk to everything."
 
 //************************************************************************
@@ -96,6 +96,10 @@
 
 //Include virtual memory management functions in OS.
 #define __CFG_SYS_VMM
+
+//Enable or disable interrupt nest.It should be disabled under x86 platform,
+//and maybe enabled on ARM platform.
+//#define __CFG_SYS_INTNEST
 
 //Include thread heap functions.
 #define __CFG_SYS_HEAP

@@ -13,26 +13,16 @@
 //***********************************************************************/
 
 #ifndef __STDAFX_H__
-#include "..\..\INCLUDE\StdAfx.h"
+#include "StdAfx.h"
 #endif
 
-#include "..\..\include\console.h"
+#include "console.h"
+#include "chardisplay.h"
 
 void PrintStr(const char* pszMsg)
 {
 #ifdef __I386__
-	__asm{
-		push ebx
-		push ecx
-		mov ebx,__PRINTSTR_BASE
-		mov ecx,dword ptr [ebx]
-		mov eax,pszMsg
-		push eax
-		call ecx
-		pop eax
-		pop ecx
-		pop ebx
-	}
+	CD_PrintString((LPSTR)pszMsg,FALSE);
 #endif
 
 #ifdef __CFG_SYS_CONSOLE
@@ -43,12 +33,8 @@ void PrintStr(const char* pszMsg)
 void ClearScreen()
 {
 #ifdef __I386__
-	__asm{
-		push ebx
-		mov ebx,__CLEARSCREEN_BASE
-		call dword ptr [ebx]
-		pop ebx
-	}
+	CD_Clear();
+	CD_SetCursorPos(0,0);
 #endif
 
 #ifdef __CFG_SYS_CONSOLE
@@ -59,15 +45,7 @@ void ClearScreen()
 void PrintCh(unsigned short ch)
 {
 #ifdef __I386__
-	__asm{
-		push ebx
-		mov ebx,__PRINTCH_BASE
-		mov ax,word ptr [ebp + 0x08]
-		push eax
-		call dword ptr [ebx]
-		pop eax
-		pop ebx
-	}
+	CD_PrintChar((CHAR)ch);
 #endif
 
 #ifdef __CFG_SYS_CONSOLE
@@ -78,12 +56,9 @@ void PrintCh(unsigned short ch)
 void GotoHome()
 {
 #ifdef __I386__
-	__asm{
-		push ebx
-		mov ebx,__GOTOHOME_BASE
-		call dword ptr [ebx]
-		pop ebx
-	}
+	WORD x,y;
+	CD_GetCursorPos(&x,&y);
+	CD_SetCursorPos(0,y);
 #endif
 
 #ifdef __CFG_SYS_CONSOLE
@@ -94,12 +69,9 @@ void GotoHome()
 void ChangeLine()
 {
 #ifdef __I386__
-	__asm{
-		push ebx
-		mov ebx,__CHANGELINE_BASE
-		call dword ptr [ebx]
-		pop ebx
-	}
+	WORD x,y;
+	CD_GetCursorPos(&x,&y);
+	CD_SetCursorPos(x,y + 1);
 #endif
 
 #ifdef __CFG_SYS_CONSOLE
@@ -110,12 +82,7 @@ void ChangeLine()
 VOID GotoPrev()
 {
 #ifdef __I386__
-	__asm{
-		push ebx
-		mov ebx,__GOTOPREV_BASE
-		call dword ptr [ebx]
-		pop ebx
-	}
+	CD_DelChar(DISPLAY_DELCHAR_PREV);
 #endif
 
 #ifdef __CFG_SYS_CONSOLE

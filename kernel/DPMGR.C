@@ -15,7 +15,6 @@
 
 #include "string.h"
 
-
 //RegisterDisplay,this routine add one display controller into system.
 static BOOL RegisterDisplay(__COMMON_OBJECT*   lpThis,__COMMON_OBJECT* lpDisplayObj)
 {
@@ -101,7 +100,6 @@ static BOOL  GetDisplayRange(__COMMON_OBJECT*   lpThis,__COMMON_OBJECT* pDpObj,W
 	{
 		return FALSE;
 	}
-		
 
 	pDisplayObj->GetDisplayRange(pLines,pColums);
 
@@ -132,7 +130,6 @@ static BOOL PrintChar(__COMMON_OBJECT*   lpThis,__COMMON_OBJECT* pDpObj,CHAR ch)
 		return FALSE;
 	}
 
-
 	pDisplayObj->PrintChar(ch);
 	
 	return TRUE;
@@ -146,7 +143,6 @@ static BOOL  GetCursorPos(__COMMON_OBJECT*   lpThis,__COMMON_OBJECT* pDpObj,WORD
 	{
 		return FALSE;
 	}
-
 
 	return pDisplayObj->GetCursorPos(pCursorX,pCursorY);		
 }
@@ -199,6 +195,7 @@ static BOOL DelString(__COMMON_OBJECT*   lpThis,__COMMON_OBJECT* pDpObj,WORD nCu
 
 	return pDisplayObj->DelString(nCursorX,nCursorY,nDelLen);	
 }
+
 static BOOL DelChar(__COMMON_OBJECT*   lpThis,__COMMON_OBJECT* pDpObj,INT nDelMode)
 {
 	__DISPALY_OBJECT*  pDisplayObj = GetDisplayObj(lpThis,pDpObj);
@@ -232,7 +229,6 @@ static BOOL  Clear(__COMMON_OBJECT*   lpThis,__COMMON_OBJECT* pDpObj)
 	{
 		return FALSE;
 	}
-
 
 	return pDisplayObj->Clear();			
 }
@@ -276,6 +272,7 @@ static BOOL LoadDisplay(__DISPLAYDRIVER_ENTRY DrvEntry)
 		(__COMMON_OBJECT*)lpDrvObject);
 	return FALSE;
 }
+
 __DISPLAY_MANAGER DisplayManager = 
 {
 	{0},      //DisplayArray.

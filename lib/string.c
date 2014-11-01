@@ -173,10 +173,10 @@ BOOL Int2Str(DWORD dwNum,LPSTR pszResult)
 //
 VOID PrintLine(LPSTR pszStr)
 {
-	CD_PrintString(pszStr,TRUE);
-	/*GotoHome();
+	//CD_PrintString(pszStr,TRUE);
+	GotoHome();
 	ChangeLine();
-	PrintStr(pszStr);*/		
+	PrintStr(pszStr);
 }
 
 //
@@ -511,3 +511,18 @@ void strtrim(char * dst,int flag)
 	}
 	
 }
+
+//String copy,array bound is guaranteed.
+char* strncpy(char *dest,char *src,unsigned int n)
+{
+	char *strRtn=dest;
+	while(n && (*dest++=*src++))
+	{
+		n--;
+	}
+	if(n){
+		while(--n)
+			*dest++;
+	}  
+    return strRtn;  
+} 

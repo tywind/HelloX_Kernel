@@ -30,6 +30,7 @@
 #include "..\kthread\idle.h"
 #include "..\include\MODMGR.H"
 #include "..\include\console.h"
+#include "lwip\tcpip.h"
 #include "nicdrv\ethif.h"
 
 #include "..\lib\stdio.h"
@@ -45,7 +46,10 @@ char* pszHelpInfo = "Any help please press 'help' + return.";
 //Driver entry point array,this array resides in drventry.cpp file in the 
 //same directory as os_entry.cpp,which is OSENTRY in current version.
 extern __DRIVER_ENTRY DriverEntryArray[];
+
+#ifdef __I386__
 extern __DISPLAYDRIVER_ENTRY DisplayEntryArray[];
+#endif
 
 //A dead loop routine.
 static void DeadLoop()
@@ -83,7 +87,7 @@ void __OS_Entry()
 	//Print out welcome message.
 	//Please note the output should put here that before the System.BeginInitialization routine,
 	//since it may cause the interrupt enable,which will lead the failure of system initialization.
-	ClearScreen();
+	/*ClearScreen();
 	PrintStr(pszStartMsg1);
 	PrintStr(pszStartMsg2);
 	GotoHome();
@@ -91,7 +95,7 @@ void __OS_Entry()
 
 	PrintStr(pszHelpInfo); //Print out help information.
 	GotoHome();
-	ChangeLine();
+	ChangeLine();*/
 
 	//Prepare the OS initialization environment.It's worth noting that even the System
 	//object self is not initialized yet.
@@ -109,6 +113,7 @@ void __OS_Entry()
 		goto __TERMINAL;
 	}
 
+#ifdef __I386__
 	// load display device
 	dwIndex = 0;
 	while(DisplayEntryArray[dwIndex])
@@ -121,6 +126,17 @@ void __OS_Entry()
 		dwIndex ++;  //Continue to load.
 	}
 	CD_InitDisplay(0);
+#endif
+
+	ClearScreen();
+	PrintStr(pszStartMsg1);
+	PrintStr(pszStartMsg2);
+	GotoHome();
+	ChangeLine();
+
+	PrintStr(pszHelpInfo); //Print out help information.
+	GotoHome();
+	ChangeLine();
 
 #ifdef __CFG_SYS_VMM  //Enable VMM.
 	*(__PDE*)PD_START = NULL_PDE;    //Set the first page directory entry to NULL,to indicate
@@ -313,7 +329,7 @@ void __OS_Entry()
 			(__COMMON_OBJECT*)&KernelThreadManager,
 			0,
 			KERNEL_THREAD_STATUS_READY,
-			PRIORITY_LEVEL_NORMAL,
+			PRIORITY_LEVEL_HIGH,
 			ModuleMgr.ShellEntry,
 			NULL,
 			NULL,

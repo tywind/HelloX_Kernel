@@ -30,16 +30,12 @@
 //Handler of version command.
 VOID VerHandler(LPSTR pstr)
 {
-	/*GotoHome();
+	GotoHome();
 	ChangeLine();
 	PrintStr(VERSION_INFO);
 	GotoHome();
 	ChangeLine();
-	PrintStr(SLOGAN_INFO);*/
-	
-	CD_ChangeLine();
-	CD_PrintString(VERSION_INFO,TRUE);
-	CD_PrintString(SLOGAN_INFO,TRUE);
+	PrintStr(SLOGAN_INFO);
 }
 
 //Handler for memory,this routine print out the memory layout and memory usage status.
@@ -156,20 +152,17 @@ VOID SysInfoHandler(LPSTR pstr)
 	}
 
 	//All system registers are got,then print out them.
-   /*GotoHome();
+	GotoHome();
 	ChangeLine();
-	PrintStr("    System context information(general registers and segment registers):");*/
-
-	CD_ChangeLine();
-	CD_PrintString("    System context information(general registers and segment registers):",TRUE);
+	PrintStr("    System context information(general registers and segment registers):");
 	for(bt = 0;bt < 11;bt ++)
 	{
-		//GotoHome();
-		//ChangeLine();
-		CD_PrintString(strHdr[bt],TRUE);
+		GotoHome();
+		ChangeLine();
+		PrintStr(strHdr[bt]);
 		Hex2Str(sysContext[bt],Buffer);
 		//Buffer[8] = 0x00;
-		CD_PrintString(Buffer,TRUE);
+		PrintStr(Buffer);
 	}
 	return;
 #else   //Only x86 platform is supported yet.
