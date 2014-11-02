@@ -141,7 +141,7 @@ static err_t ethernetif_init(struct netif *netif)
    * from it if you have to do some checks before sending (e.g. if link
    * is available...) */
   netif->output       = etharp_output;
-  netif->hwaddr_len = ETHARP_HWADDR_LEN;
+	netif->hwaddr_len = ETHARP_HWADDR_LEN;
 #ifdef __STM32__
   netif->linkoutput   = low_level_output;
   low_level_init(netif);
@@ -287,6 +287,7 @@ static DWORD WiFiDriverThreadEntry(LPVOID pData)
 						_hx_printf("  A valid association info object must be specified.\r\n");
 						break;
 					}
+					_hx_printf("\r\n");
 				  _hx_printf("  Try to associate to [%s] in [%s] mode...\r\n", \
 					    pAssocInfo->ssid, \
 					    (0 == pAssocInfo->mode) ? "INFRA" : "ADHOC");
@@ -298,6 +299,7 @@ static DWORD WiFiDriverThreadEntry(LPVOID pData)
 					break;
 					
 				case WIFI_MSG_SHOWINT:             //Show interface's statistics info.
+					_hx_printf("\r\n");
 					_hx_printf("  Ethernet statistics information:\r\n");
 				  _hx_printf("    Send frame #       : %d\r\n",ifState.dwFrameSend);
 				  _hx_printf("    Success send #     : %d\r\n",ifState.dwFrameSendSuccess);
