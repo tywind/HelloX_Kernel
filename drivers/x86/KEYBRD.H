@@ -92,7 +92,7 @@ BOOL KBDriverEntry(__DRIVER_OBJECT* pDriverObject);
 //Messages to indicate which event has occured.
 #define ASCII_KEY_DOWN          MSG_KEY_DOWN
 #define ASCII_KEY_UP            MSG_KEY_UP
-#define VIRTUAL_KEY_DOWN        203
+#define VIRTUAL_KEY_DOWN        MSG_VK_KEY_DOWN
 #define VIRTUAL_KEY_UP          204
 //#define KERNEL_MESSAGE_TERMINAL 5    //This message will be send to current
                                      //focus thread when user press the combination of

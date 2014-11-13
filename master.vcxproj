@@ -178,6 +178,7 @@
     <ClCompile Include="shell\network2.c" />
     <ClCompile Include="shell\SHELL.C" />
     <ClCompile Include="shell\SHELL1.C" />
+    <ClCompile Include="shell\SHELL_HELP.C" />
     <ClCompile Include="shell\STAT_S.C" />
     <ClCompile Include="shell\SYSD_S.C" />
     <ClCompile Include="osentry\DRVENTRY.C" />

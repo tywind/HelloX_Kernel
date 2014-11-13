@@ -4,8 +4,8 @@
 //    Module Name               : FS.CPP
 //    Module Funciton           : 
 //    Description               : Implementation code of fs application.
-//    Last modified Author      : Tywind
-//    Last modified Date        : 2014.10.15
+//    Last modified Author      :
+//    Last modified Date        : 
 //    Last modified Content     :
 //                                1.
 //                                2.
@@ -25,7 +25,7 @@
 #include "..\lib\stdio.h"
 
 
-#define  FS_PROMPT_STR   "#"
+#define  FS_PROMPT_STR   "[fs_view]"
 
 static HISOBJ            s_hHiscmdInoObj   = NULL;
 
@@ -82,237 +82,51 @@ static struct __FDISK_CMD_MAP{
 	{NULL,		   NULL,      NULL}
 };
 
-//
-//The following is a helper routine,it only prints out a "#" character as prompt.
-//
-static VOID PrintPound()
+static DWORD QueryCmdName(LPSTR pMatchBuf,INT nBufLen)
 {
-	/*WORD  wr = 0x0700;	
-	wr += '#';
-	GotoHome();
-	ChangeLine();
-	PrintCh(wr);*/
-	//CD_ChangeLine();
+	static DWORD dwIndex = 0;
 
-	CD_PrintString(FS_PROMPT_STR,FALSE);
-
-}
-
-//
-//This is the keybord entry point.
-//
-static INT OnKeyControl(BYTE   bt )
-{
-
-	switch(bt)
+	if(pMatchBuf == NULL)
 	{
-		case VK_RETURN:
-		{
-			CHAR   szCmdBuffer[CMD_MAX_LEN] = {0};			
-			WORD   CursorX                  = 0;
-			WORD   CursorY                  = 0;
-
-			//µ√µΩ√¸¡Ó ‰»Î¥Æ
-			CD_GetCursorPos(&CursorX,&CursorY);		
-			CD_GetString(strlen(FS_PROMPT_STR),CursorY,szCmdBuffer,sizeof(szCmdBuffer));
-			CD_ChangeLine();
-
-			His_SaveCmd(s_hHiscmdInoObj,szCmdBuffer);
-
-			switch(CommandParser(szCmdBuffer))
-			{
-				case FS_CMD_TERMINAL: //Exit command is entered.
-				{
-					return FALSE;
-				}
-				break;
-				case FS_CMD_INVALID:  //Can not parse the command.
-				{
-					CD_PrintString("Invalid command.",TRUE);
-				}							
-				break;
-			case FS_CMD_FAILED:
-				{
-					CD_PrintString("Failed to process the command.",TRUE);
-				}
-				break;
-			default:
-				break;
-			}
-		
-		PrintPound();
-		}
-		break;
-		case VK_BACKSPACE:
-		{
-			WORD CursorX = 0;
-			WORD CursorY = 0;
-
-			CD_GetCursorPos(&CursorX,&CursorY);
-			if(CursorX <= strlen(FS_PROMPT_STR))
-			{
-				break;
-			}
-
-			CD_DelChar(DISPLAY_DELCHAR_PREV);
-		}
-		break;
-		default:
-		{
-			CD_PrintChar(bt);
-		}
-			
-	}
-
-	return TRUE;
-}
-
-
-//load history cmd to current cmd line
-static 	void LoadHisCmd(BOOL bUp)
-{
-	CHAR   szHisCmd[CMD_MAX_LEN] = {0};
-	WORD   CursorX               = 0;
-	WORD   CursorY               = 0;
-	INT    nInc                  = 0;
-
-
-	if(His_LoadHisCmd(s_hHiscmdInoObj,bUp,szHisCmd,sizeof(szHisCmd)) == FALSE)
-	{
-		return; 
-	}
-
-	CD_GetCursorPos(&CursorX,&CursorY);
-	CD_SetCursorPos(strlen(FS_PROMPT_STR),CursorY);
-	CD_DelString(strlen(FS_PROMPT_STR),CursorY,CMD_MAX_LEN);
-	CD_PrintString(szHisCmd,FALSE);		
-}
-
-
-static BOOL OnVkKeyControl(BYTE bt)
-{
-	WORD CursorX = 0;
-	WORD CursorY = 0;
-
-	CD_GetCursorPos(&CursorX,&CursorY);
-
-	switch(bt)
-	{
-		case VK_LEFTARROW:
-		{
-			if(CursorX <= strlen(FS_PROMPT_STR))
-			{
-				break;
-			}
-
-			CursorX --;
-			CD_SetCursorPos(CursorX,CursorY);
-		}
-		break;
-		case VK_RIGHTARROW:
-		{
-			CHAR szCurChar[2] = {0};
-
-			CD_GetString(CursorX,CursorY,szCurChar,1);
-			if(szCurChar[0] > 0)
-			{
-				CD_SetCursorPos(CursorX+1,CursorY);
-			}
-		}
-		break;
-		case VK_UPARROW:
-		{			
-			LoadHisCmd(TRUE);
-		}
-		break;
-		case VK_DOWNARROW:
-		{
-			LoadHisCmd(FALSE);
-		}
-		break;
-	case VK_DELETE:
-		{
-			CD_DelChar(DISPLAY_DELCHAR_CURR);
-		}
-		break;
-	default:
-		return FALSE;
+		dwIndex    = 0;	
+		return SHELL_QUERY_CONTINUE;
 	}
 
 
-	return TRUE;
-}
-DWORD fsEntry(LPVOID p)
-{
-	__KERNEL_THREAD_MESSAGE     Msg;
-
-	
-	if(0 == init())  //Can not finish the initialization work.
+	if(NULL == SysDiagCmdMap[dwIndex].lpszCommand)
 	{
-		PrintLine("  Can not initialize the FS thread.");
-		return 0;
+		dwIndex = 0;
+		return SHELL_QUERY_CANCEL;	
 	}
 
-	s_hHiscmdInoObj = His_CreateHisObj(HISCMD_MAX_COUNT);
-	PrintPound();    //Print out the prompt.
+	strncpy(pMatchBuf,SysDiagCmdMap[dwIndex].lpszCommand,nBufLen);
+	dwIndex ++;
 
-	while(TRUE)
-	{
-		if(GetMessage(&Msg))
-		{
-			BYTE bt = (BYTE)(Msg.dwParam);
-
-			switch(Msg.wCommand)
-			{
-				case MSG_KEY_DOWN:
-				{
-					if(OnKeyControl(bt) == FALSE)
-					{
-						goto __TERMINAL;
-					}
-				}
-				case MSG_VK_KEY_DOWN:
-				{
-					OnVkKeyControl(bt);
-				}
-				break;
-				case KERNEL_MESSAGE_TIMER:
-				{
-					PrintLine("Timer message received.");
-				}
-				break;
-			}
-		}
-	}
-
-__TERMINAL:
-
-	His_DeleteHisObj(s_hHiscmdInoObj);
-
-	return 0;
+	return SHELL_QUERY_CONTINUE;	
 }
-
 //
 //The following routine processes the input command string.
 //
 static DWORD CommandParser(LPCSTR lpszCmdLine)
 {
-	DWORD                  dwRetVal          = FS_CMD_INVALID;
+	DWORD                  dwRetVal          = SHELL_CMD_PARSER_INVALID;
 	DWORD                  dwIndex           = 0;
 	__CMD_PARA_OBJ*        lpCmdParamObj     = NULL;
 
 	if((NULL == lpszCmdLine) || (0 == lpszCmdLine[0]))    //Parameter check
-		return FS_CMD_INVALID;
+	{
+		return SHELL_CMD_PARSER_INVALID;
+	}
 
 	lpCmdParamObj = FormParameterObj(lpszCmdLine);
 	if(NULL == lpCmdParamObj)    //Can not form a valid command parameter object.
 	{
-		return FS_CMD_FAILED;
+		return SHELL_CMD_PARSER_FAILED;
 	}
 
 	if(0 == lpCmdParamObj->byParameterNum)  //There is not any parameter.
 	{
-		return FS_CMD_FAILED;
+		return SHELL_CMD_PARSER_FAILED;
 	}
 
 	//
@@ -324,7 +138,7 @@ static DWORD CommandParser(LPCSTR lpszCmdLine)
 	{
 		if(NULL == SysDiagCmdMap[dwIndex].lpszCommand)
 		{
-			dwRetVal = FS_CMD_INVALID;
+			dwRetVal = SHELL_CMD_PARSER_INVALID;
 			break;
 		}
 		if(StrCmp(SysDiagCmdMap[dwIndex].lpszCommand,lpCmdParamObj->Parameter[0]))  //Find the handler.
@@ -340,9 +154,22 @@ static DWORD CommandParser(LPCSTR lpszCmdLine)
 
 //__TERMINAL:
 	if(NULL != lpCmdParamObj)
+	{
 		ReleaseParameterObj(lpCmdParamObj);
+	}
 
 	return dwRetVal;
+}
+
+DWORD fsEntry(LPVOID p)
+{
+	if(0 == init())  //Can not finish the initialization work.
+	{
+		PrintLine("  Can not initialize the FS thread.");
+		return 0;
+	}
+
+	return Shell_Msg_Loop2(FS_PROMPT_STR,CommandParser,QueryCmdName);	
 }
 
 //
@@ -351,7 +178,8 @@ static DWORD CommandParser(LPCSTR lpszCmdLine)
 static DWORD exit(__CMD_PARA_OBJ* lpCmdObj)
 {
 	memzero(&FsGlobalData,sizeof(struct __FS_GLOBAL_DATA));
-	return FS_CMD_TERMINAL;
+
+	return SHELL_CMD_PARSER_TERMINAL;
 }
 
 //
@@ -369,7 +197,7 @@ static DWORD help(__CMD_PARA_OBJ* lpCmdObj)
 		PrintLine(SysDiagCmdMap[dwIndex].lpszHelpInfo);
 		dwIndex ++;
 	}
-	return FS_CMD_SUCCESS;
+	return SHELL_CMD_PARSER_SUCCESS;
 }
 
 static DWORD fslist(__CMD_PARA_OBJ* pcpo)
@@ -392,14 +220,14 @@ static DWORD fslist(__CMD_PARA_OBJ* pcpo)
 			FsGlobalData.FsArray[i].dwAttribute);
 		PrintLine(Buffer);
 	}
-	return FS_CMD_SUCCESS;
+	return SHELL_CMD_PARSER_SUCCESS;;
 }
 
 //A local helper routine to print the directory list,used by dir command.
 static VOID PrintDir(FS_FIND_DATA* pFindData)
 {
 	CHAR    Buffer[128] = {0};
-
+	
 	_hx_sprintf(Buffer,"    %16s    %16d    %4s",
 			pFindData->cAlternateFileName,
 		pFindData->nFileSizeLow,
@@ -411,7 +239,9 @@ static VOID PrintDir(FS_FIND_DATA* pFindData)
 static DWORD dir(__CMD_PARA_OBJ* pCmdObj)
 {
 #ifdef __CFG_SYS_DDF
+	
 	FS_FIND_DATA      ffd;
+	CHAR              szTitle[128] = {0};
 	__COMMON_OBJECT*  pFindHandle = NULL;
 	BOOL              bFindNext   = FALSE;
 	
@@ -421,6 +251,8 @@ static DWORD dir(__CMD_PARA_OBJ* pCmdObj)
 		strcat(Buffer,pCmdObj->Parameter[1]);
 	}
 	ToCapital(Buffer);  //Convert to capital.
+
+	
 	pFindHandle = IOManager.FindFirstFile((__COMMON_OBJECT*)&IOManager,
 		Buffer,
 		&ffd);
@@ -428,12 +260,22 @@ static DWORD dir(__CMD_PARA_OBJ* pCmdObj)
 	if(NULL == pFindHandle)  //Can not open the target directory.
 	{
 		PrintLine("  Can not open the specified or current directory to display.");
+		
 		goto __TERMINAL;
 	}
-	//Dump out the directory's content.
-	PrintLine("    File_Name           FileSize            F_D");
+
+	_hx_sprintf(szTitle,"    %16s    %16s    %4s",
+		        "File_Name",
+		        "FileSize",
+		        "F_D"
+				);
+	PrintLine(szTitle);
+
+	//Dump out the directory's content.	
 	do{
+		
 		PrintDir(&ffd);
+		memzero(&ffd,sizeof(ffd));
 		bFindNext = IOManager.FindNextFile((__COMMON_OBJECT*)&IOManager,
 			Buffer,
 			pFindHandle,
@@ -447,7 +289,7 @@ static DWORD dir(__CMD_PARA_OBJ* pCmdObj)
 		pFindHandle);
 
 __TERMINAL:
-	return FS_CMD_SUCCESS;
+	return SHELL_CMD_PARSER_SUCCESS;;
 #else
 	return FS_CMD_FAILED;
 #endif
@@ -502,7 +344,7 @@ static DWORD cd(__CMD_PARA_OBJ* pCmdObj)
 	//Validation is ok,set the new path as current directory.
 	strcpy(FsGlobalData.CurrentDir,NewPath);
 __TERMINAL:
-	return FS_CMD_SUCCESS;
+	return SHELL_CMD_PARSER_SUCCESS;;
 #else
 	return FS_CMD_FAILED;
 #endif
@@ -516,7 +358,7 @@ static DWORD md(__CMD_PARA_OBJ* pCmdObj)
 	if(pCmdObj->byParameterNum < 2)
 	{
 		PrintLine("  Please specify the directory name to be created.");
-		return FS_CMD_SUCCESS;
+		return SHELL_CMD_PARSER_SUCCESS;;
 	}
 	strcpy(DirPath,FsGlobalData.CurrentDir);
 	strcat(DirPath,pCmdObj->Parameter[1]);
@@ -531,7 +373,7 @@ static DWORD md(__CMD_PARA_OBJ* pCmdObj)
 	{
 		PrintLine("  Create directory failed.");
 	}
-	return FS_CMD_SUCCESS;
+	return SHELL_CMD_PARSER_SUCCESS;;
 #else
 	return FS_CMD_FAILED;
 #endif
@@ -565,7 +407,7 @@ static DWORD del(__CMD_PARA_OBJ* pCmdObj)
 		goto __TERMINAL;
 	}
 __TERMINAL:
-	return FS_CMD_SUCCESS;
+	return SHELL_CMD_PARSER_SUCCESS;;
 #else
 	return FS_CMD_FAILED;
 #endif
@@ -593,7 +435,7 @@ static DWORD rd(__CMD_PARA_OBJ* pCmdObj)
 		goto __TERMINAL;
 	}
 __TERMINAL:
-	return FS_CMD_SUCCESS;
+	return SHELL_CMD_PARSER_SUCCESS;;
 #else
 	return FS_CMD_FAILED;
 #endif
@@ -601,7 +443,7 @@ __TERMINAL:
 
 static DWORD ren(__CMD_PARA_OBJ* pcpo)
 {
-	return FS_CMD_SUCCESS;
+	return SHELL_CMD_PARSER_SUCCESS;;
 }
 
 static DWORD vl(__CMD_PARA_OBJ* pCmdObj)
@@ -654,7 +496,7 @@ __TERMINAL:
 		IOManager.CloseFile((__COMMON_OBJECT*)&IOManager,
 			hFile);
 	}
-	return FS_CMD_SUCCESS;
+	return SHELL_CMD_PARSER_SUCCESS;;
 #else
 	return FS_CMD_FAILED;
 #endif
@@ -733,7 +575,7 @@ __TERMINAL:
 		IOManager.CloseFile((__COMMON_OBJECT*)&IOManager,
 			hFile);
 	}
-	return FS_CMD_SUCCESS;
+	return SHELL_CMD_PARSER_SUCCESS;;
 #else
 	return FS_CMD_FAILED;
 #endif
@@ -768,7 +610,7 @@ static DWORD copy(__CMD_PARA_OBJ* pcpo)
 	PrintLine("  In copy of fs application.");
 	PrintLine(lpInfo1);
 	PrintLine(lpInfo2);
-	return FS_CMD_SUCCESS;
+	return SHELL_CMD_PARSER_SUCCESS;;
 }
 
 static DWORD use(__CMD_PARA_OBJ* pCmdObj)
@@ -823,7 +665,7 @@ static DWORD use(__CMD_PARA_OBJ* pCmdObj)
 	FsGlobalData.CurrentFs     = Info[0];
 
 __TERMINAL:
-	return FS_CMD_SUCCESS;
+	return SHELL_CMD_PARSER_SUCCESS;;
 }
 
 //Initialize routine for FS thread.

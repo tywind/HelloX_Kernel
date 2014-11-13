@@ -395,6 +395,9 @@
     <ClCompile Include="shell\HISCMD .C">
       <Filter>Source Files\shell</Filter>
     </ClCompile>
+    <ClCompile Include="shell\SHELL_HELP.C">
+      <Filter>Source Files\shell</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\arch\bpstruct.h">

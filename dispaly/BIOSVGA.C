@@ -8,9 +8,8 @@
 
 
 #ifndef __STDAFX_H__
-#include "..\INCLUDE\StdAfx.h"
+#include "StdAfx.h"
 #endif
-
 
 #ifndef __VGA_H__
 #include "BIOSVGA.H"
@@ -311,6 +310,7 @@ static BOOL  VGA_DelString(WORD CursorX,WORD CursorY,INT nDelLen)
 
 	return TRUE;
 }
+
 static BOOL  VGA_DelChar(INT nDelMode)
 {	
 	WORD*  pVideoBuf   = NULL;

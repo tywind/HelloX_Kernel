@@ -28,7 +28,7 @@
 #include "..\lib\stdio.h"
 
 //Handler of version command.
-VOID VerHandler(LPSTR pstr)
+VOID VerHandler(__CMD_PARA_OBJ* pCmdParaObj)
 {
 	/*GotoHome();
 	ChangeLine();
@@ -43,7 +43,7 @@ VOID VerHandler(LPSTR pstr)
 }
 
 //Handler for memory,this routine print out the memory layout and memory usage status.
-VOID MemHandler(LPSTR pstr)
+VOID MemHandler(__CMD_PARA_OBJ* pCmdParaObj)
 {
 	CHAR   buff[256];
 	DWORD  dwFlags;
@@ -103,15 +103,15 @@ LPSTR strHdr[] = {               //I have put the defination of this strings
 	"    FS-GS :   0x",
 	"    ES-SS :   0x"};
 
-#ifdef __I386__
-static CHAR Buffer[] = {"Hello,China!"};
-#endif
+//#ifdef __I386__
+//static CHAR Buffer[] = {"Hello,China!"};
+//#endif
 
 //Handler for sysinfo command.
-VOID SysInfoHandler(LPSTR pstr)
+VOID SysInfoHandler(__CMD_PARA_OBJ* pCmdParaObj)
 {
 #ifdef __I386__
-	DWORD sysContext[11];
+	DWORD sysContext[11] = {0};
 	DWORD bt;
 
 	__asm{                       //Get the system information.
@@ -121,35 +121,35 @@ VOID SysInfoHandler(LPSTR pstr)
 								 //where this instruction is executed.
         push eax
         mov eax,dword ptr [esp + 0x04]
-		mov dword ptr [ebp - 0x2c],eax    //Get the eax register's value.
+		mov dword ptr [ebp - 0x30],eax    //Get the eax register's value.
 		                                  //Fuck Bill Gates!!!!!
 		mov eax,dword ptr [esp + 0x08]
-		mov dword ptr [ebp - 0x28],eax    //Get the ecx value.
+		mov dword ptr [ebp - 0x2c],eax    //Get the ecx value.
 		mov eax,dword ptr [esp + 0x0c]
-		mov dword ptr [ebp - 0x24],eax    //edx
+		mov dword ptr [ebp - 0x28],eax    //edx
 		mov eax,dword ptr [esp + 0x10]
-		mov dword ptr [ebp - 0x20],eax    //ebx
+		mov dword ptr [ebp - 0x24],eax    //ebx
 		mov eax,dword ptr [esp + 0x14]
-		mov dword ptr [ebp - 0x1c],eax    //esp
+		mov dword ptr [ebp - 0x20],eax    //esp
 		mov eax,dword ptr [esp + 0x18]
-		mov dword ptr [ebp - 0x18],eax    //ebp
+		mov dword ptr [ebp - 0x1c],eax    //ebp
 		mov eax,dword ptr [esp + 0x1c]
-		mov dword ptr [ebp - 0x14],eax    //esi
+		mov dword ptr [ebp - 0x18],eax    //esi
 		mov eax,dword ptr [esp + 0x20]
-		mov dword ptr [ebp - 0x10],eax    //edi
+		mov dword ptr [ebp - 0x14],eax    //edi
 
 		mov ax,cs
 		shl eax,0x10
 		mov ax,ds
-		mov dword ptr [ebp - 0x0c],eax    //Get cs : ds.
+		mov dword ptr [ebp - 0x10],eax    //Get cs : ds.
 		mov ax,fs
 		shl eax,0x10
 		mov ax,gs
-		mov dword ptr [ebp - 0x08],eax    //Get fs : gs.
+		mov dword ptr [ebp - 0x0c],eax    //Get fs : gs.
 		mov ax,es
 		shl eax,0x10
 		mov ax,ss
-		mov dword ptr [ebp - 0x04],eax   //Get es : ss.
+		mov dword ptr [ebp - 0x08],eax   //Get es : ss.
 
 		pop eax
 		popad                    //Restore the stack frame.
@@ -164,12 +164,11 @@ VOID SysInfoHandler(LPSTR pstr)
 	CD_PrintString("    System context information(general registers and segment registers):",TRUE);
 	for(bt = 0;bt < 11;bt ++)
 	{
-		//GotoHome();
-		//ChangeLine();
-		CD_PrintString(strHdr[bt],TRUE);
-		Hex2Str(sysContext[bt],Buffer);
-		//Buffer[8] = 0x00;
-		CD_PrintString(Buffer,TRUE);
+		CHAR szTemp[64] = {0};
+
+		CD_PrintString(strHdr[bt],FALSE);		
+		Hex2Str(sysContext[bt],szTemp);
+		CD_PrintString(szTemp,TRUE);	
 	}
 	return;
 #else   //Only x86 platform is supported yet.
@@ -181,7 +180,7 @@ VOID SysInfoHandler(LPSTR pstr)
 }
 
 //Handler for help command.
-VOID HlpHandler(LPSTR pstr)           //Command 'help' 's handler.
+VOID HlpHandler(__CMD_PARA_OBJ* pCmdParaObj)           //Command 'help' 's handler.
 {
 	LPSTR strHelpTitle   = "    The following commands are available currently:";
 	LPSTR strHelpVer     = "    version      : Print out the version information.";
@@ -226,8 +225,8 @@ VOID HlpHandler(LPSTR pstr)           //Command 'help' 's handler.
 //
 static BOOL LoadBinModule(HANDLE hBinFile,DWORD dwStartAddress)
 {
-	BYTE*   pBuffer = (BYTE*)dwStartAddress;
-	BYTE*   pTmpBuff = NULL;
+	BYTE*   pBuffer    = (BYTE*)dwStartAddress;
+	BYTE*   pTmpBuff   = NULL;
 	DWORD   dwReadSize = 0;
 	BOOL    bResult    = FALSE;
 
@@ -328,33 +327,29 @@ __TERMINAL:
 }
 
 //Handler for loadapp command.
-VOID LoadappHandler(LPSTR strCmdParam)
-{
-	__CMD_PARA_OBJ*    pCmdObj = NULL;
-	HANDLE             hBinFile  = NULL;
-	CHAR               FullPathName[64];  //Full name of binary file.
-	DWORD              dwStartAddr;       //Load address of the module.
+VOID LoadappHandler(__CMD_PARA_OBJ* pCmdParaObj)
+{		
+	CHAR      FullPathName[128]  = {0};  //Full name of binary file.
+	DWORD     dwStartAddr        = 0;       //Load address of the module.
+	HANDLE    hBinFile           = NULL;
+	
 
-	pCmdObj = FormParameterObj(strCmdParam);
-	if(NULL == pCmdObj)
-	{
-		PrintLine("Not enough system resource to interpret the command.");
-		goto __TERMINAL;
-	}
-	if(pCmdObj->byParameterNum < 2)
+	if(pCmdParaObj->byParameterNum < 2)
 	{
 		PrintLine("Please specify both app module name and load address.");
 		goto __TERMINAL;
 	}
-	if((0 == pCmdObj->Parameter[0][0]) || (0 == pCmdObj->Parameter[1][0]))
+
+	if((0 == pCmdParaObj->Parameter[0][0]) || (0 == pCmdParaObj->Parameter[1][0]))
 	{
 		PrintLine("Invalid parameter(s).");
 		goto __TERMINAL;
 	}
+
 	//Construct the full path and name.
 	strcpy(FullPathName,"C:\\PTHOUSE\\");
-	strcat(FullPathName,pCmdObj->Parameter[0]);
-	if(!Str2Hex(pCmdObj->Parameter[1],&dwStartAddr))
+	strcat(FullPathName,pCmdParaObj->Parameter[0]);
+	if(!Str2Hex(pCmdParaObj->Parameter[1],&dwStartAddr))
 	{
 		PrintLine("Invalid load address.");
 		goto __TERMINAL;
@@ -382,21 +377,19 @@ VOID LoadappHandler(LPSTR strCmdParam)
 		goto __TERMINAL;
 	}
 __TERMINAL:
+
 	if(NULL != hBinFile)  //Destroy it.
 	{
 		CloseFile(hBinFile);
 	}
-	if(NULL != pCmdObj)
-	{
-		ReleaseParameterObj(pCmdObj);
-	}
+		
 	return;
 }
 
 //Handler for GUI command,it only call LoadappHandler by given
 //the GUI module's name and it's start address after loaded into
 //memory.
-VOID GUIHandler(LPSTR pstr)
+VOID GUIHandler(__CMD_PARA_OBJ* pCmdParaObj)
 {
 	LoadappHandler("hcngui.bin 160000");  //hcngui.bin is the GUI module's name,it's
 	                                      //start address after loaded into memory

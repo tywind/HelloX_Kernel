@@ -665,7 +665,7 @@ static BOOL FillFindData(__FAT32_FIND_HANDLE* pFindHandle,FS_FIND_DATA* pFindDat
 		//Now try to find a valid directory short entry.
 		for(i;i < pFindHandle->dwClusterSize / 32;i ++)
 		{
-			if((BYTE)0xE5 == pShortEntry->FileName[0])
+			if((BYTE)0xE5 == (BYTE)pShortEntry->FileName[0])
 			{
 				pShortEntry += 1;
 				pFindHandle->dwClusterOffset += 32;
