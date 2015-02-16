@@ -16,79 +16,8 @@
 #include "StdAfx.h"
 #endif
 
+#include "arch.h"
 #include "console.h"
-#include "chardisplay.h"
-
-void PrintStr(const char* pszMsg)
-{
-#ifdef __I386__
-	CD_PrintString((LPSTR)pszMsg,FALSE);
-#endif
-
-#ifdef __CFG_SYS_CONSOLE
-	Console.PrintStr(pszMsg);
-#endif
-}
-
-void ClearScreen()
-{
-#ifdef __I386__
-	CD_Clear();
-	CD_SetCursorPos(0,0);
-#endif
-
-#ifdef __CFG_SYS_CONSOLE
-	Console.ClearScreen();
-#endif
-}
-
-void PrintCh(unsigned short ch)
-{
-#ifdef __I386__
-	CD_PrintChar((CHAR)ch);
-#endif
-
-#ifdef __CFG_SYS_CONSOLE
-	Console.PrintCh(ch);
-#endif
-}
-
-void GotoHome()
-{
-#ifdef __I386__
-	WORD x,y;
-	CD_GetCursorPos(&x,&y);
-	CD_SetCursorPos(0,y);
-#endif
-
-#ifdef __CFG_SYS_CONSOLE
-	Console.GotoHome();
-#endif
-}
-
-void ChangeLine()
-{
-#ifdef __I386__
-	WORD x,y;
-	CD_GetCursorPos(&x,&y);
-	CD_SetCursorPos(x,y + 1);
-#endif
-
-#ifdef __CFG_SYS_CONSOLE
-	Console.ChangeLine();
-#endif
-}
-
-VOID GotoPrev()
-{
-#ifdef __I386__
-	CD_DelChar(DISPLAY_DELCHAR_PREV);
-#endif
-
-#ifdef __CFG_SYS_CONSOLE
-	Console.GotoPrev();
-#endif
-}
 
 #ifdef __I386__  //Only available in x86 based PC platform.
 
@@ -106,7 +35,6 @@ INT_HANDLER SetGeneralIntHandler(__GENERAL_INTERRUPT_HANDLER TimerHandler)
 		pop ebx
 	}
 }
-
 
 __declspec(naked) VOID WriteByteToPort(UCHAR byte,WORD wPort)
 {
@@ -331,4 +259,3 @@ VOID __BUG(LPSTR lpszFileName,DWORD dwLineNum)
 	while(TRUE);
 	__LEAVE_CRITICAL_SECTION(NULL,dwFlags);
 }
-

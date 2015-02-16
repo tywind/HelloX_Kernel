@@ -18,10 +18,10 @@
 
 typedef struct tag__HISTORY_CMD_INFO
 {
-	HIS_CMD_OBJ*  pHisCmdArry;
+	HIS_CMD_OBJ*  pHisCmdArry;	
 	INT           nHisCount;
-	INT           nSaveHisIndex;   
-	INT           nExecHisIndex;   
+	INT           nSaveCount;	
+	INT           nExecHisPos;   
 
 }HISTORY_CMD_INFO;
 
@@ -40,9 +40,9 @@ HISOBJ His_CreateHisObj(INT nHisCount)
 	}
 
 	pHisInfo->nHisCount     = nHisCount;
+	pHisInfo->nSaveCount    = 0;		
+	pHisInfo->nExecHisPos   = -1;
 	pHisInfo->pHisCmdArry   = (HIS_CMD_OBJ*)KMemAlloc(sizeof(HIS_CMD_OBJ)*nHisCount,KMEM_SIZE_TYPE_ANY);
-	pHisInfo->nSaveHisIndex = 0;
-	pHisInfo->nExecHisIndex = 0;
 
 	return (HISOBJ)pHisInfo;
 }
@@ -62,37 +62,43 @@ VOID His_DeleteHisObj(HISOBJ hHisObj)
 BOOL His_SaveCmd(HISOBJ hHisObj,LPCSTR pCmdStr)
 {	
 	HISTORY_CMD_INFO*  pHisInfo = (HISTORY_CMD_INFO*)hHisObj;
-	INT           nEndHisIndex  = 0;//HISCMD_MAX_COUNT-1;
-
+	INT                nSavePos = 0;
+	
 	if(NULL == pHisInfo)
 	{
 		return FALSE;
 	}
-	nEndHisIndex = pHisInfo->nHisCount-1;
 	
-
-	//判断是否重复
-	if(strcmp(pCmdStr,pHisInfo->pHisCmdArry[pHisInfo->nSaveHisIndex].CmdStr) == 0)
+	//判断和最新的历史纪录是否重复
+	if(pHisInfo->nSaveCount >0 && StrCmp((LPSTR)pCmdStr,pHisInfo->pHisCmdArry[pHisInfo->nSaveCount-1].CmdStr))
 	{
-		pHisInfo->nExecHisIndex = pHisInfo->nSaveHisIndex+1;	
+		pHisInfo->nExecHisPos = -1;
 		return FALSE;
 	}
 
-	if(pHisInfo->nSaveHisIndex >= nEndHisIndex)
+	if(pHisInfo->nSaveCount >= pHisInfo->nHisCount)
 	{
-		INT nMoveLen = sizeof(HIS_CMD_OBJ)*nEndHisIndex;
+		INT  i = 0;
 
-		//删除最后一个指令
-		memcpy(&pHisInfo->pHisCmdArry[0],&pHisInfo->pHisCmdArry[1],nMoveLen);
+		//移动指令序列，清除最早的那一个
+		for(i=0;i < pHisInfo->nSaveCount-1;i++)
+		{
+			pHisInfo->pHisCmdArry[i] = pHisInfo->pHisCmdArry[i+1];      
+		}	
+		nSavePos  = pHisInfo->nSaveCount-1;		
+	}
+	else
+	{		
+		nSavePos  = pHisInfo->nSaveCount;		
 	}
 
-	StrCpy(pCmdStr,pHisInfo->pHisCmdArry[pHisInfo->nSaveHisIndex].CmdStr);
-	if(pHisInfo->nSaveHisIndex < nEndHisIndex)
+	StrCpy((LPSTR)pCmdStr,(LPSTR)pHisInfo->pHisCmdArry[nSavePos].CmdStr);	
+	if(pHisInfo->nSaveCount  < pHisInfo->nHisCount)
 	{
-		pHisInfo->nSaveHisIndex ++;
+		pHisInfo->nSaveCount ++;
 	}
 
-	pHisInfo->nExecHisIndex = pHisInfo->nSaveHisIndex;	
+	pHisInfo->nExecHisPos = -1;
 
 	return TRUE;
 }
@@ -103,14 +109,20 @@ BOOL His_LoadHisCmd(HISOBJ hHisObj,BOOL bUp,LPSTR pCmdBuf,INT nBufLen)
 	HISTORY_CMD_INFO*  pHisInfo = (HISTORY_CMD_INFO*)hHisObj;	
 	INT                nInc     = 0;
 
+
 	if(NULL == pHisInfo)
 	{
 		return FALSE;
 	}
 
+	if(pHisInfo->nExecHisPos  == -1)
+	{
+		pHisInfo->nExecHisPos  = pHisInfo->nSaveCount;	
+	}
+
 	if(bUp == TRUE)	
 	{
-		if(pHisInfo->nExecHisIndex <= 0)
+		if(pHisInfo->nExecHisPos <= 0)
 		{
 			return FALSE;
 		}
@@ -118,21 +130,16 @@ BOOL His_LoadHisCmd(HISOBJ hHisObj,BOOL bUp,LPSTR pCmdBuf,INT nBufLen)
 	}
 	else
 	{		
-		if(pHisInfo->nExecHisIndex >= pHisInfo->nSaveHisIndex-1)
+		if(pHisInfo->nExecHisPos >= pHisInfo->nSaveCount -1)
 		{
 			return FALSE;
 		}
 		nInc = 1;
 	}
 
-	pHisInfo->nExecHisIndex += nInc;
+	pHisInfo->nExecHisPos += nInc;
 
-	StrCpy(pHisInfo->pHisCmdArry[pHisInfo->nExecHisIndex].CmdStr,pCmdBuf);
+	StrCpy(pHisInfo->pHisCmdArry[pHisInfo->nExecHisPos].CmdStr,pCmdBuf);
 
 	return TRUE;
-	/*CD_GetCursorPos(&CursorX,&CursorY);
-	CD_SetCursorPos(SHELL_INPUT_START_X,CursorY);
-	CD_DelString(SHELL_INPUT_START_X,CursorY,CMD_MAX_LEN);
-	CD_PrintString(s_szHisCmdArry[s_nExecHisIndex].CmdStr,FALSE);*/
 }
-

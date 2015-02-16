@@ -44,7 +44,8 @@ INT FormString(LPSTR,LPSTR,LPVOID*);
 void* memcpy(void* dst,const void* src,size_t count);
 void* memset(void* dst,int val,size_t count);
 void* memzero(void* dst,size_t count); 
-int memcmp(const void* p1,const void* p2,int count);
+int   memcmp(const void* p1,const void* p2,int count);
+void* memchr (const void * buf,int chr,size_t cnt);
 
 //Standard C Lib string operations.
 char* strcat(char* dst,const char* src);
@@ -53,14 +54,13 @@ char* strchr(const char* string,int ch);
 int strcmp(const char* src,const char* dst);
 int strlen(const char* s);
 
-//Secured string manipulation functions.
 char* strncpy(char *dest,char *src,unsigned int n);
 
-//清除空格符标志
+//Flags to control the trimming.
 #define TRIM_LEFT    0x1
 #define TRIM_RIGHT   0x2
 
-//清除空格符
+//Trim space in a string.
 void strtrim(char * dst,int flag);
 
 long atol(const char* nptr);

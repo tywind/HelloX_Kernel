@@ -17,6 +17,11 @@
 typedef char *  va_list;
 typedef unsigned int     size_t;
 
+//Flags to control file seeking operation.
+#define SEEK_SET    0
+#define SEEK_CUR    1
+#define SEEK_END    2
+
 #define _INTSIZEOF(n)   ( (sizeof(n) + sizeof(int) - 1) & ~(sizeof(int) - 1) )
 
 #define va_start(ap,v)  ( ap = (va_list)&v + _INTSIZEOF(v) )

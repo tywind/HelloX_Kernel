@@ -53,11 +53,10 @@
 //Enable or disable DHCP client functions.
 #define LWIP_DHCP            1
 
-//Enable or disable DNS client functions.
+//Enable or disable DNS functions in lwIP.
 #define LWIP_DNS             1
 
-//Change the default value(3) to larger number,since DHCP and DNS functions
-//are enabled.
+//Change the default value(3) to larger number,since DHCP is enabled.
 #define MEMP_NUM_SYS_TIMEOUT 8
 
 //Disable the "purge oldest pbuf function" in IP fragment,since it

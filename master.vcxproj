@@ -43,11 +43,17 @@
     <LinkIncremental>false</LinkIncremental>
     <GenerateManifest>false</GenerateManifest>
     <IncludePath>network;Lib;</IncludePath>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules />
+    <CodeAnalysisRuleAssemblies />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>.\Debug\</OutDir>
     <IntDir>.\Debug\</IntDir>
     <LinkIncremental>true</LinkIncremental>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules />
+    <CodeAnalysisRuleAssemblies />
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -58,7 +64,7 @@
       <Optimization>MinSpace</Optimization>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>.\include;.\arch\x86;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\include;.\arch\x86;.\jvm\arch;.\jvm\classlib\openjdk;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;MASTER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AssemblerListingLocation>.\Release\</AssemblerListingLocation>
       <PrecompiledHeaderOutputFile>.\Release\master.pch</PrecompiledHeaderOutputFile>
@@ -89,8 +95,9 @@
       <ImportLibrary>.\Release\master.lib</ImportLibrary>
       <AdditionalOptions> /ALIGN:32</AdditionalOptions>
       <BaseAddress>0x110000</BaseAddress>
-      <AdditionalDependencies>libcmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <EntryPointSymbol>__OS_Entry</EntryPointSymbol>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -139,18 +146,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="dispaly\BIOSVGA.C" />
+    <ClCompile Include="arch\x86\BIOSVGA.C" />
     <ClCompile Include="drivers\x86\com.c" />
     <ClCompile Include="drivers\x86\IDEBASE.C" />
     <ClCompile Include="drivers\x86\IDEHD.C" />
     <ClCompile Include="drivers\x86\KEYBRD.C" />
     <ClCompile Include="drivers\x86\MOUSE.C" />
-    <ClCompile Include="kernel\CharDisplay .C" />
-    <ClCompile Include="kernel\DPMGR.C" />
-    <ClCompile Include="lib\atox.c" />
-    <ClCompile Include="lib\stdio.c" />
-    <ClCompile Include="lib\string.c" />
-    <ClCompile Include="lib\sysmem.c" />
+    <ClCompile Include="kernel\CharDisplay.C" />
     <ClCompile Include="kthread\idle.c" />
     <ClCompile Include="kthread\logcat.c" />
     <ClCompile Include="arch\x86\ARCH_X86.C" />
@@ -165,6 +167,18 @@
     <ClCompile Include="fs\NTFS.C" />
     <ClCompile Include="fs\NTFS2.C" />
     <ClCompile Include="fs\NTFSDRV.C" />
+    <ClCompile Include="lib\atox.c" />
+    <ClCompile Include="lib\io.c" />
+    <ClCompile Include="lib\memory.c" />
+    <ClCompile Include="lib\pthread.c" />
+    <ClCompile Include="lib\pthread_mutex .c" />
+    <ClCompile Include="lib\pthread_other.c" />
+    <ClCompile Include="lib\stdio.c" />
+    <ClCompile Include="lib\string.c" />
+    <ClCompile Include="lib\sysmem.c" />
+    <ClCompile Include="lib\time.c" />
+    <ClCompile Include="network\ethernet\ethentry.c" />
+    <ClCompile Include="network\ethernet\ethif.c" />
     <ClCompile Include="shell\EXTCMD.C" />
     <ClCompile Include="shell\FDISK.C" />
     <ClCompile Include="shell\FDISK2.C" />
@@ -178,6 +192,7 @@
     <ClCompile Include="shell\network2.c" />
     <ClCompile Include="shell\SHELL.C" />
     <ClCompile Include="shell\SHELL1.C" />
+    <ClCompile Include="shell\SHELL_HELP.C" />
     <ClCompile Include="shell\STAT_S.C" />
     <ClCompile Include="shell\SYSD_S.C" />
     <ClCompile Include="osentry\DRVENTRY.C" />
@@ -188,7 +203,6 @@
     <ClCompile Include="kernel\debug.c" />
     <ClCompile Include="kernel\DEVMGR.C" />
     <ClCompile Include="kernel\DIM.C" />
-    <ClCompile Include="kernel\HEAP.C" />
     <ClCompile Include="kernel\IOMGR.C" />
     <ClCompile Include="kernel\IOMGR2.C" />
     <ClCompile Include="kernel\KAPI.C" />
@@ -219,8 +233,6 @@
     <ClCompile Include="network\core\dns.c" />
     <ClCompile Include="network\api\err.c" />
     <ClCompile Include="network\netif\etharp.c" />
-    <ClCompile Include="network\netif\ethernetif.c" />
-    <ClCompile Include="network\nicdrv\ethif.c" />
     <ClCompile Include="network\core\icmp.c" />
     <ClCompile Include="network\core\igmp.c" />
     <ClCompile Include="network\core\inet.c" />
@@ -249,6 +261,7 @@
     <ClCompile Include="network\core\udp.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="arch\x86\BIOSVGA.H" />
     <ClInclude Include="dispaly\BIOSVGA.H" />
     <ClInclude Include="include\arch\bpstruct.h" />
     <ClInclude Include="INCLUDE\BUFFMGR.H" />
@@ -260,7 +273,6 @@
     <ClInclude Include="INCLUDE\DEVMGR.H" />
     <ClInclude Include="INCLUDE\dim.h" />
     <ClInclude Include="include\arch\epstruct.h" />
-    <ClInclude Include="include\DPMGR.H" />
     <ClInclude Include="INCLUDE\GLOBVAR.H" />
     <ClInclude Include="INCLUDE\HEAP.H" />
     <ClInclude Include="INCLUDE\HELLOCN.H" />
@@ -298,10 +310,15 @@
     <ClInclude Include="fs\FAT32.H" />
     <ClInclude Include="fs\fsstr.h" />
     <ClInclude Include="fs\NTFS.H" />
+    <ClInclude Include="lib\io.h" />
+    <ClInclude Include="lib\pthread.h" />
     <ClInclude Include="lib\stddef.h" />
+    <ClInclude Include="lib\stdint.h" />
     <ClInclude Include="lib\stdio.h" />
     <ClInclude Include="lib\stdlib.h" />
-    <ClInclude Include="LIB\string.h" />
+    <ClInclude Include="lib\string.h" />
+    <ClInclude Include="lib\time.h" />
+    <ClInclude Include="lib\time_pri.h" />
     <ClInclude Include="shell\EXTCMD.H" />
     <ClInclude Include="shell\FDISK.H" />
     <ClInclude Include="shell\FIBONACCI.H" />
@@ -323,6 +340,10 @@
     <ClInclude Include="include\lwip\sockets.h" />
     <ClInclude Include="include\lwip\sys.h" />
     <ClInclude Include="include\arch\sys_arch.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Authors.txt" />
+    <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

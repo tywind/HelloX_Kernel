@@ -17,6 +17,9 @@
 #ifndef __ARCH_H__
 #define __ARCH_H__
 
+//A macro converting BCD code to decimal.
+#define BCD_TO_DEC_BYTE(bcd)   ((bcd>>4)&0xF)*10+((bcd)&0xF)
+
 //Kernel thread wrapper routine.
 typedef VOID (*__KERNEL_THREAD_WRAPPER)(__COMMON_OBJECT*);
 
@@ -40,6 +43,9 @@ VOID __SaveAndSwitch(__KERNEL_THREAD_CONTEXT** lppOldContext,
 
 //Get Time Stamp Counter of current CPU.
 VOID __GetTsc(__U64*);
+
+//Get time from CMOS of the PC.
+VOID __GetTime(BYTE*);
 
 //Microsecond level delay.
 VOID __MicroDelay(DWORD dwmSeconds);

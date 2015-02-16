@@ -21,49 +21,12 @@
 #include "string.h"
 #endif
 
-//------------------------------------------------------------------------
-// Memory manipulating functions,memcpy,memset,...
-//------------------------------------------------------------------------
-
-void * memcpy (
-        void * dst,
-        const void * src,
-        size_t count
-        )
-{
-        void * ret = dst;
-
-        //copy from lower addresses to higher addresses
-        while (count--) {
-                *(char *)dst = *(char *)src;
-                dst = (char *)dst + 1;
-                src = (char *)src + 1;
-        }
-        return(ret);
-}
-
-void * memset (
-        void *dst,
-        int val,
-        size_t count
-        )
-{
-        void *start = dst;
-
-        while (count--) {
-                *(char *)dst = (char)val;
-                dst = (char *)dst + 1;
-        }
-
-        return(start);
-}
-
-void * memzero(
-		void* dst,
-		size_t count)
-{
-	return memset(dst,0,count);
-}
+/*Purpose:
+*       memmove() copies a source memory buffer to a destination memory buffer.
+*       This routine recognize overlapping buffers to avoid propogation.
+*       For cases where propogation is not a problem, memcpy() can be used.
+*
+*/
 
 //
 //String operation functions implementation.
@@ -173,10 +136,9 @@ BOOL Int2Str(DWORD dwNum,LPSTR pszResult)
 //
 VOID PrintLine(LPSTR pszStr)
 {
-	//CD_PrintString(pszStr,TRUE);
+	CD_PrintString(pszStr,FALSE);
 	GotoHome();
 	ChangeLine();
-	PrintStr(pszStr);
 }
 
 //
@@ -406,18 +368,6 @@ int strcmp (
         else if ( ret > 0 )
                 ret = 1 ;
         return( ret );
-}
-
-int memcmp(const void *buffer1,const void *buffer2,int count)
-{
-   if (!count)
-      return(0);
-   while ( --count && *(char *)buffer1 == *(char *)buffer2)
-   {
-      buffer1 = (char *)buffer1 + 1;
-        buffer2 = (char *)buffer2 + 1;
-   }
-   return( *((unsigned char *)buffer1) - *((unsigned char *)buffer2) );
 }
 
 int strlen(const char * s)

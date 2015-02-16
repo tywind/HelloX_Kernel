@@ -21,19 +21,22 @@
 //***********************************************************************/
 
 #ifndef __STDAFX_H__
-#include "..\include\StdAfx.h"
+#include "../include/StdAfx.h"
 #endif
 
-#include "..\include\STATCPU.H"
-#include "..\shell\shell.h"
-#include "..\shell\STAT_S.H"
-#include "..\kthread\idle.h"
-#include "..\include\MODMGR.H"
-#include "..\include\console.h"
-#include "lwip\tcpip.h"
-#include "nicdrv\ethif.h"
+#include "../include/STATCPU.H"
+#include "../shell/shell.h"
+#include "../shell/STAT_S.H"
+#include "../kthread/idle.h"
+#include "../include/MODMGR.H"
+#include "../include/console.h"
+#include "lwip/tcpip.h"
+#include "ethernet/ethif.h"
+#include "../lib/stdio.h"
 
-#include "..\lib\stdio.h"
+#ifdef __I386__
+#include "../arch/x86/biosvga.h"
+#endif
 
 //Welcome information.
 char* pszStartMsg1 = "Hello China is running now.If you have any question,";
@@ -46,10 +49,6 @@ char* pszHelpInfo = "Any help please press 'help' + return.";
 //Driver entry point array,this array resides in drventry.cpp file in the 
 //same directory as os_entry.cpp,which is OSENTRY in current version.
 extern __DRIVER_ENTRY DriverEntryArray[];
-
-#ifdef __I386__
-extern __DISPLAYDRIVER_ENTRY DisplayEntryArray[];
-#endif
 
 //A dead loop routine.
 static void DeadLoop()
@@ -73,6 +72,7 @@ extern DWORD _HCNMain(LPVOID);
 //But the dead loop codes only run a short time since the kernel thread(s) will be 
 //scheduled once system clock occurs and the dead loop will end.
 //
+
 void __OS_Entry()
 {
 	__KERNEL_THREAD_OBJECT*       lpIdleThread     = NULL;
@@ -82,12 +82,17 @@ void __OS_Entry()
 #endif
 	DWORD                         dwIndex          = 0;
 	CHAR                          strInfo[64];
-	char*                         pszErrorMsg      = "INIT: OK";
+	char*                         pszErrorMsg      = "INIT: OK,everything is done.";
+
+	//Initialize display device under PC architecture,since the rest output will rely on this.
+#ifdef __I386__
+	InitializeVGA();
+#endif
 
 	//Print out welcome message.
 	//Please note the output should put here that before the System.BeginInitialization routine,
 	//since it may cause the interrupt enable,which will lead the failure of system initialization.
-	/*ClearScreen();
+	ClearScreen();
 	PrintStr(pszStartMsg1);
 	PrintStr(pszStartMsg2);
 	GotoHome();
@@ -95,7 +100,7 @@ void __OS_Entry()
 
 	PrintStr(pszHelpInfo); //Print out help information.
 	GotoHome();
-	ChangeLine();*/
+	ChangeLine();
 
 	//Prepare the OS initialization environment.It's worth noting that even the System
 	//object self is not initialized yet.
@@ -113,36 +118,10 @@ void __OS_Entry()
 		goto __TERMINAL;
 	}
 
-#ifdef __I386__
-	// load display device
-	dwIndex = 0;
-	while(DisplayEntryArray[dwIndex])
-	{
-		if(!DisplayManager.LoadDisplay(DisplayEntryArray[dwIndex])) //Failed to load.
-		{
-			//sprintf(strInfo,"Failed to load the %dth driver.",dwIndex); //Show an error.
-			//PrintLine(strInfo);
-		}
-		dwIndex ++;  //Continue to load.
-	}
-	CD_InitDisplay(0);
-#endif
-
-	ClearScreen();
-	PrintStr(pszStartMsg1);
-	PrintStr(pszStartMsg2);
-	GotoHome();
-	ChangeLine();
-
-	PrintStr(pszHelpInfo); //Print out help information.
-	GotoHome();
-	ChangeLine();
-
 #ifdef __CFG_SYS_VMM  //Enable VMM.
 	*(__PDE*)PD_START = NULL_PDE;    //Set the first page directory entry to NULL,to indicate
 	//this location is not initialized yet.
 #endif
-
 
 	//********************************************************************************
 	//
@@ -231,6 +210,15 @@ void __OS_Entry()
 	EnableVMM();
 #endif
 
+	//Initialize Ethernet Manager if it is enabled.
+#ifdef __CFG_NET_ETHMGR
+	if(!EthernetManager.Initialize(&EthernetManager))
+	{
+		pszErrorMsg = "INIT ERROR: Can not initialize Ethernet Manager.\r\n";
+		goto __TERMINAL;
+	}
+#endif
+
 	//********************************************************************************
 	//
 	//The following code loads all inline device drivers,and external drivers implemented as
@@ -258,7 +246,6 @@ void __OS_Entry()
 		goto __TERMINAL;
 	}
 #endif
-	//BISStartup();
 
 	//********************************************************************************
 	//
@@ -329,7 +316,7 @@ void __OS_Entry()
 			(__COMMON_OBJECT*)&KernelThreadManager,
 			0,
 			KERNEL_THREAD_STATUS_READY,
-			PRIORITY_LEVEL_HIGH,
+			PRIORITY_LEVEL_NORMAL,
 			ModuleMgr.ShellEntry,
 			NULL,
 			NULL,
@@ -341,7 +328,6 @@ void __OS_Entry()
 		}
 	}
 	g_lpShellThread = lpShellThread;     //Initialize the shell thread global variable.
-
 	//Print out the default system prompt,which can be changed by 'sysname' command.
 	//strcpy(&HostName[0],"[system-view]");
 #endif
@@ -405,11 +391,6 @@ void __OS_Entry()
 		pszErrorMsg = "INIT ERROR: Can not initialize IPv4 protocol function.";
 		goto __TERMINAL;
 	}
-	if(!InitializeEthernetIf())
-	{
-		pszErrorMsg = "INIT ERROR: Can not initialize Ethernet interface.";
-		goto __TERMINAL;
-	}
 #endif
 
 	System.EndInitialize((__COMMON_OBJECT*)&System);
@@ -431,7 +412,8 @@ __TERMINAL:
 #ifdef __STM32__
 int main()
 {
-	__OS_Entry();  //Call OS entry routine.
+	__OS_Entry();  //Call OS entry ro
+
 	return 0;
 }
 #endif

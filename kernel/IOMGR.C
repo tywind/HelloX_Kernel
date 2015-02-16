@@ -754,49 +754,7 @@ static DWORD _GetFileSize(__COMMON_OBJECT* lpThis,
 						  __COMMON_OBJECT* lpFileObject,
 						  DWORD* lpdwSizeHigh)
 {
-	__DRIVER_OBJECT*        pDrvObject  = NULL;
-	__DEVICE_OBJECT*        pFileObject = (__DEVICE_OBJECT*)lpFileObject;
-	__DRCB*                 pDrcb       = NULL;
-	DWORD                   dwResult    = 0;
-
-	if(NULL == pFileObject)  //Low part of offset must be not null.
-	{
-		return FALSE;
-	}
-		
-	//Check if file object's validity.
-	if(DEVICE_OBJECT_SIGNATURE != pFileObject->dwSignature)
-	{
-		return FALSE;
-	}
-	pDrvObject = pFileObject->lpDriverObject;
-	//Create DRCB object and issue DeviceSeek command to file system driver.
-	pDrcb = (__DRCB*)ObjectManager.CreateObject(&ObjectManager,
-		NULL,
-		OBJECT_TYPE_DRCB);
-	if(NULL == pDrcb)        //Failed to create DRCB object.
-	{
-		return FALSE;
-	}
-
-	if(!pDrcb->Initialize((__COMMON_OBJECT*)pDrcb))  //Failed to initialize.
-	{
-		ObjectManager.DestroyObject(&ObjectManager,
-			(__COMMON_OBJECT*)pDrcb);
-		return FALSE;
-	}
-
-	pDrcb->dwRequestMode   = DRCB_REQUEST_MODE_SIZE;
-	pDrcb->dwStatus        = DRCB_STATUS_INITIALIZED;
-	pDrcb->dwInputLen      = sizeof(DWORD);
-	pDrcb->lpInputBuffer   = (LPVOID)lpdwSizeHigh;      //Use input buffer to contain move scheme,from begin or current.
-
-	dwResult = pDrvObject->DeviceSeek((__COMMON_OBJECT*)pDrvObject,
-		(__COMMON_OBJECT*)pFileObject,
-		pDrcb);
-	ObjectManager.DestroyObject(&ObjectManager,(__COMMON_OBJECT*)pDrcb);
-
-	return dwResult;
+	return 0;
 }
 
 //Implementation of SetFilePointer.

@@ -11,9 +11,6 @@
     <Filter Include="Source Files\lib">
       <UniqueIdentifier>{7a259e89-527e-4072-b29b-60aaeb1d95cc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\kthread">
-      <UniqueIdentifier>{c23b14ee-55b9-4861-9d6c-61f9897b5be2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\arch">
       <UniqueIdentifier>{31322fc7-009f-4f73-8181-474a3f27f813}</UniqueIdentifier>
     </Filter>
@@ -69,6 +66,15 @@
       <UniqueIdentifier>{9d761576-26cf-4ef6-b103-ced7e0f1229c}</UniqueIdentifier>
       <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
     </Filter>
+    <Filter Include="Source Files\kthread">
+      <UniqueIdentifier>{c23b14ee-55b9-4861-9d6c-61f9897b5be2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\jvm">
+      <UniqueIdentifier>{6432b8a3-cf23-4f8e-8b60-d4dea4988f4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\jvm">
+      <UniqueIdentifier>{5d7e3cd5-2f3f-45d1-951e-314add1e05c2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="drivers\x86\com.c">
@@ -85,18 +91,6 @@
     </ClCompile>
     <ClCompile Include="drivers\x86\MOUSE.C">
       <Filter>Source Files\drivers</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\atox.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\stdio.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\string.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\sysmem.c">
-      <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="kthread\idle.c">
       <Filter>Source Files\kthread</Filter>
@@ -206,9 +200,6 @@
     <ClCompile Include="kernel\DIM.C">
       <Filter>Source Files\kernel</Filter>
     </ClCompile>
-    <ClCompile Include="kernel\HEAP.C">
-      <Filter>Source Files\kernel</Filter>
-    </ClCompile>
     <ClCompile Include="kernel\IOMGR.C">
       <Filter>Source Files\kernel</Filter>
     </ClCompile>
@@ -299,12 +290,6 @@
     <ClCompile Include="network\netif\etharp.c">
       <Filter>Source Files\network</Filter>
     </ClCompile>
-    <ClCompile Include="network\netif\ethernetif.c">
-      <Filter>Source Files\network</Filter>
-    </ClCompile>
-    <ClCompile Include="network\nicdrv\ethif.c">
-      <Filter>Source Files\network</Filter>
-    </ClCompile>
     <ClCompile Include="network\core\icmp.c">
       <Filter>Source Files\network</Filter>
     </ClCompile>
@@ -383,17 +368,53 @@
     <ClCompile Include="network\core\udp.c">
       <Filter>Source Files\network</Filter>
     </ClCompile>
-    <ClCompile Include="dispaly\BIOSVGA.C">
-      <Filter>Source Files\drivers</Filter>
-    </ClCompile>
-    <ClCompile Include="kernel\CharDisplay .C">
-      <Filter>Source Files\kernel</Filter>
-    </ClCompile>
-    <ClCompile Include="kernel\DPMGR.C">
-      <Filter>Source Files\kernel</Filter>
-    </ClCompile>
     <ClCompile Include="shell\HISCMD .C">
       <Filter>Source Files\shell</Filter>
+    </ClCompile>
+    <ClCompile Include="shell\SHELL_HELP.C">
+      <Filter>Source Files\shell</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\CharDisplay.C">
+      <Filter>Source Files\kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="arch\x86\BIOSVGA.C">
+      <Filter>Source Files\arch</Filter>
+    </ClCompile>
+    <ClCompile Include="network\ethernet\ethentry.c">
+      <Filter>Source Files\network</Filter>
+    </ClCompile>
+    <ClCompile Include="network\ethernet\ethif.c">
+      <Filter>Source Files\network</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\atox.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\io.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\memory.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\pthread.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\pthread_mutex .c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\pthread_other.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\stdio.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\string.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\sysmem.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\time.c">
+      <Filter>Source Files\lib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -535,18 +556,6 @@
     <ClInclude Include="fs\NTFS.H">
       <Filter>Header Files\fs_hdr</Filter>
     </ClInclude>
-    <ClInclude Include="lib\stddef.h">
-      <Filter>Header Files\lib_hdr</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\stdio.h">
-      <Filter>Header Files\lib_hdr</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\stdlib.h">
-      <Filter>Header Files\lib_hdr</Filter>
-    </ClInclude>
-    <ClInclude Include="LIB\string.h">
-      <Filter>Header Files\lib_hdr</Filter>
-    </ClInclude>
     <ClInclude Include="shell\EXTCMD.H">
       <Filter>Header Files\shell_hdr</Filter>
     </ClInclude>
@@ -613,11 +622,46 @@
     <ClInclude Include="include\CharDisplay.H">
       <Filter>Header Files\include</Filter>
     </ClInclude>
-    <ClInclude Include="include\DPMGR.H">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
     <ClInclude Include="dispaly\BIOSVGA.H">
       <Filter>Header Files\drv_hdr</Filter>
     </ClInclude>
+    <ClInclude Include="arch\x86\BIOSVGA.H">
+      <Filter>Header Files\arch_hdr</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\io.h">
+      <Filter>Header Files\lib_hdr</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\pthread.h">
+      <Filter>Header Files\lib_hdr</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\stddef.h">
+      <Filter>Header Files\lib_hdr</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\stdint.h">
+      <Filter>Header Files\lib_hdr</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\stdio.h">
+      <Filter>Header Files\lib_hdr</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\stdlib.h">
+      <Filter>Header Files\lib_hdr</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\string.h">
+      <Filter>Header Files\lib_hdr</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\time.h">
+      <Filter>Header Files\lib_hdr</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\time_pri.h">
+      <Filter>Header Files\lib_hdr</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Authors.txt">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="README.md">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

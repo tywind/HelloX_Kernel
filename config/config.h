@@ -23,7 +23,7 @@
 //
 //************************************************************************
 
-#define VERSION_INFO "    HelloX [Version 1.770(Beta),build in 2014/10/31,by Garry.Xin]"
+#define VERSION_INFO "    HelloX [Version 1.770(Beta),build in 2015/02/15,by Garry.Xin]"
 #define SLOGAN_INFO  "    HelloX OS,through which you can talk to everything."
 
 //************************************************************************
@@ -78,7 +78,7 @@
 //if the user does not give a stack size in CreateKernelThread calling,then
 //use this value as stack size.
 //
-#define DEFAULT_STACK_SIZE 0x00002000 //16k bytes.
+#define DEFAULT_STACK_SIZE 0x00001000 //4k bytes.
 
 //************************************************************************
 //
@@ -87,7 +87,7 @@
 //************************************************************************
 
 //Use Inline Schedule(IS) mode.The inline schedule means OS kernel can establish
-//thread context without inte rrupt,only by normal instructions,and also can switch
+//thread context without interrupt,only by normal instructions,and also can switch
 //to a kernel thread without need in interrupt context.
 //A type case for inline schedule is x86 platform,STM32 is contrast,which can not
 //support inline schedule,i.e,kernel thread context must be restored in interrupt(handler)
@@ -102,7 +102,7 @@
 //#define __CFG_SYS_INTNEST
 
 //Include thread heap functions.
-#define __CFG_SYS_HEAP
+//#define __CFG_SYS_HEAP
 
 //Include bus management code.
 #define __CFG_SYS_BM
@@ -127,7 +127,7 @@
 
 //Include console object into kernel.COM input and output functions are implemented
 //in console object.
-//#define __CFG_SYS_CONSOLE
+#define __CFG_SYS_CONSOLE
 
 // Logcat service for debug subsystem
 //#define __CFG_SYS_LOGCAT
@@ -146,6 +146,9 @@
 
 //Include USART driver in OS,specific for STM32 or ARM platform.
 //#define __CFG_DRV_USART
+
+//Include SDIO driver support in OS,only available for STM32.
+//#define __CFG_DRV_SDIO
 
 //Include MOUSE driver in OS.
 #define __CFG_DRV_MOUSE
@@ -169,7 +172,7 @@
 //#define __CFG_FS_RAM
 
 //Include FLASH file system in OS.
-#define __CFG_FS_FLASH
+//#define __CFG_FS_FLASH
 
 //************************************************************************
 //
@@ -177,11 +180,20 @@
 //
 //************************************************************************
 
+//Include ethernet manager in OS.
+#define __CFG_NET_ETHMGR
+
 //Include IPv4 network protocol in OS.
 #define __CFG_NET_IPv4
 
 //Include IPv6 network protocol in OS.
-#define __CFG_NET_IPv6
+//#define __CFG_NET_IPv6
+
+//Include Marvel WLAN's ethernet driver.
+//#define __CFG_NET_MARVELLAN
+
+//Include ENC28J60 ethernet driver.
+//#define __CFG_NET_ENC28J60
 
 //************************************************************************
 //

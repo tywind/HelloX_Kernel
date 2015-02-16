@@ -19,6 +19,14 @@
 #ifndef __STDAFX_H__
 #define __STDAFX_H__
 
+#ifdef _MSC_VER
+//Disable the packing warning in case of Microsoft C environment.
+#pragma warning(disable:4103)
+//Disable the frame pointer register modified in inline assembly code warning.
+#pragma warning(disable:4731)
+
+#endif
+
 //Include configuration headers in advance any of other headers.
 #ifndef __CONFIG_H__
 #include "..\config\config.h"
@@ -108,11 +116,6 @@
 #include "iomgr.h"
 #endif
 
-#ifndef __DPMGR_H__
-#include "dpmgr.h"
-#endif
-
-
 #ifndef __BUFFMGR_H__
 #include "buffmgr.h"
 #endif
@@ -131,6 +134,10 @@
 
 #ifndef __GLOBAL_VAR__
 #include "globvar.h"
+#endif
+
+#ifndef __CHARDISPLAY_H__
+#include "chardisplay.h"
 #endif
 
 #ifndef __ARCH_H__

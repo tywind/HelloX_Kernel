@@ -21,4 +21,6 @@ All authors have contribution to the Kernel module of HelloX operating system wi
               optimized shell mechanism,
               about 2000 LOC.
 
-
+ tywind.huang Implements a subset of POSIX     370543742@qq.com               N/A
+              library to support the JamVM
+			  migration.

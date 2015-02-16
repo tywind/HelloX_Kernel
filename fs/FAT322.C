@@ -191,12 +191,7 @@ DWORD FatDeviceWrite(__COMMON_OBJECT* lpDrv,
 		}
 		//Adjust file object's status.
 		pFat32File->dwClusOffset += dwOnceSize;
-
-		//2014.9.28 modified by tywind
-		if(pFat32File->dwCurrPos >= pFat32File->dwFileSize)
-		{
-			pFat32File->dwFileSize = pFat32File->dwCurrPos;
-		}
+		pFat32File->dwFileSize   += dwOnceSize;
 
 		if(0 == (pFat32File->dwClusOffset % pFat32Fs->dwClusterSize))
 		{
@@ -398,25 +393,4 @@ __TERMINAL:
 	return dwTotalRead;
 }
 
-//Implementation of DeviceRead routine.
-DWORD FatDeviceSize(__COMMON_OBJECT* lpDrv,
-	__COMMON_OBJECT* lpDev,
-	__DRCB* lpDrcb)
-{
-	__FAT32_FILE*          pFatFile     = NULL;
-	DWORD                  dwFileSize   = 0;   
-	
-	if((NULL == lpDrv) || (NULL == lpDev))
-	{
-		return dwFileSize;
-	}
-
-	pFatFile = (__FAT32_FILE*)(((__DEVICE_OBJECT*)lpDev)->lpDevExtension);
-	if( NULL != pFatFile)
-	{
-		dwFileSize =  pFatFile->dwFileSize;
-	}
-
-	return dwFileSize;	
-}
 #endif

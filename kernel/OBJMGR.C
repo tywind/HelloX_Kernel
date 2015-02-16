@@ -71,9 +71,6 @@ BEGIN_DECLARE_INIT_DATA(ObjectInitData)
 	OBJECT_INIT_DATA(OBJECT_TYPE_SEMAPHORE,sizeof(__SEMAPHORE),
 	SemInitialize,SemUninitialize)
 
-	OBJECT_INIT_DATA(OBJECT_TYPE_DISPLAY,sizeof(__DISPALY_OBJECT),
-	TimerInitialize,TimerUninitialize)
-
 END_DECLARE_INIT_DATA()
 
 //

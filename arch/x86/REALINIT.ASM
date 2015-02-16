@@ -544,7 +544,7 @@ __BIOS_JMP_TABLE:
     dw __REBOOT           ;Entry point for reboot.
     dw __POWEROFF         ;Entry point for poweroff.
     dw __READSECT         ;Entry point for read sector.
-    dw __WRITESECT        ;Entry point for Write sector // old Entry point for delay test.
+    dw __DELAY_TEST       ;Entry point for delay test.
     dw __TO_GRAPHIC       ;Entry point for switching to graphic mode.
     dw __TO_TEXT          ;Entry point for switching to text mode.
     dw 0x00
@@ -682,26 +682,25 @@ __READSECT:
     mov eax,0x00
     ret
  
-__WRITESECT:
-     ;pusha           ;Save all registers.
-    ;Initialize the DAP
-    mov dword [dapSectorLow],edx  ;EDX contains the start sector number.
-    mov eax,esi   ;ESI contains the sector number to read.
-    mov byte [dapSectorsNum],al
-    mov ah,0x43
-    lea si,[__DAP_BEGIN] ;Load DAP's address.
-	 
-    ;Only read the first harddisk now.
-    mov  dl ,0x80 ;Only handle the first HD.
-    int  0x13
-    jc   .__ERROR        ;Read failed.
-    ;popa
-		
-    mov eax,0x01          ;Indicate the successful of this operation.
-    ret
-.__ERROR:
-    ;popa
-    mov eax,0x00
+__DELAY_TEST:
+    push cx
+    mov ax,0xFF
+.ll_loopout:
+    push ax
+    mov cx,65535
+.ll_loop:
+    push cx
+    mov ax,initmsg
+    call np_strlen
+    mov ax,initmsg
+    ;call np_printmsg
+    pop cx
+    loop .ll_loop
+    pop ax
+    dec ax
+    jnz .ll_loopout
+    pop cx
+    mov eax,0x01
     ret
  
  

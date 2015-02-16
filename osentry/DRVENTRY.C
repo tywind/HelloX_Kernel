@@ -32,10 +32,6 @@
 #include "..\fs\NTFS.H"
 #endif
 
-#ifdef __I386__
-#include "..\arch\x86\biosvga.h"
-#endif
-
 #ifdef __CFG_DRV_IDE
 #include "..\drivers\x86\IDEHD.H"      //IDE interface harddisk controller driver.
 #endif
@@ -48,10 +44,14 @@
 #include "..\drivers\x86\com.h"
 #endif
 
-
-
 #ifdef __CFG_DRV_USART
-#include "..\drivers\stm32\usart.h"
+#include "usart/usart.h"
+#endif
+
+#ifdef __CFG_DRV_SDIO
+#ifndef __SDIO_DRV_H__
+#include "mrvlwifi/sdio_drv.h"
+#endif
 #endif
 
 //
@@ -94,12 +94,10 @@ __DRIVER_ENTRY DriverEntryArray[] = {
 #ifdef __CFG_DRV_USART //Only available under STM32.
 	UsartDrvEntry,
 #endif
+
+#ifdef __CFG_DRV_SDIO //Only available under STM32.
+  SDIODriverEntry,
+#endif
 	NULL               //Terminator of the driver entry array.
 };
 
-
-__DISPLAYDRIVER_ENTRY DisplayEntryArray[] = 
-{
-	BiosVgaDriverEntry,
-	NULL
-};

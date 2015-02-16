@@ -187,9 +187,6 @@ DWORD FatDeviceWrite(__COMMON_OBJECT* lpDrv,
 DWORD FatDeviceRead(__COMMON_OBJECT* lpDrv,
 					__COMMON_OBJECT* lpDev,
 					__DRCB*          lpDrcb);
-DWORD FatDeviceSize(__COMMON_OBJECT* lpDrv,
-	               __COMMON_OBJECT* lpDev,
-	               __DRCB* lpDrcb);
 BOOL DeleteFatFile(__FAT32_FS* pFat32Fs,CHAR* pszFileName);
 BOOL DeleteFatDir(__FAT32_FS* pFat32Fs,CHAR* pszDirName);
 

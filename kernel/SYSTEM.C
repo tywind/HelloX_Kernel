@@ -548,6 +548,7 @@ static VOID DispatchInterrupt(__COMMON_OBJECT* lpThis,
 {
 	__INTERRUPT_OBJECT*    lpIntObject  = NULL;
 	__SYSTEM*              lpSystem     = NULL;
+	//CHAR                   strError[64];    //To print out the BUG information.
 
 	if((NULL == lpThis) || (NULL == lpEsp))
 	{
@@ -571,6 +572,7 @@ static VOID DispatchInterrupt(__COMMON_OBJECT* lpThis,
 				NULL);
 		}
 	}
+	//For debugging.
 	else
 	{
 #ifdef __CFG_SYS_INTNEST  //Interupt nest is enabled.
@@ -626,7 +628,9 @@ static VOID DefaultExcepHandler(LPVOID pESP,UCHAR ucVector)
 {
 	CHAR Buff[64];
 	static DWORD totalExcepNum = 0;
+#ifdef __I386__
 	DWORD excepAddr = 0;
+#endif
 	__KERNEL_THREAD_OBJECT* pKernelThread = KernelThreadManager.lpCurrentKernelThread;
 
 	//Switch to text mode,because the exception maybe caused in GUI mode.
@@ -845,7 +849,7 @@ __DESTROY_TIMER:  //Destroy the timer object.
 
 //Hardware platform initialization routine,implemented in arch_xxx.c file and will be called
 //in BeginInitialize routine.
-extern BOOL HardwareInitialize();
+extern BOOL HardwareInitialize(void);
 
 //Called before the OS enter initialization phase.It prepares the initialization evnironment
 //to run initializing code.Also hardware initialization routine will be called in this routine,

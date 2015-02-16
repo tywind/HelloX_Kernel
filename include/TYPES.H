@@ -49,8 +49,8 @@ typedef double              DOUBLE;
 typedef float               FLOAT;
 
 typedef char*               LPSTR;
-typedef const char*         LPCSTR;
 typedef const char*         LPCTSTR;
+typedef const char*         LPCSTR;
 
 typedef void                VOID;
 typedef void*               LPVOID;
@@ -68,6 +68,8 @@ typedef unsigned int size_t;
 //Special values for basic data types defined above.
 #define FALSE               0x00000000
 #define TRUE                0x00000001
+
+#define S_OK                0x00000001
 
 #define NULL                ((void*)0x00000000)
 

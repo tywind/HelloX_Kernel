@@ -6,19 +6,25 @@
 //                                This module countains CPU specific code,in this file,
 //                                Intel X86 series CPU's specific code is included.
 //
-//    Last modified Author      :
+//    Last modified Author      : Garry
 //    Last modified Date        : 29 JAN,2009
 //    Last modified Content     :
 //                                1. __inb,__inw,__ind,__inbs,__inws and __inds are added.
 //                                2. __outb,__outw,__outd are added.
+//
+//    Last modified Author      : Tywind
+//    Last modified Date        : 30 JAN,2015
+//    Last modified Content     :
+//                                __GetTime routine is added,used to read system date and
+//                                time from CMOS.
 //    Lines number              :
 //***********************************************************************/
 
 #ifndef __STDAFX_H__
-#include "..\..\INCLUDE\StdAfx.h"
+#include "StdAfx.h"
 #endif
 
-#include "ARCH.H"
+#include "arch.h"
 
 #ifdef __I386__  //Only available in x86 based PC platform.
 
@@ -183,6 +189,50 @@ VOID __GetTsc(__U64* lpResult)
 		pop edx
 		pop eax
 	}
+}
+
+//A local helper routine used to read CMOS date and time information.
+static _declspec(naked) ReadCmosData(WORD* pData,BYTE nPort)
+{
+	__asm{
+		    push ebp
+			mov ebp,esp
+			push ebx
+			push edx
+
+			mov ebx,dword ptr [ebp + 0x08]
+
+		    xor ax,ax
+			mov al,nPort
+			out 70h,al
+			in al,71h
+			mov word ptr [ebx],ax
+
+			pop edx
+			pop ebx
+			leave
+			retn
+	}
+}
+
+//Get CMOS date and time.
+VOID __GetTime(BYTE* pDate)
+{
+	ReadCmosData((WORD*)&pDate[0],9);//read year
+	ReadCmosData((WORD*)&pDate[1],8);//read month
+	ReadCmosData((WORD*)&pDate[2],7);//read day
+
+	ReadCmosData((WORD*)&pDate[3],4);//read hour
+	ReadCmosData((WORD*)&pDate[4],2);//read Minute
+	ReadCmosData((WORD*)&pDate[5],0);//read second
+
+	//BCD convert
+	pDate[0] = BCD_TO_DEC_BYTE(pDate[0]);
+	pDate[1] = BCD_TO_DEC_BYTE(pDate[1]);
+	pDate[2] = BCD_TO_DEC_BYTE(pDate[2]);
+	pDate[3] = BCD_TO_DEC_BYTE(pDate[3]);
+	pDate[4] = BCD_TO_DEC_BYTE(pDate[4]);
+	pDate[5] = BCD_TO_DEC_BYTE(pDate[5]);
 }
 
 #define CLOCK_PER_MICROSECOND 1024  //Assume the CPU's clock is 1G Hz.

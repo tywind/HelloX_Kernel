@@ -11,11 +11,9 @@
 #include "StdAfx.h"
 #endif
 
-#ifndef __VGA_H__
+#include "chardisplay.h"
 #include "BIOSVGA.H"
-#endif
-
-#include "..\lib\stdio.h"
+#include "../lib/stdio.h"
 
 #define  BIOS_VGABUF_ADDR    0xB8000
 #define  BIOS_VGABUF_LEN     4000
@@ -39,11 +37,9 @@ typedef struct tag__VGA_DISPLAY_INFO
 	
 }VGA_DISPLAY_INFO;
 
-static __DISPALY_OBJECT*   s_pDisplayObj = NULL;
 static VGA_DISPLAY_INFO    s_szVgaInfo   = {0};
 
-
-static WORD* _VGA_GetDisplayAddr(WORD nX,WORD nY)
+WORD* _VGA_GetDisplayAddr(WORD nX,WORD nY)
 {
 	INT    nAddrOffset = 0;
 
@@ -57,7 +53,7 @@ static WORD* _VGA_GetDisplayAddr(WORD nX,WORD nY)
 	return (WORD*)(s_szVgaInfo.pVideoAddr+nAddrOffset);
 }
 
-static VOID  _VGA_ScrollLine(BOOL bScrollUp)
+VOID  _VGA_ScrollLine(BOOL bScrollUp)
 {
 	WORD* pBaseAddr  = _VGA_GetDisplayAddr(0,0);
 	WORD* pNextLine  = pBaseAddr+s_szVgaInfo.Colums;
@@ -80,122 +76,12 @@ static VOID  _VGA_ScrollLine(BOOL bScrollUp)
 	}
 }
 
-static DWORD VGA_GetDisplayID()
+DWORD VGA_GetDisplayID()
 {
 	return DISPLAY_BIOSVGA;
 }
 
-static BOOL  VGA_GetDisplayRange(INT* pLines,INT* pColums)
-{
-	if(NULL != pLines)
-	{
-		*pLines  = s_szVgaInfo.Lines;
-	}
-
-	if(NULL != pColums)
-	{
-		*pColums = s_szVgaInfo.Colums;
-	}
-
-	return TRUE;
-}
-
-static BOOL  VGA_PrintChar(CHAR ch)
-{
-	WORD   CursorX     = s_szVgaInfo.CursorX;
-	WORD   CursorY     = s_szVgaInfo.CursorY;
-	WORD*  pVideoBuf   = _VGA_GetDisplayAddr(CursorX,CursorY);
-
-	if(NULL == pVideoBuf || pVideoBuf >= BIOS_VGABUF_ADDR+BIOS_VGABUF_LEN)
-	{
-		return FALSE;
-	}
-
-	*pVideoBuf =  ch|0x700;
-	CursorX ++;
-
-	if(CursorX >= s_szVgaInfo.Colums)
-	{
-		CursorX = 0;
-		CursorY ++;
-	}
-	VGA_SetCursorPos(CursorX,CursorY);
-	
-	return TRUE;
-}
-
-static BOOL VGA_PrintString(LPCSTR pString,BOOL cl)
-{
-	WORD*  pVideoBuf   = _VGA_GetDisplayAddr(s_szVgaInfo.CursorX,s_szVgaInfo.CursorY);
-	LPSTR  pos         = (LPSTR)pString;
-	WORD   CursorX     = s_szVgaInfo.CursorX;
-    WORD   CursorY     = s_szVgaInfo.CursorY;
-	
-
-	if(NULL == pos || NULL == pVideoBuf)
-	{
-		return FALSE;
-	}
-
-	while(*pos != 0)
-	{
-		WORD  wch   = 0x700;
-	
-		wch += (BYTE)*pos;
-		*pVideoBuf =  wch;
-		
-		pVideoBuf ++;
-		pos       ++;
-
-		//是否折行
-		CursorX   ++;
-		if(CursorX >= s_szVgaInfo.Colums)
-		{
-			CursorX = 0; 
-			CursorY ++;
-
-			if(CursorY >= s_szVgaInfo.LastLine)
-			{
-				CursorY = s_szVgaInfo.LastLine-1;				
-				_VGA_ScrollLine(TRUE);
-
-				pVideoBuf -= s_szVgaInfo.Colums;
-			}
-		}
-
-		if(pVideoBuf >= BIOS_VGABUF_ADDR+BIOS_VGABUF_LEN)
-		{
-			break;
-		}
-
-	}
-
-	VGA_SetCursorPos(CursorX,CursorY);
-
-	if(cl == TRUE)
-	{
-		VGA_ChangeLine();
-	}
-
-	return TRUE;
-}
-
-static BOOL   VGA_GetCursorPos(WORD* pCursorX,WORD* pCursorY)
-{
-	if(NULL != pCursorX)
-	{
-		*pCursorX  = s_szVgaInfo.CursorX;
-	}
-
-	if(NULL != pCursorY)
-	{
-		*pCursorY = s_szVgaInfo.CursorY;
-	}
-
-	return TRUE;
-}
-
-static BOOL  VGA_SetCursorPos(WORD CursorX,WORD CursorY)
+BOOL  VGA_SetCursorPos(WORD CursorX,WORD CursorY)
 {
 	#define DEF_INDEX_PORT 0x3d4 //;;The index port of the display card.
 	#define DEF_VALUE_PORT 0x3d5 //;;The data port of the display card.
@@ -242,7 +128,7 @@ static BOOL  VGA_SetCursorPos(WORD CursorX,WORD CursorY)
 	return TRUE;
 }
 
-static BOOL VGA_ChangeLine()
+BOOL VGA_ChangeLine()
 {
 
 	if(s_szVgaInfo.CursorY < s_szVgaInfo.Lines)
@@ -253,7 +139,117 @@ static BOOL VGA_ChangeLine()
     return TRUE;
 }
 
-static BOOL VGA_GetString(WORD CursorX,WORD CursorY,LPSTR pString,INT nBufLen)
+BOOL  VGA_GetDisplayRange(INT* pLines,INT* pColums)
+{
+	if(NULL != pLines)
+	{
+		*pLines  = s_szVgaInfo.Lines;
+	}
+
+	if(NULL != pColums)
+	{
+		*pColums = s_szVgaInfo.Colums;
+	}
+
+	return TRUE;
+}
+
+BOOL  VGA_PrintChar(CHAR ch)
+{
+	WORD   CursorX     = s_szVgaInfo.CursorX;
+	WORD   CursorY     = s_szVgaInfo.CursorY;
+	WORD*  pVideoBuf   = _VGA_GetDisplayAddr(CursorX,CursorY);
+
+	if(NULL == pVideoBuf || (DWORD)pVideoBuf >= BIOS_VGABUF_ADDR+BIOS_VGABUF_LEN)
+	{
+		return FALSE;
+	}
+
+	*pVideoBuf =  ch|0x700;
+	CursorX ++;
+
+	if(CursorX >= s_szVgaInfo.Colums)
+	{
+		CursorX = 0;
+		CursorY ++;
+	}
+	VGA_SetCursorPos(CursorX,CursorY);
+	
+	return TRUE;
+}
+
+BOOL VGA_PrintString(LPCSTR pString,BOOL cl)
+{
+	WORD*  pVideoBuf   = _VGA_GetDisplayAddr(s_szVgaInfo.CursorX,s_szVgaInfo.CursorY);
+	LPSTR  pos         = (LPSTR)pString;
+	WORD   CursorX     = s_szVgaInfo.CursorX;
+    WORD   CursorY     = s_szVgaInfo.CursorY;
+	
+
+	if(NULL == pos || NULL == pVideoBuf)
+	{
+		return FALSE;
+	}
+
+	while(*pos != 0)
+	{
+		WORD  wch   = 0x700;
+	
+		wch += (BYTE)*pos;
+		*pVideoBuf =  wch;
+		
+		pVideoBuf ++;
+		pos       ++;
+
+		//是否折行
+		CursorX   ++;
+		if(CursorX >= s_szVgaInfo.Colums)
+		{
+			CursorX = 0; 
+			CursorY ++;
+
+			if(CursorY >= s_szVgaInfo.LastLine)
+			{
+				CursorY = s_szVgaInfo.LastLine-1;				
+				_VGA_ScrollLine(TRUE);
+
+				pVideoBuf -= s_szVgaInfo.Colums;
+			}
+		}
+
+		if((DWORD)pVideoBuf >= BIOS_VGABUF_ADDR+BIOS_VGABUF_LEN)
+		{
+			break;
+		}
+
+	}
+
+	VGA_SetCursorPos(CursorX,CursorY);
+
+	if(cl == TRUE)
+	{
+		VGA_ChangeLine();
+	}
+
+	return TRUE;
+}
+
+BOOL   VGA_GetCursorPos(WORD* pCursorX,WORD* pCursorY)
+{
+	if(NULL != pCursorX)
+	{
+		*pCursorX  = s_szVgaInfo.CursorX;
+	}
+
+	if(NULL != pCursorY)
+	{
+		*pCursorY = s_szVgaInfo.CursorY;
+	}
+
+	return TRUE;
+}
+
+BOOL VGA_GetString(WORD CursorX,WORD CursorY,LPSTR pString,INT nBufLen)
 {	
 	WORD*  pVideoBuf    = _VGA_GetDisplayAddr(CursorX,CursorY);
 	WORD   InputEnd     = s_szVgaInfo.CursorY*BIOS_VGABUF_COLUMS+s_szVgaInfo.CursorX;
@@ -278,7 +274,7 @@ static BOOL VGA_GetString(WORD CursorX,WORD CursorY,LPSTR pString,INT nBufLen)
 			break;
 		}
 
-		if(pVideoBuf >= BIOS_VGABUF_ADDR+BIOS_VGABUF_LEN)
+		if((DWORD)pVideoBuf >= BIOS_VGABUF_ADDR+BIOS_VGABUF_LEN)
 		{
 			break;
 		}
@@ -287,7 +283,7 @@ static BOOL VGA_GetString(WORD CursorX,WORD CursorY,LPSTR pString,INT nBufLen)
 	return TRUE;
 }
 
-static BOOL  VGA_DelString(WORD CursorX,WORD CursorY,INT nDelLen)
+BOOL  VGA_DelString(WORD CursorX,WORD CursorY,INT nDelLen)
 {
 	WORD*  pVideoBuf   = _VGA_GetDisplayAddr(CursorX,CursorY);
 	INT    i           = 0;
@@ -302,7 +298,7 @@ static BOOL  VGA_DelString(WORD CursorX,WORD CursorY,INT nDelLen)
 		*pVideoBuf =  0x700;
 
 		pVideoBuf ++;
-		if(pVideoBuf >= BIOS_VGABUF_ADDR+BIOS_VGABUF_LEN)
+		if((DWORD)pVideoBuf >= BIOS_VGABUF_ADDR+BIOS_VGABUF_LEN)
 		{
 			break;
 		}
@@ -311,7 +307,7 @@ static BOOL  VGA_DelString(WORD CursorX,WORD CursorY,INT nDelLen)
 	return TRUE;
 }
 
-static BOOL  VGA_DelChar(INT nDelMode)
+BOOL  VGA_DelChar(INT nDelMode)
 {	
 	WORD*  pVideoBuf   = NULL;
 	INT    nCharDelX   = 0;
@@ -351,7 +347,7 @@ static BOOL  VGA_DelChar(INT nDelMode)
 		*pVideoBuf = *(pVideoBuf+1);
 		pVideoBuf ++;
 
-		if(pVideoBuf >= BIOS_VGABUF_ADDR+BIOS_VGABUF_LEN)
+		if((DWORD)pVideoBuf >= BIOS_VGABUF_ADDR+BIOS_VGABUF_LEN)
 		{
 			break;
 		}
@@ -363,7 +359,7 @@ static BOOL  VGA_DelChar(INT nDelMode)
 	return TRUE;
 }
 
-static BOOL  VGA_Clear()
+BOOL  VGA_Clear()
 {
 	WORD*  pVideoBuf   = (WORD*)(s_szVgaInfo.pVideoAddr);
 	INT    i           = 0;
@@ -376,33 +372,13 @@ static BOOL  VGA_Clear()
 	return TRUE;
 }
 
-BOOL BiosVgaDriverEntry(__DISPALY_OBJECT* lpDisplayObject)
-{	
-	if(NULL == lpDisplayObject)
-	{
-		return FALSE;
-	}
-
-	lpDisplayObject->GetDisplayID    = VGA_GetDisplayID;
-	lpDisplayObject->PrintString     = VGA_PrintString;
-	lpDisplayObject->PrintChar       = VGA_PrintChar;
-	lpDisplayObject->GetCursorPos    = VGA_GetCursorPos;
-	lpDisplayObject->SetCursorPos    = VGA_SetCursorPos;
-	lpDisplayObject->ChangeLine      = VGA_ChangeLine;
-	lpDisplayObject->GetString       = VGA_GetString;
-	lpDisplayObject->DelString       = VGA_DelString;
-	lpDisplayObject->DelChar         = VGA_DelChar;
-	lpDisplayObject->Clear           = VGA_Clear;
-
-	s_pDisplayObj          = lpDisplayObject;
+BOOL InitializeVGA(void)
+{
 	s_szVgaInfo.pVideoAddr = (BYTE*)BIOS_VGABUF_ADDR;
 	s_szVgaInfo.Lines      = BIOS_VGABUF_LINES;
 	s_szVgaInfo.Colums     = BIOS_VGABUF_COLUMS;
 	s_szVgaInfo.LastLine   = s_szVgaInfo.Lines;
-		
-	DisplayManager.RegisterDisplay(&DisplayManager,lpDisplayObject);
-
 	return TRUE;
 }
 
-#endif
+#endif  //__CFG_SYS_DDF

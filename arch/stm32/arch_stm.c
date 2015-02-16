@@ -25,6 +25,7 @@
 #endif
 
 #include "ARCH.H"
+#include "stdio.h"
 
 #ifdef __STM32__  //Only available under STM32 chipset.
 
@@ -156,6 +157,9 @@ VOID __outws(BYTE* pBuffer,DWORD dwBuffLen,WORD wPort)
 {
 }
 
+//External low level output routine.
+extern void SER_PutString(char*);
+
 //Hardware fault handler.
 void HardFault_Handler()
 {
@@ -168,7 +172,7 @@ void HardFault_Handler()
 		
 	SER_PutString("  ---- Thread Info ---- \r\n");
 	SER_PutString("  Thread name: ");
-	SER_PutString(KernelThreadManager.lpCurrentKernelThread->KernelThreadName);
+	SER_PutString((char*)KernelThreadManager.lpCurrentKernelThread->KernelThreadName);
 	SER_PutString("\r\n");
 	SER_PutString("  Thread Status: ");
 	if(KERNEL_THREAD_STATUS_RUNNING == KernelThreadManager.lpCurrentKernelThread->dwThreadStatus)
