@@ -1,3 +1,4 @@
+
 HelloX operating system is a open source project dedicated to M2M(or IoT,Internet of Things) application,it include a compact kernel,some auxillary applications and development environment.
 Any one can contribute it,and any contribution will be recorded in authors.txt file under the same directory as README file.
 
@@ -18,9 +19,17 @@ Here is the include directory configuration for your IDE:
    b) /include
    c) /shell
    d) /network
-   e) /network
+   e) /jvm
    f) /include/lwip
 2. Delete the default include directory set by your IDE,since it may conflict with source files under /lib.
 
 Wish you good luck!:-),please contact garryxin@gmail.com or QQ/WeChat:89007638 for assistance.
 
+[V1.78 Release Notes]
+1. Port the JamVM to HelloX,to support Java language,which is used to build IoT application framework;
+2. Boot options are enhanced under PC platform,a dedicated tool is developed to create boot USB stick and VHD;
+3. File system is enhanced to base on BIOS reading and writting;
+4. Kernel sychronization mechanism is enhanced,condition operation is added;
+5. Essential process mechanism is added to support JVM porting;
+6. C libarary is enhanced to support common POSIX standards;
+7. Fixed some bugs of the kernel and shell.
