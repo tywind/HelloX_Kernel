@@ -19,6 +19,11 @@
  * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+//HelloX Porting Code.
+#include <stdafx.h>
+#include <kapi.h>
+#include <io.h>
+
 #include "jam.h"
 #include "sig.h"
 #include "frame.h"
@@ -26,6 +31,7 @@
 #include "symbol.h"
 #include "excep.h"
 #include "properties.h"
+#include "jni.h"
 #include "jni-internal.h"
 
 #define VA_DOUBLE(args, sp)                                 \
@@ -69,7 +75,8 @@
     }                                                       \
     sp++; args++
 
-#define ADJUST_RET_ADDR(ret_addr, ret_type) ({              \
+/*
+#define ADJUST_RET_ADDR(ret_addr, ret_type) {              \
     char *adjusted = ret_addr;                              \
     if(IS_BIG_ENDIAN) {                                     \
         int size;                                           \
@@ -90,7 +97,32 @@
         adjusted += size;                                   \
     }                                                       \
     adjusted;                                               \
-})
+}*/
+
+//For debugging.
+static void* ADJUST_RET_ADDR(void* ret_addr,char ret_type) {          
+    char *adjusted = ret_addr;                              
+    if(IS_BIG_ENDIAN) {                                     
+        int size;                                           
+        switch(ret_type) {                                  
+            case 'B': case 'Z':                             
+                size = sizeof(uintptr_t) - 1;               
+                break;                                      
+            case 'C': case 'S':                             
+                size = sizeof(uintptr_t) - 2;               
+                break;                                      
+            case 'I': case 'F':                             
+                size = sizeof(uintptr_t) - 4;               
+                break;                                      
+            default:                                        
+                size = 0;                                   
+                break;                                      
+        }                                                   
+        adjusted += size;                                   
+    }                                                       
+    return adjusted;                                               
+}
+
 
 void *executeMethodArgs(Object *ob, Class *class, MethodBlock *mb, ...) {
     va_list jargs;

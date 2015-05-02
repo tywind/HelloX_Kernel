@@ -71,6 +71,12 @@ BEGIN_DECLARE_INIT_DATA(ObjectInitData)
 	OBJECT_INIT_DATA(OBJECT_TYPE_SEMAPHORE,sizeof(__SEMAPHORE),
 	SemInitialize,SemUninitialize)
 
+	OBJECT_INIT_DATA(OBJECT_TYPE_CONDITION,sizeof(__CONDITION),
+	ConditionInitialize,ConditionUninitialize)
+
+	OBJECT_INIT_DATA(OBJECT_TYPE_PROCESS,sizeof(__PROCESS_OBJECT),
+	ProcessInitialize,ProcessUninitialize)
+
 END_DECLARE_INIT_DATA()
 
 //

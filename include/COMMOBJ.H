@@ -143,33 +143,34 @@ extern __OBJECT_MANAGER ObjectManager;
 //For each object in this system,it must have a type value assocated with it.
 //
 
-#define OBJECT_TYPE_DRIVER                0x00000001
-#define OBJECT_TYPE_FILE                  0x00000002
-#define OBJECT_TYPE_VOLUME                0x00000003
-#define OBJECT_TYPE_FAT32                 0x00000004
-#define OBJECT_TYPE_NTFS                  0x00000005
-#define OBJECT_TYPE_KERNAL_THREAD         0x00000006
-#define OBJECT_TYPE_PROCESS               0x00000007
-#define OBJECT_TYPE_THREAD                0x00000008
-#define OBJECT_TYPE_MUTEX                 0x00000009
-#define OBJECT_TYPE_EVENT                 0x0000000A
-#define OBJECT_TYPE_CRITICAL_SECTION      0x0000000B
-#define OBJECT_TYPE_VMA                   0x0000000C
-#define OBJECT_TYPE_DLL                   0x0000000D
-#define OBJECT_TYPE_IMAGE                 0x0000000E
-#define OBJECT_TYPE_PRIORITY_QUEUE        0x0000000F
-#define OBJECT_TYPE_FIFO_QUEUE            0x00000010
-#define OBJECT_TYPE_KERNEL_THREAD         0x00000011
-#define OBJECT_TYPE_TIMER                 0x00000012
-#define OBJECT_TYPE_INTERRUPT             0x00000013
-#define OBJECT_TYPE_SEMAPHORE             0x00000014
-#define OBJECT_TYPE_DEVICE                0x00000015
-#define OBJECT_TYPE_DRCB                  0x00000016
-#define OBJECT_TYPE_MAILBOX               0x00000017
+#define OBJECT_TYPE_DRIVER                  0x00000001
+#define OBJECT_TYPE_FILE                    0x00000002
+#define OBJECT_TYPE_VOLUME                  0x00000003
+#define OBJECT_TYPE_FAT32                   0x00000004
+#define OBJECT_TYPE_NTFS                    0x00000005
+#define OBJECT_TYPE_KERNAL_THREAD           0x00000006
+#define OBJECT_TYPE_PROCESS                 0x00000007
+#define OBJECT_TYPE_THREAD                  0x00000008
+#define OBJECT_TYPE_MUTEX                   0x00000009
+#define OBJECT_TYPE_EVENT                   0x0000000A
+#define OBJECT_TYPE_CRITICAL_SECTION        0x0000000B
+#define OBJECT_TYPE_VMA                     0x0000000C
+#define OBJECT_TYPE_DLL                     0x0000000D
+#define OBJECT_TYPE_IMAGE                   0x0000000E
+#define OBJECT_TYPE_PRIORITY_QUEUE          0x0000000F
+#define OBJECT_TYPE_FIFO_QUEUE              0x00000010
+#define OBJECT_TYPE_KERNEL_THREAD           0x00000011
+#define OBJECT_TYPE_TIMER                   0x00000012
+#define OBJECT_TYPE_INTERRUPT               0x00000013
+#define OBJECT_TYPE_SEMAPHORE               0x00000014
+#define OBJECT_TYPE_DEVICE                  0x00000015
+#define OBJECT_TYPE_DRCB                    0x00000016
+#define OBJECT_TYPE_MAILBOX                 0x00000017
 #define OBJECT_TYPE_PAGE_INDEX_MANAGER      0x00000018
 #define OBJECT_TYPE_VIRTUAL_MEMORY_MANAGER  0x00000019
 #define OBJECT_TYPE_COMMON_QUEUE            0x0000001A
 #define OBJECT_TYPE_RING_BUFFER             0x0000001B
+#define OBJECT_TYPE_CONDITION               0x0000001C
 
 // Please define your object type here,and increment the type value.
 //The maximal object type value should not exceed 63.

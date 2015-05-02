@@ -62,3 +62,32 @@ int memcmp(const void *buffer1,const void *buffer2,int count)
 
 	return( *((unsigned char *)buffer1) - *((unsigned char *)buffer2) );
 }
+ 
+//It can handle the scenario that the dst and src memory overlaped scenario.
+void *memmove(void *dst,const void *src,int n)
+{
+     char *dp = (char *)dst;
+     char *sp = (char *)src; 
+     
+	 if((NULL == dst) || (NULL == src) || (n <= 0))
+	 {
+		 return NULL;
+	 }
+
+     //Not overlaped.
+     if(sp>dp||(sp+n)<dp)
+     { 
+         while(n--) 
+             *(dp++) = *(sp++);
+         *dp = '\0';
+     }
+     else if(sp<dp) //Overlaped.
+     {
+		 sp += n; 
+         dp += n; 
+         *dp = '\0'; 
+         while(n--)
+            *(--dp) = *(--sp); 
+     }
+     return dst;
+}

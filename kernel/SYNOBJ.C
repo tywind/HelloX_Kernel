@@ -27,13 +27,6 @@
 #include "StdAfx.h"
 #endif
 
-//Timer handler's parameter.
-typedef struct{
-	__COMMON_OBJECT*        lpSynObject;  //Synchronous object.
-	__PRIORITY_QUEUE*       lpWaitingQueue; //Waiting queue of the synchronous object.
-	__KERNEL_THREAD_OBJECT* lpKernelThread; //Kernel thread who want to wait.
-}__TIMER_HANDLER_PARAM;
-
 //Timer handler routine for all synchronous object.
 static DWORD WaitingTimerHandler(LPVOID lpData)
 {
@@ -53,17 +46,24 @@ static DWORD WaitingTimerHandler(LPVOID lpData)
 		case OBJECT_WAIT_DELETED:
 			break;
 		case OBJECT_WAIT_WAITING:
-			lpHandlerParam->lpKernelThread->dwWaitingStatus &= ~OBJECT_WAIT_MASK;
-			lpHandlerParam->lpKernelThread->dwWaitingStatus |= OBJECT_WAIT_TIMEOUT;
-			//Delete the lpKernelThread from waiting queue.
-			lpHandlerParam->lpWaitingQueue->DeleteFromQueue(
-				(__COMMON_OBJECT*)lpHandlerParam->lpWaitingQueue,
-				(__COMMON_OBJECT*)lpHandlerParam->lpKernelThread);
-			//Also should decrement reference counter of the synchronization object if it has.
-			//Add this kernel thread to ready queue.
-			lpHandlerParam->lpKernelThread->dwThreadStatus = KERNEL_THREAD_STATUS_READY;
-			KernelThreadManager.AddReadyKernelThread((__COMMON_OBJECT*)&KernelThreadManager,
-				lpHandlerParam->lpKernelThread);
+			if(lpHandlerParam->TimeOutCallback)  //Call the specified time out call back.
+			{
+				lpHandlerParam->TimeOutCallback((VOID*)lpHandlerParam);
+			}
+			else  //Use the default implementation,it works for most synchronization kernel objects.
+			{
+				lpHandlerParam->lpKernelThread->dwWaitingStatus &= ~OBJECT_WAIT_MASK;
+				lpHandlerParam->lpKernelThread->dwWaitingStatus |= OBJECT_WAIT_TIMEOUT;
+				//Delete the lpKernelThread from waiting queue.
+				lpHandlerParam->lpWaitingQueue->DeleteFromQueue(
+					(__COMMON_OBJECT*)lpHandlerParam->lpWaitingQueue,
+					(__COMMON_OBJECT*)lpHandlerParam->lpKernelThread);
+				//Also should decrement reference counter of the synchronization object if it has.
+				//Add this kernel thread to ready queue.
+				lpHandlerParam->lpKernelThread->dwThreadStatus = KERNEL_THREAD_STATUS_READY;
+				KernelThreadManager.AddReadyKernelThread((__COMMON_OBJECT*)&KernelThreadManager,
+					lpHandlerParam->lpKernelThread);
+			}
 			break;
 		default:
 			BUG();
@@ -80,7 +80,8 @@ static DWORD WaitingTimerHandler(LPVOID lpData)
 DWORD TimeOutWaiting(__COMMON_OBJECT* lpSynObject,      //Synchronous object.
 					 __PRIORITY_QUEUE* lpWaitingQueue,  //Waiting queue.
 					 __KERNEL_THREAD_OBJECT* lpKernelThread,  //Who want to wait.
-					 DWORD dwMillionSecond)  //Time out value in millionsecond.
+					 DWORD dwMillionSecond,  //Time out value in millionsecond.
+					 VOID (*TimeOutCallback)(VOID*))  //Call back routine when timeout.
 {
 	__TIMER_OBJECT*           lpTimerObj;
 	__TIMER_HANDLER_PARAM     HandlerParam;
@@ -96,6 +97,7 @@ DWORD TimeOutWaiting(__COMMON_OBJECT* lpSynObject,      //Synchronous object.
 	HandlerParam.lpKernelThread  = lpKernelThread;
 	HandlerParam.lpSynObject     = lpSynObject;
 	HandlerParam.lpWaitingQueue  = lpWaitingQueue;
+	HandlerParam.TimeOutCallback = TimeOutCallback;
 
 	//lpKernelThread->dwWaitingStatus &= ~OBJECT_WAIT_MASK;
 	//lpKernelThread->dwWaitingStatus |= OBJECT_WAIT_WAITING;
@@ -423,7 +425,7 @@ static DWORD WaitForEventObjectEx(__COMMON_OBJECT* lpObject,DWORD dwMillionSecon
 		__LEAVE_CRITICAL_SECTION(NULL,dwFlags);
 		
 		switch(TimeOutWaiting((__COMMON_OBJECT*)lpEvent,lpEvent->lpWaitingQueue,
-			lpKernelThread,dwTimeSpan))
+			lpKernelThread,dwTimeSpan,NULL))
 		{
 			case OBJECT_WAIT_RESOURCE:  //Should loop to while again to check the status.
 				__ENTER_CRITICAL_SECTION(NULL,dwFlags);
@@ -467,7 +469,7 @@ static DWORD ReleaseMutex(__COMMON_OBJECT* lpThis)
 	{
 		lpMutex->dwWaitingNum --;    //Decrement the counter.
 	}
-	if(0 == lpMutex->dwWaitingNum)   //There is not kernel thread waiting for the object.
+	if(0 == lpMutex->dwWaitingNum)   //There is no kernel thread waiting for the object.
 	{
 		dwPreviousStatus = lpMutex->dwMutexStatus;
 		lpMutex->dwMutexStatus = MUTEX_STATUS_FREE;  //Set to free.
@@ -531,6 +533,31 @@ static DWORD WaitForMutexObject(__COMMON_OBJECT* lpThis)
 	return OBJECT_WAIT_RESOURCE;
 }
 
+//Timeout call back for Mutex object,will be called in TimeOutWaiting routine,
+//to remove the kernel thread waiting on the mutex from pending queue in case
+//of waiting time out.
+static VOID MutexTimeOutCallback(VOID* pData)
+{
+	__TIMER_HANDLER_PARAM*    lpHandlerParam = (__TIMER_HANDLER_PARAM*)pData;
+
+	if(NULL == lpHandlerParam)  //Shoud not occur.
+	{
+		BUG();
+	}
+	lpHandlerParam->lpKernelThread->dwWaitingStatus &= ~OBJECT_WAIT_MASK;
+	lpHandlerParam->lpKernelThread->dwWaitingStatus |= OBJECT_WAIT_TIMEOUT;
+	//Delete the lpKernelThread from waiting queue.
+	lpHandlerParam->lpWaitingQueue->DeleteFromQueue(
+		(__COMMON_OBJECT*)lpHandlerParam->lpWaitingQueue,
+		(__COMMON_OBJECT*)lpHandlerParam->lpKernelThread);
+	//Also should decrement reference counter of the MUTEX object.
+	((__MUTEX*)lpHandlerParam->lpSynObject)->dwWaitingNum --;
+	//Add this kernel thread to ready queue.
+	lpHandlerParam->lpKernelThread->dwThreadStatus = KERNEL_THREAD_STATUS_READY;
+	KernelThreadManager.AddReadyKernelThread((__COMMON_OBJECT*)&KernelThreadManager,
+		lpHandlerParam->lpKernelThread);
+}
+
 //
 //Implementation of WaitForThisObjectEx routine.
 //This routine is a time out waiting routine,caller can give a time value
@@ -545,6 +572,7 @@ static DWORD WaitForMutexObjectEx(__COMMON_OBJECT* lpThis,DWORD dwMillionSecond)
 	__MUTEX*                      lpMutex        = (__MUTEX*)lpThis;
 	__KERNEL_THREAD_OBJECT*       lpKernelThread = NULL;
 	DWORD                         dwFlags;
+	DWORD                         dwResult       = OBJECT_WAIT_FAILED;
 
 	if(NULL == lpMutex)
 	{
@@ -573,6 +601,7 @@ static DWORD WaitForMutexObjectEx(__COMMON_OBJECT* lpThis,DWORD dwMillionSecond)
 		lpKernelThread->dwWaitingStatus |= OBJECT_WAIT_WAITING;
 		//Waiting on mutex's waiting queue.
 		lpKernelThread->dwThreadStatus = KERNEL_THREAD_STATUS_BLOCKED;
+		lpMutex->dwWaitingNum ++;  //Added in 2015-04-06.
 		lpMutex->lpWaitingQueue->InsertIntoQueue(
 			(__COMMON_OBJECT*)lpMutex->lpWaitingQueue,
 			(__COMMON_OBJECT*)lpKernelThread,
@@ -580,9 +609,7 @@ static DWORD WaitForMutexObjectEx(__COMMON_OBJECT* lpThis,DWORD dwMillionSecond)
 		__LEAVE_CRITICAL_SECTION(NULL,dwFlags);
 
 		return TimeOutWaiting((__COMMON_OBJECT*)lpMutex,
-			lpMutex->lpWaitingQueue,
-			lpKernelThread,
-			dwMillionSecond);
+			lpMutex->lpWaitingQueue,lpKernelThread,dwMillionSecond,MutexTimeOutCallback);
 	}
 }
 

@@ -1,6 +1,9 @@
 
-#include "types.h"
-#include "pthread.h"
+#include <StdAfx.h>
+#include <types.h>
+#include <kapi.h>
+#include <pthread.h>
+#include <time.h>
 
 /*
  * Spinlock Functions
@@ -76,31 +79,124 @@
  */
  int  pthread_cond_init (pthread_cond_t * cond, const pthread_condattr_t * attr)
  {
+	 __CONDITION* pCondition = NULL;
+
+	 if(NULL == cond)
+	 {
+		 return EINVAL;
+	 }
+	 *cond = (pthread_cond_t)KMemAlloc(sizeof(pthread_cond_t),KMEM_SIZE_TYPE_ANY);
+	 if(NULL == *cond)
+	 {
+		 return EINVAL;
+	 }
+
+	 (*cond)->cond = CreateCondition(0);
+	 if(NULL == (*cond)->cond)
+	 {
+		 KMemFree(*cond,KMEM_SIZE_TYPE_ANY,0);
+		 return EINVAL;
+	 }
 	 return S_OK;
  }
 
  int  pthread_cond_destroy (pthread_cond_t * cond)
  {
+	 __CONDITION* pCond = NULL;
+	 
+	 if(NULL == cond)
+	 {
+		 return EINVAL;
+	 }
+	 if(NULL == (*cond)->cond)
+	 {
+		 return EINVAL;
+	 }
+	 DestroyCondition((HANDLE)((*cond)->cond));
+	 KMemFree((*cond),KMEM_SIZE_TYPE_ANY,0);
 	 return S_OK;
  }
 
  int  pthread_cond_wait (pthread_cond_t * cond, pthread_mutex_t * mutex)
  {
-	 return S_OK;
+	 __CONDITION*    pCond   = NULL;
+	 __MUTEX*        pMutex  = NULL;
+
+	 if((NULL == cond) || (NULL == mutex))
+	 {
+		 return EINVAL;
+	 }
+	 if((NULL == (*cond)->cond) || (NULL == (*mutex)->event))
+	 {
+		 return EINVAL;
+	 }
+	 pCond  = (__CONDITION*)(*cond)->cond;
+	 pMutex = (__MUTEX*)(*mutex)->event;
+
+	 if(OBJECT_WAIT_RESOURCE == pCond->CondWait((__COMMON_OBJECT*)pCond,(__COMMON_OBJECT*)pMutex))
+	 {
+		 return S_OK;
+	 }
+	 return EINVAL;
  }
 
  int  pthread_cond_timedwait (pthread_cond_t * cond,pthread_mutex_t * mutex, const struct timespec *abstime)
  {
-	 return  S_OK;
+	 __CONDITION*    pCond   = NULL;
+	 __MUTEX*        pMutex  = NULL;
+	 DWORD           waitTime = 0;
+
+	 if((NULL == cond) || (NULL == mutex) || (NULL == abstime))
+	 {
+		 return EINVAL;
+	 }
+	 if((NULL == (*cond)->cond) || (NULL == (*mutex)->event))
+	 {
+		 return EINVAL;
+	 }
+	 pCond  = (__CONDITION*)(*cond)->cond;
+	 pMutex = (__MUTEX*)(*mutex)->event;
+
+	 //Should revise later.
+	 waitTime  = abstime->tv_sec * 1000;
+	 waitTime += abstime->tv_nsec / 1000;
+
+	 if(OBJECT_WAIT_RESOURCE == pCond->CondWaitTimeout((__COMMON_OBJECT*)pCond,(__COMMON_OBJECT*)pMutex,waitTime))
+	 {
+		 return S_OK;
+	 }
+	 return EINVAL;
  }
 
  int  pthread_cond_signal (pthread_cond_t * cond)
  {
+	 __CONDITION* pCond = NULL;
+
+	 if(NULL == cond)
+	 {
+		 return EINVAL;
+	 }
+	 if(NULL == (*cond)->cond)
+	 {
+		 return EINVAL;
+	 }
+	 pCond->CondSignal((__COMMON_OBJECT*)pCond);
 	 return S_OK;
  }
 
  int  pthread_cond_broadcast (pthread_cond_t * cond)
  {
+	 __CONDITION* pCond = NULL;
+
+	 if(NULL == cond)
+	 {
+		 return EINVAL;
+	 }
+	 if(NULL == (*cond)->cond)
+	 {
+		 return EINVAL;
+	 }
+	 pCond->CondBroadcast((__COMMON_OBJECT*)pCond);
 	 return S_OK;
  }
 

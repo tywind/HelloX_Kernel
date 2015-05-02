@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009
  * Robert Lougher <rob@jamvm.org.uk>.
  *
  * This file is part of JamVM.
@@ -57,47 +57,20 @@
 
 #define SLOTS(type) (sizeof(type) + 3)/4
 
-#define STACK_POP(type) ({        \
-    ostack -= SLOTS(type);        \
-    STACK(type, 0);               \
-})
+/*#define STACK_POP(type) ({       \
+    ostack -= SLOTS(type);       \
+    STACK(type, 0);              \
+})*/
 
-/* In the macro below we assign 'value' to a temporary
-   to ensure any modification of ostack within value
-   is done before pushing */
+//For debugging.
+#define STACK_POP(type) ( \
+	ostack -= SLOTS(type), \
+	STACK(type,0));
 
-#define STACK_PUSH(type, value) { \
-    type val = value;             \
-    STACK(type, 0) = val;         \
-    ostack += SLOTS(type);        \
+#define STACK_PUSH(type, val) {  \
+    STACK(type, 0) = val;        \
+    ostack += SLOTS(type);       \
 }
-
-#ifdef CHECK_INTDIV_OVERFLOW
-#define INTDIV_OVERFLOW(dividend, divisor) \
-    (dividend == INT_MIN && divisor == -1)
-#else
-#define INTDIV_OVERFLOW(dividend, divisor) FALSE
-#endif
-
-#ifdef CHECK_LONGDIV_OVERFLOW
-#define LONGDIV_OVERFLOW(dividend, divisor) \
-    (dividend == LLONG_MIN && divisor == -1)
-#else
-#define LONGDIV_OVERFLOW(dividend, divisor) FALSE
-#endif
-
-#ifndef JSR292
-#define CACHE_POLY_OFFSETS
-#define CACHED_POLY_OFFSETS
-
-#define ID_invokeBasic   1
-#define ID_linkToStatic  1
-#define ID_linkToVirtual 1
-
-#define mbPolymorphicNameID(mb)       0
-#define isPolymorphicRef(class, idx)  FALSE
-#define resolvePolyMethod(class, idx) ({ NULL; })
-#endif
 
 /* Include the interpreter variant header */
 

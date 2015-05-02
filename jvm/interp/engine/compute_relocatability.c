@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2013, 2014
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008
  * Robert Lougher <rob@jamvm.org.uk>.
  *
  * This file is part of JamVM.
@@ -83,55 +83,6 @@ int main() {
 
 /* Stubs for functions called from executeJava */
 
-char *symbol_values[] = {};
-
-void clearException() {
-}
-
-Class *initClass(Class *class) {
-    return NULL;
-}
-
-MethodBlock *lookupVirtualMethod(Class *class, MethodBlock *mb) {
-    return NULL;
-}
-
-int isPolymorphicRef(Class *class, int cp_index) {
-    return FALSE;
-}
-
-PolyMethodBlock *resolvePolyMethod(Class *class, int cp_index) {
-    return NULL;
-}
-
-Object *findInvokeDynamicInvoker(Class *class, ResolvedInvDynCPEntry *entry,
-                                 MethodBlock **invoker) {
-    return NULL;
-}
-
-void *threadSelf() {
-    return NULL;
-}
-
-void resolveLock(void *self) {
-}
-
-void resolveUnlock(void *self) {
-}
-
-ResolvedInvDynCPEntry *resolveInvokeDynamic(Class *class, int cp_index) {
-    return NULL;
-}
-
-InvDynMethodBlock *resolveCallSite(ResolvedInvDynCPEntry *entry,
-                                   MethodBlock *invoker,
-                                   Object *appendix_box) {
-    return NULL;
-}
-
-void cachePolyOffsets(void *cpo) {
-}
-
 Object *allocObject(Class *class) {
     return NULL;
 }
@@ -156,7 +107,7 @@ Class *findArrayClassFromClassLoader(char *name, Object *loader) {
     return NULL;
 }
 
-Class *resolveClass(Class *class, int index, int check_access, int init) {
+Class *resolveClass(Class *class, int index, int init) {
     return NULL;
 }
 
@@ -177,10 +128,6 @@ uintptr_t resolveSingleConstant(Class *class, int index) {
 }
 
 char isInstanceOf(Class *class, Class *test) {
-    return 0;
-}
-
-char isSubClassOf(Class *class, Class *test) {
     return 0;
 }
 
@@ -231,3 +178,4 @@ void inlineProfiledBlock(Instruction *pc, MethodBlock *mb) {
 
 void shutdownInlining() {
 }
+

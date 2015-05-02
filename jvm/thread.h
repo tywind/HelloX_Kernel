@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2011
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009
  * Robert Lougher <rob@jamvm.org.uk>.
  *
  * This file is part of JamVM.
@@ -20,49 +20,23 @@
  */
 
 #ifndef CREATING
-//#include <pthread.h>
-#include <kapi.h>
-//#include <setjmp.h>
+#include <pthread.h>
+#include <setjmp.h>
 #include <stdlib.h>
 
 #ifdef HAVE_ALLOCA_H
 #include <alloca.h>
 #endif
 
-typedef HANDLE pthread_mutex_t;
-typedef HANDLE pthread_key_t;
-typedef HANDLE pthread_attr_t;
-typedef UINT    pthread_t;
-typedef UINT    pthread_cond_t;
 /* Thread states */
 
-#define JVMTI_THREAD_STATE_ALIVE                    0x001
-#define JVMTI_THREAD_STATE_TERMINATED               0x002
-#define JVMTI_THREAD_STATE_RUNNABLE                 0x004
-#define JVMTI_THREAD_STATE_WAITING_INDEFINITELY     0x010
-#define JVMTI_THREAD_STATE_WAITING_WITH_TIMEOUT     0x020
-#define JVMTI_THREAD_STATE_SLEEPING                 0x040
-#define JVMTI_THREAD_STATE_WAITING                  0x080
-#define JVMTI_THREAD_STATE_IN_OBJECT_WAIT           0x100
-#define JVMTI_THREAD_STATE_PARKED                   0x200
-#define JVMTI_THREAD_STATE_BLOCKED_ON_MONITOR_ENTER 0x400
-
-#define CREATING          0x0 
-#define RUNNING           (JVMTI_THREAD_STATE_ALIVE \
-                          |JVMTI_THREAD_STATE_RUNNABLE)
-#define WAITING           (JVMTI_THREAD_STATE_ALIVE \
-                          |JVMTI_THREAD_STATE_WAITING \
-                          |JVMTI_THREAD_STATE_WAITING_INDEFINITELY)
-#define TIMED_WAITING     (JVMTI_THREAD_STATE_ALIVE \
-                          |JVMTI_THREAD_STATE_WAITING \
-                          |JVMTI_THREAD_STATE_WAITING_WITH_TIMEOUT)
-#define OBJECT_WAIT       (JVMTI_THREAD_STATE_IN_OBJECT_WAIT|WAITING)
-#define OBJECT_TIMED_WAIT (JVMTI_THREAD_STATE_IN_OBJECT_WAIT|TIMED_WAITING)
-#define SLEEPING          (JVMTI_THREAD_STATE_SLEEPING|TIMED_WAITING)
-#define PARKED            (JVMTI_THREAD_STATE_PARKED|WAITING)
-#define TIMED_PARKED      (JVMTI_THREAD_STATE_PARKED|TIMED_WAITING)
-#define BLOCKED           JVMTI_THREAD_STATE_BLOCKED_ON_MONITOR_ENTER
-#define TERMINATED        JVMTI_THREAD_STATE_TERMINATED
+#define CREATING      0
+#define STARTED       1
+#define RUNNING       2
+#define WAITING       3
+#define TIMED_WAITING 4
+#define BLOCKED       5
+#define SUSPENDED     6
 
 /* thread priorities */
 
@@ -70,18 +44,16 @@ typedef UINT    pthread_cond_t;
 #define NORM_PRIORITY  5
 #define MAX_PRIORITY  10
 
-/* Suspend states */
+/* Enable/Disable suspend modes */
 
-#define SUSP_NONE      0
-#define SUSP_BLOCKING  1
-#define SUSP_CRITICAL  2
-#define SUSP_SUSPENDED 3
+#define SUSP_BLOCKING 1
+#define SUSP_CRITICAL 2
 
 /* Park states */
 
-#define PARK_BLOCKED   0
-#define PARK_RUNNING   1
-#define PARK_PERMIT    2
+#define PARK_BLOCKED 0
+#define PARK_RUNNING 1
+#define PARK_PERMIT  2
 
 typedef struct thread Thread;
 
@@ -100,6 +72,12 @@ typedef struct monitor {
 struct thread {
     int id;
     pthread_t tid;
+    char state;
+    char suspend;
+    char blocking;
+    char park_state;
+    char interrupted;
+    char interrupting;
     ExecEnv *ee;
     void *stack_top;
     void *stack_base;
@@ -115,18 +93,12 @@ struct thread {
     Thread *prev, *next;
     unsigned int wait_id;
     unsigned int notify_id;
-    char suspend;
-    char park_state;
-    char interrupted;
-    char interrupting;
-    char suspend_state;
-    CLASSLIB_THREAD_EXTRA_FIELDS
 };
 
 extern Thread *threadSelf();
-extern long long javaThreadId(Thread *thread);
 extern Thread *jThread2Thread(Object *jThread);
-extern long long jThread2ThreadId(Object *jthread);
+extern Thread *vmThread2Thread(Object *vmThread);
+extern long long javaThreadId(Thread *thread);
 
 extern void *getStackTop(Thread *thread);
 extern void *getStackBase(Thread *thread);
@@ -166,23 +138,19 @@ extern Thread *findThreadById(long long id);
 extern Thread *findRunningThreadByTid(int tid);
 extern void suspendThread(Thread *thread);
 extern void resumeThread(Thread *thread);
-extern Object *runningThreadStackTrace(Thread *thread, int max_depth,
-                                       int *in_native);
-extern Object *runningThreadObjects();
-extern void printThreadsDump(Thread *self);
 
-#define disableSuspend(thread)             \
-{                                          \
-    sigjmp_buf *env;                       \
-    env = alloca(sizeof(sigjmp_buf));      \
-    sigsetjmp(*env, FALSE);                \
-    disableSuspend0(thread, (void*)env);   \
+#define disableSuspend(thread)          \
+{                                       \
+    sigjmp_buf *env;                    \
+    env = alloca(sizeof(sigjmp_buf));   \
+    sigsetjmp(*env, FALSE);             \
+    disableSuspend0(thread, (void*)env);\
 }
 
-#define fastDisableSuspend(thread)         \
-{                                          \
-    thread->suspend_state = SUSP_CRITICAL; \
-    MBARRIER();                            \
+#define fastDisableSuspend(thread)      \
+{                                       \
+    thread->blocking = SUSP_CRITICAL;   \
+    MBARRIER();                         \
 }
 
 typedef struct {
@@ -198,10 +166,10 @@ typedef pthread_mutex_t VMLock;
     pthread_cond_init(&wait_lock.cv, NULL);    \
 }
 
-#define lockVMLock(lock, self) {                \
-    classlibSetThreadState(self, BLOCKED);      \
-    pthread_mutex_lock(&lock);                  \
-    classlibSetThreadState(self, RUNNING);      \
+#define lockVMLock(lock, self) { \
+    self->state = BLOCKED;       \
+    pthread_mutex_lock(&lock);   \
+    self->state = RUNNING;       \
 }
 
 #define tryLockVMLock(lock, self) \
@@ -213,9 +181,9 @@ typedef pthread_mutex_t VMLock;
 #define unlockVMWaitLock(wait_lock, self) unlockVMLock(wait_lock.lock, self)
 
 #define waitVMWaitLock(wait_lock, self) {                        \
-    classlibSetThreadState(self, WAITING);                       \
+    self->state = WAITING;                                       \
     pthread_cond_wait(&wait_lock.cv, &wait_lock.lock);           \
-    classlibSetThreadState(self, RUNNING);                       \
+    self->state = RUNNING;                                       \
 }
 
 #define timedWaitVMWaitLock(wait_lock, self, ms) {               \
@@ -228,9 +196,9 @@ typedef pthread_mutex_t VMLock;
         ts.tv_sec++;                                             \
         ts.tv_nsec -= 1000000000L;                               \
     }                                                            \
-    classlibSetThreadState(self, TIMED_WAITING);                 \
+    self->state = TIMED_WAITING;                                 \
     pthread_cond_timedwait(&wait_lock.cv, &wait_lock.lock, &ts); \
-    classlibSetThreadState(self, RUNNING);                       \
+    self->state = RUNNING;                                       \
 }
 
 #define notifyVMWaitLock(wait_lock, self) pthread_cond_signal(&wait_lock.cv)

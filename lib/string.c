@@ -13,13 +13,9 @@
 //    Lines number              :
 //***********************************************************************/
 
-#ifndef __HELLO_CHINA__
-#include "..\INCLUDE\StdAfx.h"
-#endif
-
-#ifndef __STRING__
-#include "string.h"
-#endif
+#include <stdafx.h>
+#include <string.h>
+#include <limits.h>
 
 /*Purpose:
 *       memmove() copies a source memory buffer to a destination memory buffer.
@@ -469,10 +465,200 @@ char* strncpy(char *dest,char *src,unsigned int n)
 	while(n && (*dest++=*src++))
 	{
 		n--;
-	}
+	} 
 	if(n){
 		while(--n)
-			*dest++;
+			*dest++;  //There may be bug...
 	}  
     return strRtn;  
 } 
+
+//String comparation,array bound is guaranteed.
+int strncmp ( char * s1, char * s2, size_t n)
+{
+  if ( !n )
+   return(0);
+
+  while (--n && *s1 && *s1 == *s2)
+  {
+     s1++;
+     s2++;
+  }
+  return( *s1 - *s2 );
+}
+
+//Find the first bit in a given integer.
+int ffs(int x)
+{
+	int r = 1;
+	if(!x)
+	{
+		return 0;
+	}
+	if(!(x & 0xFFFF))
+	{
+		x >>= 16;
+		r += 16;
+	}
+	if(!(x & 0xFF))
+	{
+		x >>= 8;
+		r += 8;
+	}
+	if(!(x & 0x0F))
+	{
+		x >>= 4;
+		r += 4;
+	}
+	if(!(x & 3))
+	{
+		x >>= 2;
+		r += 2;
+	}
+	if(!(x & 1))
+	{
+		x >>= 1;
+		r += 1;
+	}
+	return r;
+}
+
+#ifndef isdigit
+#define isdigit(ch) ((ch >= '0') && (ch <= '9'))
+#endif
+
+#ifndef isalpha
+#define isalpha(ch) (((ch >= 'a') && (ch <= 'z')) || ((ch >= 'A') && (ch <= 'Z')))
+#endif
+
+#ifndef isupper
+#define isupper(ch) ((ch >= 'A') && (ch <= 'Z'))
+#endif
+
+//String to long.
+int strtol(const char *nptr, char **endptr, int base)
+{
+   const char *p = nptr;
+   unsigned long ret;
+   int ch;
+   unsigned long Overflow;
+   int sign = 0, flag, LimitRemainder;
+  
+   /*
+      跳过前面多余的空格，并判断正负符号。
+      如果base是0，允许以0x开头的十六进制数，
+      以0开头的8进制数。
+      如果base是16，则同时也允许以0x开头。
+ 
+   */
+   do
+   {
+      ch = *p++;
+   } while (' ' == ch);
+  
+   if (ch == '-')
+   {
+      sign = 1;
+      ch = *p++;
+   }
+   else if (ch == '+')
+      ch = *p++;
+   if ((base == 0 || base == 16) &&
+      ch == '0' && (*p == 'x' || *p == 'X'))
+   {
+      ch = p[1];
+      p += 2;
+      base = 16;
+   }
+   if (base == 0)
+      base = ch == '0' ? 8 : 10;
+ 
+   Overflow = sign ? -(unsigned long)LONG_MIN : LONG_MAX;
+   LimitRemainder = Overflow % (unsigned long)base;
+   Overflow /= (unsigned long)base;
+ 
+   for (ret = 0, flag = 0;; ch = *p++)
+   {
+      /*把当前字符转换为相应运算中需要的值。*/
+      if (isdigit(ch))
+        ch -= '0';
+      else if (isalpha(ch))
+        ch -= isupper(ch) ? 'A' - 10 : 'a' - 10;
+      else
+        break;
+      if (ch >= base)
+        break;
+ 
+      /*如果产生溢出，则置标志位，以后不再做计算。*/
+      if (flag < 0 || ret > Overflow || (ret == Overflow && ch > LimitRemainder))
+        flag = -1;
+      else
+      {
+        flag = 1;
+        ret *= base;
+        ret += ch;
+      }
+   }
+ 
+   /*
+      如果溢出，则返回相应的Overflow的峰值。
+      没有溢出，如是符号位为负，则转换为负数。
+   */
+   if (flag < 0)
+      ret = sign ? LONG_MIN : LONG_MAX;
+   else if (sign)
+      ret = -ret;
+  
+   /*
+      如字符串不为空，则*endptr等于指向nptr结束
+      符的指针值；否则*endptr等于nptr的首地址。
+   */
+   if (endptr != 0)
+      *endptr = (char *)(flag ?(p - 1) : nptr);
+ 
+   return ret;
+}
+
+char * strrchr(const char * str,int ch)
+
+{
+	char *p = (char *)str;
+	while (*str) str++;
+	while (str-- != p && *str != (char)ch);
+	if (*str == (char)ch)
+	{
+		return( (char *)str );
+	}
+	return(NULL);
+}
+
+char * strstr(const char *s1,const char *s2)
+{
+	if (*s1 == 0)
+	{
+		if (*s2)
+		{
+			return (char *) NULL;
+		}
+		return (char *) s1;
+	}
+	while (*s1)
+	{
+		size_t i;
+		i = 0;
+		while (1)
+		{
+			if (s2[i] == 0)
+			{
+				return (char *) s1;
+			}
+			if (s2[i] != s1[i])
+			{
+				break;
+			}
+			i++;
+		}
+		s1++;
+	}
+	return (char *) NULL;
+}

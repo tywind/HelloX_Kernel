@@ -23,7 +23,8 @@
 //
 //************************************************************************
 
-#define VERSION_INFO "    HelloX [Version 1.770(Beta),build in 2015/02/15,by Garry.Xin]"
+#define OS_VERSION   "    HelloX V1.78"
+#define VERSION_INFO "    HelloX [Version 1.780(Beta),build in 2015/05/01,by Garry.Xin]"
 #define SLOGAN_INFO  "    HelloX OS,through which you can talk to everything."
 
 //************************************************************************
@@ -54,6 +55,9 @@
 
 //CPU byte alignment,memory allocation will use this value to align block.
 #define SYSTEM_BYTE_ALIGN  4   //4 will work under most platforms.
+
+//The maximal TLS(Thread Local Storage) number.
+#define MAX_TLS_NUM        0x04
 
 //************************************************************************
 //
@@ -127,7 +131,7 @@
 
 //Include console object into kernel.COM input and output functions are implemented
 //in console object.
-#define __CFG_SYS_CONSOLE
+//#define __CFG_SYS_CONSOLE
 
 // Logcat service for debug subsystem
 //#define __CFG_SYS_LOGCAT
@@ -217,5 +221,6 @@
 //
 //************************************************************************
 
-//More compiling switches can be appended here.
+//Enable or disable Java virtual machine in system.
+#define __CFG_APP_JVM
 

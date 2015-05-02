@@ -187,7 +187,18 @@ DWORD FatDeviceWrite(__COMMON_OBJECT* lpDrv,
 DWORD FatDeviceRead(__COMMON_OBJECT* lpDrv,
 					__COMMON_OBJECT* lpDev,
 					__DRCB*          lpDrcb);
+DWORD FatDeviceSize(__COMMON_OBJECT* lpDrv,
+	__COMMON_OBJECT* lpDev,
+	__DRCB*          lpDrcb);
+
 BOOL DeleteFatFile(__FAT32_FS* pFat32Fs,CHAR* pszFileName);
 BOOL DeleteFatDir(__FAT32_FS* pFat32Fs,CHAR* pszDirName);
+BOOL ReleaseClusterChain(__FAT32_FS* pFat32Fs,DWORD dwStartCluster);
+
+#define  FAT32_DATETIME_CREATE     0x1
+#define  FAT32_DATETIME_WRITE      0x2
+#define  FAT32_DATETIME_ACCEPT     0x4
+
+VOID     SetFatFileDateTime(__FAT32_SHORTENTRY*  pDirEntry,DWORD dwTimeFlage);
 
 #endif  //__FAT32_H__

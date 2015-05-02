@@ -69,7 +69,7 @@ typedef unsigned int size_t;
 #define FALSE               0x00000000
 #define TRUE                0x00000001
 
-#define S_OK                0x00000001
+#define S_OK                0x00000000
 
 #define NULL                ((void*)0x00000000)
 

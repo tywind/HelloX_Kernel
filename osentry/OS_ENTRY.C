@@ -51,9 +51,19 @@ char* pszHelpInfo = "Any help please press 'help' + return.";
 extern __DRIVER_ENTRY DriverEntryArray[];
 
 //A dead loop routine.
-static void DeadLoop()
+static void DeadLoop(BOOL bDisableInt)
 {
-	while(TRUE);
+	DWORD dwFlags;
+	if (bDisableInt)
+	{
+		__ENTER_CRITICAL_SECTION(NULL, dwFlags);
+		while (TRUE);
+		__LEAVE_CRITICAL_SECTION(NULL, dwFlags);
+	}
+	else
+	{
+		while (TRUE);
+	}
 }
 
 //User entry point if used as EOS.
@@ -145,6 +155,13 @@ void __OS_Entry()
 		goto __TERMINAL;
 	}
 #endif
+
+	//Initialize the process manager object.
+	if(!ProcessManager.Initialize((__COMMON_OBJECT*)&ProcessManager))
+	{
+		pszErrorMsg = "INIT ERROR: Can not initialize ProcessManager object.";
+		goto __TERMINAL;
+	}
 
 	//Initialize Kernel Thread Manager object.
 	if(!KernelThreadManager.Initialize((__COMMON_OBJECT*)&KernelThreadManager))
@@ -271,6 +288,10 @@ void __OS_Entry()
 		pszErrorMsg = "INIT ERROR: Can not create SystemIdle kernel thread.";
 		goto __TERMINAL;
 	}
+	//Disable suspend on this kernel thread,since it may lead system crash.
+	KernelThreadManager.EnableSuspend((__COMMON_OBJECT*)&KernelThreadManager,
+		(__COMMON_OBJECT*)lpIdleThread,
+		FALSE);
 
 	//Create statistics kernel thread.
 #ifdef __CFG_SYS_CPUSTAT
@@ -395,14 +416,14 @@ void __OS_Entry()
 
 	System.EndInitialize((__COMMON_OBJECT*)&System);
 	//Enter a dead loop to wait for the scheduling of kernel threads.
-	DeadLoop();
+	DeadLoop(FALSE);
 
-	//The following code will never be executed if corrected.
+	//The following code will never be executed if anything is correct.
 __TERMINAL:
 	GotoHome();
 	ChangeLine();
 	PrintLine(pszErrorMsg);  //Show error msg.
-	DeadLoop();
+	DeadLoop(TRUE);
 }
 
 //------------------------------------------------------------------------------
@@ -412,7 +433,7 @@ __TERMINAL:
 #ifdef __STM32__
 int main()
 {
-	__OS_Entry();  //Call OS entry ro
+	__OS_Entry();  //Call OS entry routine.
 
 	return 0;
 }

@@ -22,7 +22,8 @@
 #ifndef __JNI_H__
 #define __JNI_H__
 #include <stdio.h>
-#include <stdarg.h>
+//HelloX Porting code: No need this file.
+//#include <stdarg.h>
 
 #define JNI_VERSION_1_1 0x00010001
 #define JNI_VERSION_1_2 0x00010002
@@ -110,7 +111,7 @@ typedef enum _jobjectRefType jobjectRefType;
 #define VIRTUAL_METHOD(type, native_type)                                                   \
 native_type (*Call##type##Method)(JNIEnv *env, jobject obj, jmethodID mID, ...);            \
 native_type (*Call##type##MethodV)(JNIEnv *env, jobject obj, jmethodID mID, va_list jargs); \
-native_type (*Call##type##MethodA)(JNIEnv *env, jobject obj, jmethodID mID, jvalue *jargs);
+native_type (*Call##type##MethodA)(JNIEnv *env, jobject obj, jmethodID mID, jvalue *jargs)
 
 #define NONVIRTUAL_METHOD(type, native_type)                                                \
 native_type (*CallNonvirtual##type##Method)(JNIEnv *env, jobject obj, jclass clazz,         \
@@ -118,19 +119,19 @@ native_type (*CallNonvirtual##type##Method)(JNIEnv *env, jobject obj, jclass cla
 native_type (*CallNonvirtual##type##MethodV)(JNIEnv *env, jobject obj, jclass clazz,        \
                 jmethodID methodID, va_list jargs);                                         \
 native_type (*CallNonvirtual##type##MethodA)(JNIEnv *env, jobject obj, jclass clazz,        \
-                jmethodID methodID, jvalue *jargs);
+                jmethodID methodID, jvalue *jargs)
 
 #define STATIC_METHOD(type, native_type)                                                    \
 native_type (*CallStatic##type##Method)(JNIEnv *env, jclass clazz, jmethodID methodID, ...);\
 native_type (*CallStatic##type##MethodV)(JNIEnv *env, jclass clazz, jmethodID methodID,     \
                 va_list jargs);                                                             \
 native_type (*CallStatic##type##MethodA)(JNIEnv *env, jclass clazz, jmethodID methodID,     \
-                jvalue *jargs);
+                jvalue *jargs)
 
 #define VOID_VIRTUAL_METHOD                                                                 \
 void (*CallVoidMethod)(JNIEnv *env, jobject obj, jmethodID methodID, ...);                  \
 void (*CallVoidMethodV)(JNIEnv *env, jobject obj, jmethodID methodID, va_list jargs);       \
-void (*CallVoidMethodA)(JNIEnv *env, jobject obj, jmethodID methodID, jvalue *jargs);       \
+void (*CallVoidMethodA)(JNIEnv *env, jobject obj, jmethodID methodID, jvalue *jargs)
 
 #define VOID_NONVIRTUAL_METHOD                                                              \
 void (*CallNonvirtualVoidMethod)(JNIEnv *env, jobject obj, jclass clazz,                    \
@@ -138,12 +139,12 @@ void (*CallNonvirtualVoidMethod)(JNIEnv *env, jobject obj, jclass clazz,        
 void (*CallNonvirtualVoidMethodV)(JNIEnv *env, jobject obj, jclass clazz,                   \
                 jmethodID methodID, va_list jargs);                                         \
 void (*CallNonvirtualVoidMethodA)(JNIEnv *env, jobject obj, jclass clazz,                   \
-                jmethodID methodID, jvalue *jargs);
+                jmethodID methodID, jvalue *jargs)
 
 #define VOID_STATIC_METHOD                                                                  \
 void (*CallStaticVoidMethod)(JNIEnv *env, jclass clazz, jmethodID methodID, ...);           \
 void (*CallStaticVoidMethodV)(JNIEnv *env, jclass clazz, jmethodID methodID, va_list jargs);\
-void (*CallStaticVoidMethodA)(JNIEnv *env, jclass clazz, jmethodID methodID, jvalue *jargs);
+void (*CallStaticVoidMethodA)(JNIEnv *env, jclass clazz, jmethodID methodID, jvalue *jargs)
 
 #define CALL_METHOD(access)         \
 access##_METHOD(Object, jobject);   \
@@ -155,23 +156,22 @@ access##_METHOD(Int, jint);         \
 access##_METHOD(Long, jlong);       \
 access##_METHOD(Float, jfloat);     \
 access##_METHOD(Double, jdouble);   \
-VOID_##access##_METHOD;
-
+VOID_##access##_METHOD
 
 #define NEW_PRIM_ARRAY(type, native_type, array_type) \
-native_type##Array (*New##type##Array)(JNIEnv *env, jsize length);
+native_type##Array (*New##type##Array)(JNIEnv *env, jsize length)
 
 #define GET_ELEMENTS_PRIM_ARRAY(type, native_type, array_type) \
-native_type *(*Get##type##ArrayElements)(JNIEnv *env, native_type##Array array, jboolean *isCopy);
+native_type *(*Get##type##ArrayElements)(JNIEnv *env, native_type##Array array, jboolean *isCopy)
 
 #define RELEASE_ELEMENTS_PRIM_ARRAY(type, native_type, array_type) \
-void (*Release##type##ArrayElements)(JNIEnv *env, native_type##Array array, native_type *elems, jint mode);
+void (*Release##type##ArrayElements)(JNIEnv *env, native_type##Array array, native_type *elems, jint mode)
 
 #define GET_REGION_PRIM_ARRAY(type, native_type, array_type) \
-void (*Get##type##ArrayRegion)(JNIEnv *env, native_type##Array array, jsize start, jsize len, native_type *buf);
+void (*Get##type##ArrayRegion)(JNIEnv *env, native_type##Array array, jsize start, jsize len, native_type *buf)
 
 #define SET_REGION_PRIM_ARRAY(type, native_type, array_type) \
-void (*Set##type##ArrayRegion)(JNIEnv *env, native_type##Array array, jsize start, jsize len, native_type *buf);
+void (*Set##type##ArrayRegion)(JNIEnv *env, native_type##Array array, jsize start, jsize len, native_type *buf)
 
 #define PRIM_ARRAY_OP(op)                      \
 op##_PRIM_ARRAY(Boolean, jboolean, T_BOOLEAN); \
@@ -181,20 +181,20 @@ op##_PRIM_ARRAY(Short, jshort, T_SHORT);       \
 op##_PRIM_ARRAY(Int, jint, T_INT);             \
 op##_PRIM_ARRAY(Long, jlong, T_LONG);          \
 op##_PRIM_ARRAY(Float, jfloat, T_FLOAT);       \
-op##_PRIM_ARRAY(Double, jdouble, T_DOUBLE);
+op##_PRIM_ARRAY(Double, jdouble, T_DOUBLE)
 
 
 #define GET_FIELD(type, native_type) \
-native_type (*Get##type##Field)(JNIEnv *env, jobject obj, jfieldID fieldID);
+native_type (*Get##type##Field)(JNIEnv *env, jobject obj, jfieldID fieldID)
 
 #define SET_FIELD(type, native_type) \
-void (*Set##type##Field)(JNIEnv *env, jobject obj, jfieldID fieldID, native_type value);
+void (*Set##type##Field)(JNIEnv *env, jobject obj, jfieldID fieldID, native_type value)
 
 #define GET_STATIC_FIELD(type, native_type) \
-native_type (*GetStatic##type##Field)(JNIEnv *env, jclass clazz, jfieldID fieldID);
+native_type (*GetStatic##type##Field)(JNIEnv *env, jclass clazz, jfieldID fieldID)
 
 #define SET_STATIC_FIELD(type, native_type) \
-void (*SetStatic##type##Field)(JNIEnv *env, jclass clazz, jfieldID fieldID, native_type value);
+void (*SetStatic##type##Field)(JNIEnv *env, jclass clazz, jfieldID fieldID, native_type value)
 
 #define FIELD_OP(op)           \
 op##_FIELD(Object, jobject);   \
@@ -205,8 +205,7 @@ op##_FIELD(Short, jshort);     \
 op##_FIELD(Int, jint);         \
 op##_FIELD(Long, jlong);       \
 op##_FIELD(Float, jfloat);     \
-op##_FIELD(Double, jdouble);
-
+op##_FIELD(Double, jdouble)
 
 struct _JNINativeInterface {
     void *reserved0;

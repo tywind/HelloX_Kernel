@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2011
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009
  * Robert Lougher <rob@jamvm.org.uk>.
  *
  * This file is part of JamVM.
@@ -18,6 +18,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
+
+//HelloX Porting Code.
+#include <stdafx.h>
+#include <kapi.h>
+#include <io.h>
 
 /* Must be included first to get configure options */
 #include "jam.h"
@@ -45,7 +50,7 @@ ffi_type *sig2ffi(char sig) {
 }
 
 int nativeExtraArg(MethodBlock *mb) {
-    char *sig = mb->simple_sig;
+    char *sig = mb->type;
     int count = 2;
 
     SCAN_SIG(sig, count++, count++);

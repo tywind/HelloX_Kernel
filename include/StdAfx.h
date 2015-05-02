@@ -76,6 +76,10 @@
 #include "ktmgr2.h"
 #endif
 
+#ifndef __PROCESS_H__
+#include "process.h"
+#endif
+
 #ifndef __RINGBUFF_H__
 #include "RINGBUFF.H"
 #endif

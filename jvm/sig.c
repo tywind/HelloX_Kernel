@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009, 2012 Robert Lougher <rob@jamvm.org.uk>.
+ * Copyright (C) 2009 Robert Lougher <rob@jamvm.org.uk>.
  *
  * This file is part of JamVM.
  *
@@ -18,8 +18,12 @@
  * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+//HelloX Porting Code.
+#include <stdafx.h>
+#include <kapi.h>
+#include <io.h>
+
 #include "jam.h"
-#include "sig.h"
 
 int sigElement2Size(char element) {
     switch(element) {
@@ -44,10 +48,3 @@ int sigElement2Size(char element) {
     }
 }
 
-int sigArgsCount(char *sig) {
-    int count = 0;
-
-    SCAN_SIG(sig, count+=2, count++);
-
-    return count;
-}

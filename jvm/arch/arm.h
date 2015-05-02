@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012,
- * 2014 Robert Lougher <rob@jamvm.org.uk>.
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009
+ * Robert Lougher <rob@jamvm.org.uk>.
  *
  * This file is part of JamVM.
  *
@@ -21,16 +21,10 @@
 
 #define OS_ARCH "arm"
 
-/* Override minimum min heap size.  The initial heap size is a ratio
-   of the physical memory, but it must be at least the minimum min
-   size.  The normal setting is too large for ARM machines as they
-   are usually embedded. */
-#define MIN_MIN_HEAP 1*MB
-
-/* Likewise, override the default min/max heap sizes used when the
-   size of physical memory is not available */
+/* Override default min and max heap sizes.  ARM machines are
+   usually embedded, and the standard defaults are too large. */
+#define DEFAULT_MAX_HEAP 16*MB
 #define DEFAULT_MIN_HEAP 1*MB
-#define DEFAULT_MAX_HEAP 64*MB
 
 #ifdef DIRECT
 #define HANDLER_TABLE_T static const void
@@ -56,36 +50,6 @@
 
 /* Needed for i386 -- empty here */
 #define FPU_HACK
-
-#if defined(__ARM_ARCH_6__) || defined(__ARM_ARCH_7A__)
-#define COMPARE_AND_SWAP_32(addr, old_val, new_val)       \
-({                                                        \
-    int result, read_val;                                 \
-    __asm__ __volatile__ ("                               \
-        1:      mov %0, #0;                               \
-                ldrex %1, [%2];                           \
-                cmp %3, %1;                               \
-                bne 2f;                                   \
-                strex %0, %4, [%2];                       \
-                cmp %0, #1;                               \
-                beq 1b;                                   \
-                mov %0, #1;                               \
-        2:"                                               \
-    : "=&r" (result), "=&r" (read_val)                    \
-    : "r" (addr), "r" (old_val), "r" (new_val)            \
-    : "cc", "memory");                                    \
-    result;                                               \
-})
-
-#define COMPARE_AND_SWAP(addr, old_val, new_val)          \
-        COMPARE_AND_SWAP_32(addr, old_val, new_val)
-
-#define LOCKWORD_READ(addr) *addr
-#define LOCKWORD_WRITE(addr, value) *addr = value
-#define LOCKWORD_COMPARE_AND_SWAP(addr, old_val, new_val) \
-        COMPARE_AND_SWAP(addr, old_val, new_val)
-
-#else
 
 #define LOCKWORD_COMPARE_AND_SWAP(addr, old_val, new_val) \
 ({                                                        \
@@ -130,7 +94,7 @@ do {                                                      \
     : "r" (addr), "r" (new_val)                           \
     : "cc", "memory");                                    \
 } while(0)
-#endif
+
 
 #ifdef __ARM_EABI__
 #define FLUSH_CACHE(addr, length)                         \
@@ -179,12 +143,7 @@ do {                                                      \
     patched;                                              \
 })
 
-#ifdef __ARM_ARCH_7A__
-#define MBARRIER() __asm__ __volatile__ ("dmb" ::: "memory")
-#define JMM_LOCK_MBARRIER() __asm__ __volatile__ ("dmb" ::: "memory")
-#define JMM_UNLOCK_MBARRIER() __asm__ __volatile__ ("dmb" ::: "memory")
-#else
 #define MBARRIER() __asm__ __volatile__ ("" ::: "memory")
 #define JMM_LOCK_MBARRIER() __asm__ __volatile__ ("" ::: "memory")
 #define JMM_UNLOCK_MBARRIER() __asm__ __volatile__ ("" ::: "memory")
-#endif
+

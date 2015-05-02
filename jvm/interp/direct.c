@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009
  * Robert Lougher <rob@jamvm.org.uk>.
  *
  * This file is part of JamVM.
@@ -20,6 +20,12 @@
  */
 
 /* Must be included first to get configure options */
+
+//HelloX Porting code.
+#include <stdafx.h>
+#include <kapi.h>
+#include <io.h>
+
 #include "jam.h"
 
 #ifdef DIRECT
@@ -31,11 +37,8 @@
 #include "interp.h"
 #include "symbol.h"
 #include "inlining.h"
-#include "shared.h"
 
-#include "hash.h"
-#include "class.h"
-#include "classlib.h"
+#include "shared.h"
 
 #ifdef TRACEDIRECT
 #define TRACE(fmt, ...) jam_printf(fmt, ## __VA_ARGS__)
@@ -52,6 +55,11 @@
 /* Used to indicate that stack depth
    has not been calculated yet */
 #define DEPTH_UNKNOWN -1
+
+/* Method preparation states */
+#define PREPARED   0
+#define UNPREPARED 1
+#define PREPARING  2
 
 /* Global lock for method preparation */
 static VMWaitLock prepare_lock;
@@ -80,20 +88,20 @@ void prepare(MethodBlock *mb, const void ***handlers) {
     OpcodeInfo opcodes[code_len];
     char info[code_len + 1];
 #endif
-    unsigned char *code = mb->code;
     Instruction *new_code = NULL;
+    unsigned char *code;
     short map[code_len];
     int ins_count = 0;
     int pass;
     int i;
 
-    /* The method's state field indicates whether the method
-       has been prepared.  The check in the interpreter is
-       unsynchronised, so grab the lock and recheck.  If
-       another thread tries to prepare the method, they will
-       wait on the lock.  This lock is global, but methods are
-       only prepared once, and contention to prepare a method
-       is unlikely. */
+    /* The bottom bits of the code pointer are used to
+       indicate whether the method has been prepared.  The
+       check in the interpreter is unsynchronised, so grab
+       the lock and recheck.  If another thread tries to
+       prepare the method, they will wait on the lock.  This
+       lock is global, but methods are only prepared once,
+       and contention to prepare a method is unlikely. */
 
     Thread *self = threadSelf();
 
@@ -101,24 +109,29 @@ void prepare(MethodBlock *mb, const void ***handlers) {
     lockVMWaitLock(prepare_lock, self);
 
 retry:
-    switch(mb->state) {
-        case MB_UNPREPARED:
-            mb->state = MB_PREPARING;
-            break;
+    code = mb->code;
 
-        case MB_PREPARING:
-            waitVMWaitLock(prepare_lock, self);
-            goto retry;
-
-        default:
+    switch((uintptr_t)code & 0x3) {
+        case PREPARED:
             unlockVMWaitLock(prepare_lock, self);
             enableSuspend(self);
             return;
+
+        case UNPREPARED:
+            mb->code = (void*)PREPARING;
+            break;
+
+        case PREPARING:
+            waitVMWaitLock(prepare_lock, self);
+            goto retry;
     }
 
     unlockVMWaitLock(prepare_lock, self);
 
     TRACE("Preparing %s.%s%s\n", CLASS_CB(mb->class)->name, mb->name, mb->type);
+
+    /* Method is unprepared, so bottom bit of pntr will be set */
+    code--;
 
 #ifdef USE_CACHE
     /* Initialise cache depth array, indicating that
@@ -136,11 +149,11 @@ retry:
        exception */
     memset(info, FALSE, code_len + 1);
     for(i = 0; i < mb->exception_table_size; i++)
-        info[mb->exception_table[i].handler_pc] = HANDLER;
+        info[mb->exception_table[i].handler_pc] = EXCEPTION;
 #endif
 
     for(pass = 0; pass < 2; pass++) {
-        int block_quickened = FALSE;
+            int block_quickened = FALSE;
 #ifdef INLINING
         int block_start = 0;
 #endif
@@ -317,7 +330,7 @@ retry:
                 case OPC_LREM: case OPC_LAND: case OPC_LOR:
                 case OPC_LXOR: case OPC_LSHL: case OPC_LSHR:
                 case OPC_LUSHR: case OPC_F2L: case OPC_D2L:
-                case OPC_LNEG: case OPC_I2L:
+                case OPC_I2L:
 #ifdef USE_CACHE
                     cache = 2;
                     pc += 1;
@@ -334,10 +347,9 @@ retry:
                 case OPC_FDIV: case OPC_DDIV: case OPC_I2F:
                 case OPC_I2D: case OPC_L2F: case OPC_L2D:
                 case OPC_F2D: case OPC_D2F: case OPC_FREM:
-                case OPC_DREM: case OPC_FNEG: case OPC_DNEG:
-                case OPC_MONITORENTER: case OPC_MONITOREXIT:
-                case OPC_ABSTRACT_METHOD_ERROR:
-                case OPC_MIRANDA_BRIDGE:
+                case OPC_DREM: case OPC_LNEG: case OPC_FNEG:
+                case OPC_DNEG: case OPC_MONITORENTER:
+                case OPC_MONITOREXIT: case OPC_ABSTRACT_METHOD_ERROR:
 #ifdef USE_CACHE
                     cache = 0;
                     pc += 1;
@@ -419,8 +431,8 @@ retry:
                            from dest again, we will immediately get a conflict which will be
                            resolved by adding a NOP. */
                         memset(&cache_depth[dest + 1], DEPTH_UNKNOWN, pc - dest);
+                        ins_count = map[dest];
                         cache = cache_depth[dest];
-                        ins_count = map[dest] - 1;
                         pc = dest;
                     } else {
                         cache = 0;
@@ -447,9 +459,8 @@ retry:
                     break;
                 }
 
-                case OPC_INVOKEVIRTUAL: case OPC_INVOKESPECIAL:
-                case OPC_INVOKESTATIC: case OPC_CHECKCAST:
-                case OPC_INSTANCEOF: case OPC_PUTFIELD:
+                case OPC_PUTFIELD: case OPC_INVOKEVIRTUAL: case OPC_INVOKESPECIAL:
+                case OPC_INVOKESTATIC: case OPC_CHECKCAST: case OPC_INSTANCEOF:
                     REWRITE_OPERAND(READ_U2_OP(code + pc));
 #ifdef USE_CACHE
                     cache = 0;
@@ -479,8 +490,8 @@ retry:
                            from dest again, we will immediately get a conflict which will be
                            resolved by adding a NOP. */
                         memset(&cache_depth[dest + 1], DEPTH_UNKNOWN, pc - dest);
+                        ins_count = map[dest];
                         cache = cache_depth[dest];
-                        ins_count = map[dest] - 1;
                         pc = dest;
                     } else {
                         cache = 0;
@@ -658,9 +669,6 @@ retry:
                 }
     
                 case OPC_INVOKEINTERFACE:
-#ifdef JSR292
-                case OPC_INVOKEDYNAMIC:
-#endif
                     REWRITE_OPERAND(READ_U2_OP(code + pc));
 #ifdef USE_CACHE
                     cache = 0;
@@ -691,7 +699,7 @@ retry:
 
                         memset(&cache_depth[dest + 1], DEPTH_UNKNOWN, pc - dest);
                         cache = cache_depth[dest];
-                        ins_count = map[dest] - 1;
+                        ins_count = map[dest];
                         pc = dest;
                     } else {
                         cache = 0;
@@ -928,21 +936,18 @@ retry:
         entry->handler_pc = map[entry->handler_pc];
     }
 
-    /* Update the method with the new code, and
-       mark the method as being prepared. */
-
-    mb->code = new_code;
-    mb->code_size = ins_count;
+    /* Update the method with the new code.  This
+       also marks the method as being prepared. */
 
     lockVMWaitLock(prepare_lock, self);
-    mb->state = MB_PREPARED;
-
+    mb->code = new_code;
+    mb->code_size = ins_count;
     notifyAllVMWaitLock(prepare_lock, self);
     unlockVMWaitLock(prepare_lock, self);
     enableSuspend(self);
 
     /* We don't need the old bytecode stream anymore */
-    if(!(mb->access_flags & (ACC_ABSTRACT | ACC_MIRANDA)))
+    if(!(mb->access_flags & ACC_ABSTRACT))
         sysFree(code);
 }
 #endif

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008, 2009, 2013 Robert Lougher <rob@jamvm.org.uk>.
+ * Copyright (C) 2008, 2009 Robert Lougher <rob@jamvm.org.uk>.
  *
  * This file is part of JamVM.
  *
@@ -41,12 +41,6 @@
 #else
 #define DEFINE_HANDLER_TABLES \
     DEF_HANDLER_TABLES(0);
-#endif
-
-#ifdef JSR292
-#define J(opcode, level, label) L(opcode, level, label)
-#else
-#define J(opcode, level, label) &&unused
 #endif
 
 #define DEF_HANDLER_TABLE(level,label)               \
@@ -237,7 +231,7 @@
         L(OPC_INVOKESPECIAL,          level, label), \
         L(OPC_INVOKESTATIC,           level, label), \
         L(OPC_INVOKEINTERFACE,        level, label), \
-        J(OPC_INVOKEDYNAMIC,          level, label), \
+        &&unused,                                    \
         L(OPC_NEW,                    level, label), \
         L(OPC_NEWARRAY,               level, label), \
         L(OPC_ANEWARRAY,              level, label), \
@@ -273,10 +267,10 @@
         L(OPC_GETSTATIC_QUICK_REF,    level, label), \
         L(OPC_PUTSTATIC_QUICK_REF,    level, label), \
         L(OPC_GETFIELD_THIS_REF,      level, label), \
-        L(OPC_MIRANDA_BRIDGE,         level, label), \
-        L(OPC_ABSTRACT_METHOD_ERROR,  level, label), \
-        I(OPC_INLINE_REWRITER,        level, label), \
-        I(OPC_PROFILE_REWRITER,       level, label), \
+        &&unused,                                    \
+        &&unused,                                    \
+        &&unused,                                    \
+        &&unused,                                    \
         D(OPC_INVOKEVIRTUAL_QUICK_W,  level, label), \
         D(OPC_GETFIELD_QUICK_W,       level, label), \
         D(OPC_PUTFIELD_QUICK_W,       level, label), \
@@ -295,13 +289,13 @@
         &&unused,                                    \
         &&unused,                                    \
         L(OPC_MULTIANEWARRAY_QUICK,   level, label), \
-        J(OPC_INVOKEHANDLE,           level, label), \
-        J(OPC_INVOKEBASIC,            level, label), \
-        J(OPC_LINKTOSPECIAL,          level, label), \
-        J(OPC_LINKTOVIRTUAL,          level, label), \
-        J(OPC_LINKTOINTERFACE,        level, label), \
         L(OPC_INVOKEINTERFACE_QUICK,  level, label), \
-        J(OPC_INVOKEDYNAMIC_QUICK,    level, label), \
+        L(OPC_ABSTRACT_METHOD_ERROR,  level, label), \
+        I(OPC_INLINE_REWRITER,        level, label), \
+        I(OPC_PROFILE_REWRITER,       level, label), \
+        &&unused,                                    \
+        &&unused,                                    \
+        &&unused,                                    \
         &&unused,                                    \
         &&unused,                                    \
         &&unused,                                    \

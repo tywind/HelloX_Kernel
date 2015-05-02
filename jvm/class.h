@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2010, 2012, 2013
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007
  * Robert Lougher <rob@jamvm.org.uk>.
  *
  * This file is part of JamVM.
@@ -29,60 +29,21 @@
 #define READ_U8(v,p,l)  v = ((u8)(p)[0]<<56)|((u8)(p)[1]<<48)|((u8)(p)[2]<<40) \
                             |((u8)(p)[3]<<32)|((u8)(p)[4]<<24)|((u8)(p)[5]<<16) \
                             |((u8)(p)[6]<<8)|(u8)(p)[7]; (p)+=8
-#define SKIP_U2(v,p,l)  (p)+=2
 
 #define READ_INDEX(v,p,l)               READ_U2(v,p,l)
 #define READ_TYPE_INDEX(v,cp,t,p,l)     READ_U2(v,p,l)
 
-/* Hashtable entry for each package defined by the boot loader */
-typedef struct package_entry {
-    int index;
-    char name[0];
-} PackageEntry;
+/* The default value of the boot classpath is based on the JamVM
+   and Classpath install directories.  If zip support is enabled
+   the classes will be contained in ZIP files, else they will be
+   separate class files in a directory structure */
 
-#define BOOTSTRAP_OFFSET(bootstrap_methods, idx)                         \
-    (((int*)bootstrap_methods)[idx])
+#ifdef USE_ZIP
+#define JAMVM_CLASSES INSTALL_DIR"/share/jamvm/classes.zip"
+#define CLASSPATH_CLASSES CLASSPATH_INSTALL_DIR"/share/classpath/glibj.zip"
+#else
+#define JAMVM_CLASSES INSTALL_DIR"/share/jamvm/classes"
+#define CLASSPATH_CLASSES CLASSPATH_INSTALL_DIR"/share/classpath"
+#endif
 
-#define BOOTSTRAP_IDX_PNTR(bootstrap_methods, idx)                       \
-    ((u2*)(bootstrap_methods + BOOTSTRAP_OFFSET(bootstrap_methods, idx)))
-
-#define BOOTSTRAP_METHOD_REF(bootstrap_methods, idx)                     \
-    (BOOTSTRAP_IDX_PNTR(bootstrap_methods, idx)[0])
-
-#define BOOTSTRAP_METHOD_ARG(bootstrap_methods, idx, arg)                \
-    (BOOTSTRAP_IDX_PNTR(bootstrap_methods, idx)[arg+1])
-
-#define BOOTSTRAP_METHOD_ARG_COUNT(bootstrap_methods, idx)               \
-    ((BOOTSTRAP_OFFSET(bootstrap_methods, idx+1) -                       \
-      BOOTSTRAP_OFFSET(bootstrap_methods, idx))/sizeof(u2)-1)
-
-#define BOOTSTRAP_METHODS_COUNT(bootstrap_methods)                       \
-    (BOOTSTRAP_OFFSET(bootstrap_methods, 0)/sizeof(int)-1)
-
-#define BOOTSTRAP_DATA_LEN(bootstrap_methods)                            \
-    BOOTSTRAP_OFFSET(bootstrap_methods,                                  \
-                     BOOTSTRAP_METHODS_COUNT(bootstrap_methods))
-
-
-#define CLASS_EXTRA_ATTRIBUTES(class, name) ({           \
-    ClassBlock *cb = CLASS_CB(class);                    \
-    ExtraAttributes *attributes = cb->extra_attributes;  \
-    attributes == NULL ? NULL : attributes->name;        \
-})
-
-#define INDEXED_ATTRIBUTE_DATA(attributes, name, index) ( \
-    attributes == NULL || attributes->name == NULL ?      \
-        NULL : attributes->name[index]                    \
-)
-
-#define METHOD_EXTRA_ATTRIBUTES(mb, name) ({                   \
-    ClassBlock *cb = CLASS_CB(mb->class);                      \
-    int index = mb - cb->methods;                              \
-    INDEXED_ATTRIBUTE_DATA(cb->extra_attributes, name, index); \
-})
-
-#define FIELD_EXTRA_ATTRIBUTES(fb, name) ({                    \
-    ClassBlock *cb = CLASS_CB(fb->class);                      \
-    int index = fb - cb->fields;                               \
-    INDEXED_ATTRIBUTE_DATA(cb->extra_attributes, name, index); \
-})
+#define DFLT_BCP JAMVM_CLASSES":"CLASSPATH_CLASSES

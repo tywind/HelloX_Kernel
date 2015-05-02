@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012
- * 2013, 2014 Robert Lougher <rob@jamvm.org.uk>.
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009
+ * Robert Lougher <rob@jamvm.org.uk>.
  *
  * This file is part of JamVM.
  *
@@ -19,15 +19,16 @@
  * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+//HelloX Porting Code.
+#include <stdafx.h>
+#include <kapi.h>
+#include <io.h>
+
 #include <stdio.h>
 #include <string.h>
 #include "jam.h"
 #include "symbol.h"
 #include "excep.h"
-#include "thread.h"
-#include "hash.h"
-#include "class.h"
-#include "classlib.h"
 
 MethodBlock *findMethod(Class *class, char *methodname, char *type) {
    ClassBlock *cb = CLASS_CB(class);
@@ -60,13 +61,6 @@ FieldBlock *findField(Class *class, char *fieldname, char *type) {
 MethodBlock *lookupMethod(Class *class, char *methodname, char *type) {
     MethodBlock *mb;
 
-#ifdef JSR292
-    if(CLASS_CB(class)->name == SYMBOL(java_lang_invoke_MethodHandle)) {
-        if(methodname == SYMBOL(invoke) || methodname == SYMBOL(invokeExact))
-            return NULL;
-    }
-#endif
-
     if((mb = findMethod(class, methodname, type)))
        return mb;
 
@@ -74,24 +68,6 @@ MethodBlock *lookupMethod(Class *class, char *methodname, char *type) {
         return lookupMethod(CLASS_CB(class)->super, methodname, type);
 
     return NULL;
-}
-
-MethodBlock *lookupInterfaceMethod(Class *class, char *methodname,
-                                   char *type) {
-
-    MethodBlock *mb = lookupMethod(class, methodname, type);
-
-    if(mb == NULL) {
-        ClassBlock *cb = CLASS_CB(class);
-        int i;
-
-        for(i = 0; mb == NULL && (i < cb->imethod_table_size); i++) {
-            Class *intf = cb->imethod_table[i].interface;
-            mb = findMethod(intf, methodname, type);
-        }
-    }
-
-    return mb;
 }
 
 FieldBlock *lookupField(Class *class, char *fieldname, char *fieldtype) {
@@ -117,7 +93,7 @@ FieldBlock *lookupField(Class *class, char *fieldname, char *fieldtype) {
     return NULL;
 }
 
-Class *resolveClass(Class *class, int cp_index, int check_access, int init) {
+Class *resolveClass(Class *class, int cp_index, int init) {
     ConstantPool *cp = &(CLASS_CB(class)->constant_pool);
     Class *resolved_class = NULL;
 
@@ -134,7 +110,6 @@ retry:
             char *classname;
             int name_idx = CP_CLASS(cp, cp_index);
 
-            MBARRIER();
             if(CP_TYPE(cp, cp_index) != CONSTANT_Class)
                 goto retry;
 
@@ -155,7 +130,7 @@ retry:
             if(CLASS_CB(resolved_class)->state < CLASS_LINKED)
                 linkClass(resolved_class);
 
-            if(check_access && !checkClassAccess(resolved_class, class)) {
+            if(!checkClassAccess(resolved_class, class)) {
                 signalException(java_lang_IllegalAccessError,
                                 "class is not accessible");
                 return NULL;
@@ -180,57 +155,43 @@ retry:
 MethodBlock *resolveMethod(Class *class, int cp_index) {
     ConstantPool *cp = &(CLASS_CB(class)->constant_pool);
     MethodBlock *mb = NULL;
-    int tag;
 
 retry:
-    tag = CP_TYPE(cp, cp_index);
-    switch(tag) {
+    switch(CP_TYPE(cp, cp_index)) {
         case CONSTANT_Locked:
             goto retry;
 
-        case CONSTANT_ResolvedMethod:
+        case CONSTANT_Resolved:
             mb = (MethodBlock *)CP_INFO(cp, cp_index);
             break;
 
-        case CONSTANT_Methodref:
-        case CONSTANT_InterfaceMethodref: {
+        case CONSTANT_Methodref: {
             Class *resolved_class;
             ClassBlock *resolved_cb;
             char *methodname, *methodtype;
             int cl_idx = CP_METHOD_CLASS(cp, cp_index);
             int name_type_idx = CP_METHOD_NAME_TYPE(cp, cp_index);
 
-            MBARRIER();
-            if(CP_TYPE(cp, cp_index) != tag)
+            if(CP_TYPE(cp, cp_index) != CONSTANT_Methodref)
                 goto retry;
 
             methodname = CP_UTF8(cp, CP_NAME_TYPE_NAME(cp, name_type_idx));
 
             methodtype = CP_UTF8(cp, CP_NAME_TYPE_TYPE(cp, name_type_idx));
-            resolved_class = resolveClass(class, cl_idx, TRUE, FALSE);
+            resolved_class = resolveClass(class, cl_idx, FALSE);
             resolved_cb = CLASS_CB(resolved_class);
 
             if(exceptionOccurred())
                 return NULL;
 
             if(resolved_cb->access_flags & ACC_INTERFACE) {
-#ifdef JSR335
-                mb = lookupInterfaceMethod(resolved_class, methodname,
-                	                   methodtype);
-#else
                 signalException(java_lang_IncompatibleClassChangeError, NULL);
                 return NULL;
-#endif
-            } else
-                mb = lookupMethod(resolved_class, methodname, methodtype);
+            }
+            
+            mb = lookupMethod(resolved_class, methodname, methodtype);
 
-#ifdef JSR292
-            if(mb == NULL)
-                mb = lookupPolymorphicMethod(resolved_class, class,
-                                             methodname, methodtype);
-#endif
-
-            if(mb != NULL) {
+            if(mb) {
                 if((mb->access_flags & ACC_ABSTRACT) &&
                        !(resolved_cb->access_flags & ACC_ABSTRACT)) {
                     signalException(java_lang_AbstractMethodError, methodname);
@@ -243,11 +204,14 @@ retry:
                     return NULL;
                 }
 
+                if(initClass(mb->class) == NULL)
+                    return NULL;
+
                 CP_TYPE(cp, cp_index) = CONSTANT_Locked;
                 MBARRIER();
                 CP_INFO(cp, cp_index) = (uintptr_t)mb;
                 MBARRIER();
-                CP_TYPE(cp, cp_index) = CONSTANT_ResolvedMethod;
+                CP_TYPE(cp, cp_index) = CONSTANT_Resolved;
             } else
                 signalException(java_lang_NoSuchMethodError, methodname);
 
@@ -277,13 +241,12 @@ retry:
             int cl_idx = CP_METHOD_CLASS(cp, cp_index);
             int name_type_idx = CP_METHOD_NAME_TYPE(cp, cp_index);
 
-            MBARRIER();
             if(CP_TYPE(cp, cp_index) != CONSTANT_InterfaceMethodref)
                 goto retry;
 
             methodname = CP_UTF8(cp, CP_NAME_TYPE_NAME(cp, name_type_idx));
             methodtype = CP_UTF8(cp, CP_NAME_TYPE_TYPE(cp, name_type_idx));
-            resolved_class = resolveClass(class, cl_idx, TRUE, FALSE);
+            resolved_class = resolveClass(class, cl_idx, FALSE);
 
             if(exceptionOccurred())
                 return NULL;
@@ -293,9 +256,18 @@ retry:
                 return NULL;
             }
             
-            mb = lookupInterfaceMethod(resolved_class, methodname, methodtype);
+            mb = lookupMethod(resolved_class, methodname, methodtype);
+            if(mb == NULL) {
+                ClassBlock *cb = CLASS_CB(resolved_class);
+                int i;
 
-            if(mb != NULL) {
+                for(i = 0; mb == NULL && (i < cb->imethod_table_size); i++) {
+                    Class *intf = cb->imethod_table[i].interface;
+                    mb = findMethod(intf, methodname, methodtype);
+                }
+            }
+
+            if(mb) {
                 CP_TYPE(cp, cp_index) = CONSTANT_Locked;
                 MBARRIER();
                 CP_INFO(cp, cp_index) = (uintptr_t)mb;
@@ -330,25 +302,27 @@ retry:
             int cl_idx = CP_FIELD_CLASS(cp, cp_index);
             int name_type_idx = CP_FIELD_NAME_TYPE(cp, cp_index);
 
-            MBARRIER();
             if(CP_TYPE(cp, cp_index) != CONSTANT_Fieldref)
                 goto retry;
 
             fieldname = CP_UTF8(cp, CP_NAME_TYPE_NAME(cp, name_type_idx));
             fieldtype = CP_UTF8(cp, CP_NAME_TYPE_TYPE(cp, name_type_idx));
-            resolved_class = resolveClass(class, cl_idx, TRUE, FALSE);
+            resolved_class = resolveClass(class, cl_idx, FALSE);
 
             if(exceptionOccurred())
                 return NULL;
 
             fb = lookupField(resolved_class, fieldname, fieldtype);
 
-            if(fb != NULL) {
+            if(fb) {
                 if(!checkFieldAccess(fb, class)) {
                     signalException(java_lang_IllegalAccessError,
                                     "field is not accessible");
                     return NULL;
                 }
+
+                if(initClass(fb->class) == NULL)
+                    return NULL;
 
                 CP_TYPE(cp, cp_index) = CONSTANT_Locked;
                 MBARRIER();
@@ -374,24 +348,13 @@ retry:
             goto retry;
 
         case CONSTANT_Class:
-            resolveClass(class, cp_index, TRUE, FALSE);
+            resolveClass(class, cp_index, FALSE);
             break;
-
-#ifdef JSR292
-        case CONSTANT_MethodType:
-            resolveMethodType(class, cp_index);
-            break;
-
-        case CONSTANT_MethodHandle:
-            resolveMethodHandle(class, cp_index);
-            break;
-#endif
 
         case CONSTANT_String: {
             Object *string;
             int idx = CP_STRING(cp, cp_index);
 
-            MBARRIER();
             if(CP_TYPE(cp, cp_index) != CONSTANT_String)
                 goto retry;
 

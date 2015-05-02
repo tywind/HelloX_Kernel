@@ -87,6 +87,51 @@ BOOL Sleep(DWORD dwMillionSecond)
 		dwMillionSecond);
 }
 
+//EnableSuspend on a specified kernel thread.
+BOOL EnableSuspend(HANDLE hThread,BOOL bEnable)
+{
+	__KERNEL_THREAD_OBJECT* lpKernelThread = (__KERNEL_THREAD_OBJECT*)hThread;
+
+	if(NULL == lpKernelThread)
+	{
+		//Operate on the current kernel thread.
+		lpKernelThread = KernelThreadManager.lpCurrentKernelThread;
+	}
+	return KernelThreadManager.EnableSuspend((__COMMON_OBJECT*)&KernelThreadManager,
+		(__COMMON_OBJECT*)lpKernelThread,
+		bEnable);
+}
+
+//Suspend a specified kernel thread.
+BOOL SuspendKernelThread(HANDLE hThread)
+{
+	__KERNEL_THREAD_OBJECT* lpKernelThread = (__KERNEL_THREAD_OBJECT*)hThread;
+	
+	if(NULL == lpKernelThread)
+	{
+		//Suspend the current kernel thread.
+		lpKernelThread = KernelThreadManager.lpCurrentKernelThread;
+	}
+	return KernelThreadManager.SuspendKernelThread(
+		(__COMMON_OBJECT*)&KernelThreadManager,
+		(__COMMON_OBJECT*)lpKernelThread);
+}
+
+//Resume a specified kernel thread.
+BOOL ResumeKernelThread(HANDLE hThread)
+{
+	__KERNEL_THREAD_OBJECT* lpKernelThread = (__KERNEL_THREAD_OBJECT*)hThread;
+
+	if(NULL == lpKernelThread)
+	{
+		//Operate on the current kernel thread.
+		lpKernelThread = KernelThreadManager.lpCurrentKernelThread;
+	}
+	return KernelThreadManager.ResumeKernelThread(
+		(__COMMON_OBJECT*)&KernelThreadManager,
+		(__COMMON_OBJECT*)lpKernelThread);
+}
+
 HANDLE SetTimer(DWORD dwTimerID,
 				DWORD dwMillionSecond,
 				__DIRECT_TIMER_HANDLER lpHandler,
@@ -243,6 +288,80 @@ DWORD WaitForThisObjectEx(HANDLE hObject,DWORD dwMillionSecond)
 		break;
 	}
 	return OBJECT_WAIT_FAILED;
+}
+
+//Create a CONDITION object.
+HANDLE CreateCondition(DWORD condAttr)
+{
+	__CONDITION*       lpCond = NULL;
+
+	lpCond = (__CONDITION*)ObjectManager.CreateObject(
+		&ObjectManager,
+		NULL,
+		OBJECT_TYPE_CONDITION);
+	if(NULL == lpCond)
+	{
+		return NULL;
+	}
+	if(!lpCond->Initialize((__COMMON_OBJECT*)lpCond))  //Can not initialize.
+	{
+		ObjectManager.DestroyObject(
+			&ObjectManager,
+			(__COMMON_OBJECT*)lpCond);
+		return NULL;
+	}
+	return (HANDLE)lpCond;
+}
+
+//Wait a CONDITION object infinitely.
+DWORD WaitCondition(HANDLE hCond,HANDLE hMutex)
+{
+	__CONDITION* pCond  = (__CONDITION*)hCond;
+
+	if((NULL == pCond) || (NULL == hMutex))
+	{
+		return OBJECT_WAIT_FAILED;
+	}
+	//Call CONDITION object's waiting routine directly.
+	return pCond->CondWait((__COMMON_OBJECT*)pCond,(__COMMON_OBJECT*)hMutex);
+}
+
+//Wait a CONDITION object,time out manner.
+DWORD TimeoutWaitCondition(HANDLE hCond,HANDLE hMutex,DWORD dwMillionSecond)
+{
+	__CONDITION* pCond = (__CONDITION*)hCond;
+
+	if((NULL == hCond) || (NULL == hMutex))
+	{
+		return OBJECT_WAIT_FAILED;
+	}
+	return pCond->CondWaitTimeout((__COMMON_OBJECT*)pCond,(__COMMON_OBJECT*)hMutex,dwMillionSecond);
+}
+
+//Signaling a CONDITION object.
+DWORD SignalCondition(HANDLE hCond)
+{
+	__CONDITION* pCond = (__CONDITION*)hCond;
+
+	if(NULL == pCond)
+	{
+		return 0;
+	}
+	return pCond->CondSignal((__COMMON_OBJECT*)pCond);
+}
+
+//Broadcast a CONDITION object.
+DWORD BroadcastCondition(HANDLE hCond);
+
+//Destroy a CONDITION object.
+VOID DestroyCondition(HANDLE hCond)
+{
+	if(NULL == hCond)
+	{
+		return;
+	}
+	ObjectManager.DestroyObject(&ObjectManager,
+		(__COMMON_OBJECT*)hCond);
 }
 
 HANDLE ConnectInterrupt(__INTERRUPT_HANDLER lpInterruptHandler,
@@ -478,7 +597,7 @@ BOOL IOControl(HANDLE hFile,
 #endif
 }
 
-BOOL SetFilePointer(HANDLE hFile,
+DWORD SetFilePointer(HANDLE hFile,
 					DWORD* lpdwDistLow,
 					DWORD* lpdwDistHigh,
 					DWORD dwMoveFlags)

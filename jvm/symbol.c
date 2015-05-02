@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008, 2010 Robert Lougher <rob@jamvm.org.uk>.
+ * Copyright (C) 2008 Robert Lougher <rob@jamvm.org.uk>.
  *
  * This file is part of JamVM.
  *
@@ -18,6 +18,11 @@
  * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+//HelloX Porting Code.
+#include <stdafx.h>
+#include <kapi.h>
+#include <io.h>
+
 #include <stdlib.h>
 
 #include "jam.h"
@@ -25,19 +30,16 @@
 
 #define SYMBOL_VALUE(name, value) value
 char *symbol_values[] = {
-    CLASSLIB_SYMBOLS_DO(SYMBOL_VALUE),
     SYMBOLS_DO(SYMBOL_VALUE)
 };
 
-int initialiseSymbol() {
+void initialiseSymbol() {
     int i;
 
     for(i = 0; i < MAX_SYMBOL_ENUM; i++)
         if(symbol_values[i] != newUtf8(symbol_values[i])) {
             jam_fprintf(stderr, "Error when initialising VM symbols."
                                 "  Aborting VM.\n");
-            return FALSE;
+            exit(1);
         }
-
-    return TRUE;
 }

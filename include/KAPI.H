@@ -23,7 +23,7 @@
 #endif
 
 #ifndef __CONFIG_H__
-#include "..\config\config.h"
+#include "../config/config.h"
 #endif
 
 #ifndef __HELLO_CHINA__
@@ -36,9 +36,9 @@
 
 #ifndef __SYN_MECH_H__
 #if defined(__I386__)
-#include "..\arch\x86\SYN_MECH.H"
+#include "../arch/x86/SYN_MECH.H"
 #elif defined(__STM32__)
-#include "..\arch\stm32\syn_mech.h"
+#include "../arch/stm32/syn_mech.h"
 #endif
 #endif
 
@@ -52,6 +52,10 @@
 
 #ifndef __KTMGR_H__
 #include "ktmgr.h"
+#endif
+
+#ifndef __KTMGR2_H__
+#include "ktmgr2.h"
 #endif
 
 #ifndef __PERF_H__
@@ -88,9 +92,9 @@
 
 #ifndef __ARCH_H__
 #if defined(__I386__)
-#include "..\arch\x86\arch.h"
+#include "../arch/x86/arch.h"
 #elif defined(__STM32__)
-#include "..\arch\stm32\arch.h"
+#include "../arch/stm32/arch.h"
 #endif
 #endif
 
@@ -99,7 +103,7 @@
 #endif
 
 #ifndef __DEBUG_H__
-#include "..\include\debug.h"
+#include "../include/debug.h"
 #endif
 
 #ifdef __cplusplus
@@ -141,6 +145,17 @@ BOOL GetMessage(MSG* lpMsg);
 
 //Send a message to a specified thread.
 BOOL SendMessage(HANDLE hThread,MSG* lpMsg);
+
+//Enable or disable suspend on a kernel thread.
+//Enable the suspending operation on the specified thread
+//if bEnable is TRUE,disable it if FALSE.
+BOOL EnableSuspend(HANDLE hThread,BOOL bEnable);
+
+//Suspend a kernel thread.
+BOOL SuspendKernelThread(HANDLE hThread);
+
+//Resume a kernel thread.
+BOOL ResumeKernelThread(HANDLE hThread);
 
 //Sleep a period specified by dwMillionSecond.
 BOOL Sleep(DWORD dwMillionSecond);
@@ -184,6 +199,24 @@ DWORD WaitForThisObject(HANDLE hObject);
 
 //Can specify a timeout value when wait a synchronizing object.
 DWORD WaitForThisObjectEx(HANDLE hObject,DWORD dwMillionSecond);
+
+//Create a CONDITION object.
+HANDLE CreateCondition(DWORD condAttr);
+
+//Wait a CONDITION object infinitely.
+DWORD WaitCondition(HANDLE hCond,HANDLE hMutex);
+
+//Wait a CONDITION object,time out manner.
+DWORD TimeoutWaitCondition(HANDLE hCond,HANDLE hMutex,DWORD dwMillionSecond);
+
+//Signaling a CONDITION object.
+DWORD SignalCondition(HANDLE hCond);
+
+//Broadcast a CONDITION object.
+DWORD BroadcastCondition(HANDLE hCond);
+
+//Destroy a CONDITION object.
+VOID DestroyCondition(HANDLE hCond);
 
 //Bind interrupt handler and vector together,so that the handler can be
 //called when the specified interrupt is raised.
@@ -268,7 +301,7 @@ BOOL IOControl(HANDLE hFile,
 			   DWORD* lpdwFilled);
 
 //Move file pointer to a specified position.
-BOOL SetFilePointer(HANDLE hFile,
+DWORD SetFilePointer(HANDLE hFile,
 					DWORD* lpdwDistLow,
 					DWORD* lpdwDistHigh,
 					DWORD dwMoveFlags);

@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2007, 2008, 2009, 2011, 2013
- * Robert Lougher <rob@jamvm.org.uk>.
+ * Copyright (C) 2007, 2008, 2009 Robert Lougher <rob@jamvm.org.uk>.
  *
  * This file is part of JamVM.
  *
@@ -19,6 +18,11 @@
  * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+//HelloX Porting Code.
+#include <stdafx.h>
+#include <kapi.h>
+#include <io.h>
+
 /* Must be included first to get configure options */
 #include "jam.h"
 
@@ -27,10 +31,7 @@
 #include <string.h>
 #include <sys/mman.h>
 #include <unistd.h>
-
 #include "hash.h"
-#include "class.h"
-#include "classlib.h"
 #include "inlining.h"
 
 /* To do inlining, we must know which handlers are relocatable.  This
@@ -789,7 +790,6 @@ void inlineBlocks(MethodBlock *mb, BasicBlock *start, BasicBlock *end) {
                 case OPC_INVOKESTATIC: case OPC_INVOKEINTERFACE:
                 case OPC_INVOKEVIRTUAL: case OPC_INVOKESPECIAL:
                 case OPC_MULTIANEWARRAY: case OPC_INSTANCEOF:
-                case OPC_INVOKEDYNAMIC:
                     op1 = op2 = op3 = GOTO_END;
                     break;
 
@@ -1055,15 +1055,15 @@ void checkInliningQuickenedInstruction(Instruction *pc, MethodBlock *mb) {
    rate decreases with table occupancy.
 */
 void *inlineProfiledBlock(Instruction *pc, MethodBlock *mb, int force_inlining) {
+    ProfileInfo *info, *last = NULL;
     Thread *self = threadSelf();
-    ProfileInfo *info;
     void *ret;
 
     rewriteLock(self);
 
     /* Search profile cache for block */
     for(info = mb->profile_info; info != NULL && info->block->start != pc;
-        info = info->next);
+        last = info, info = info->next);
 
     if(info != NULL && (force_inlining ||
                         info->profile_count++ >= profile_threshold)) {

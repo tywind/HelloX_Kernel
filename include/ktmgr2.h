@@ -20,6 +20,16 @@
 #ifndef __KTMGR2_H__
 #define __KTMGR2_H__
 
+//A helper structure used to transfer parameters to time out waiting handler,
+//which is a basic routine to implements time out waiting for synchronization
+//kernel objects.
+typedef struct{
+	__COMMON_OBJECT*        lpSynObject;    //Synchronous object.
+	__PRIORITY_QUEUE*       lpWaitingQueue; //Waiting queue of the synchronous object.
+	__KERNEL_THREAD_OBJECT* lpKernelThread; //Kernel thread who want to wait.
+	VOID (*TimeOutCallback)(VOID*);         //Synchronization object specified call back routine when time out.
+}__TIMER_HANDLER_PARAM;
+
 //Definition of Semaphore objects.
 BEGIN_DEFINE_OBJECT(__SEMAPHORE)
     INHERIT_FROM_COMMON_OBJECT
@@ -68,5 +78,27 @@ END_DEFINE_OBJECT(__MAIL_BOX)
 //Initializer and Uninitializer of mail box object.
 BOOL MailboxInitialize(__COMMON_OBJECT* pMailbox);
 VOID MailboxUninitialize(__COMMON_OBJECT* pMailbox);
+
+//Definition of __CONDITION object.This object is conforms POSIX standard pthread_cond_xxx
+//operations,to fit the requirement of JamVM's porting.
+BEGIN_DEFINE_OBJECT(__CONDITION)
+	INHERIT_FROM_COMMON_OBJECT
+	INHERIT_FROM_COMMON_SYNCHRONIZATION_OBJECT
+	//How many thread(s) pending on the condition object.
+	volatile int nThreadNum;
+    __PRIORITY_QUEUE* lpPendingQueue;
+	//Wait a condition object until the condition satisfied.
+	DWORD (*CondWait)(__COMMON_OBJECT* pCond,__COMMON_OBJECT* pMutex);
+	//Wait a condition object until the condition satisfied or time out.
+	DWORD (*CondWaitTimeout)(__COMMON_OBJECT* pCond,__COMMON_OBJECT* pMutex,DWORD dwMillisonSecond);
+	//Signal a condition object.
+	DWORD (*CondSignal)(__COMMON_OBJECT* pCond);
+	//Broadcast a condition object.
+	DWORD (*CondBroadcast)(__COMMON_OBJECT* pCond);
+END_DEFINE_OBJECT(__CONDITION)
+
+//Initializer and Uninitializer of condition object.
+BOOL ConditionInitialize(__COMMON_OBJECT* pCondObj);
+VOID ConditionUninitialize(__COMMON_OBJECT* pCondObj);
 
 #endif //__KTMGR2_H__

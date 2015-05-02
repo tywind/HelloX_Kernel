@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2012, 2013, 2014
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009
  * Robert Lougher <rob@jamvm.org.uk>.
  *
  * This file is part of JamVM.
@@ -24,7 +24,6 @@
 #endif
 
 #include "interp-threading.h"
-#include "interp-direct-common.h"
 
 #define INTERPRETER_DEFINITIONS                                       \
     DEFINE_HANDLER_TABLES                                             \
@@ -173,6 +172,30 @@ d##X: {                \
 #endif
 
 /* Macros for handler/bytecode rewriting */
+
+#ifdef USE_CACHE
+#define WITH_OPCODE_CHANGE_CP_DINDEX(opcode, index, cache) \
+{                                                          \
+    index = pc->operand.uui.u1;                            \
+    cache = pc->operand.uui.i;                             \
+    MBARRIER();                                            \
+    if(pc->handler != L(opcode, 0, ENTRY) &&               \
+       pc->handler != L(opcode, 1, ENTRY) &&               \
+       pc->handler != L(opcode, 2, ENTRY))                 \
+        goto *pc->handler;                                 \
+}
+
+#else /* USE_CACHE */
+
+#define WITH_OPCODE_CHANGE_CP_DINDEX(opcode, index, cache) \
+{                                                          \
+    index = pc->operand.uui.u1;                            \
+    cache = pc->operand.uui.i;                             \
+    MBARRIER();                                            \
+    if(pc->handler != L(opcode, 0, ENTRY))                 \
+        goto *pc->handler;                                 \
+}
+#endif
 
 #define OPCODE_REWRITE(opcode, cache, new_operand)         \
 {                                                          \
@@ -371,6 +394,28 @@ branch_##level##_##type:                        \
         goto *pc->handler;                      \
     } else                                      \
         pc++;
+
+#define PREPARE_MB(mb)                          \
+    if((uintptr_t)mb->code & 0x3)               \
+        prepare(mb, handlers)
+
+#define ARRAY_TYPE(pc)           pc->operand.i
+#define SINGLE_INDEX(pc)         pc->operand.i
+#define DOUBLE_INDEX(pc)         pc->operand.i
+#define SINGLE_SIGNED(pc)        pc->operand.i
+#define DOUBLE_SIGNED(pc)        pc->operand.i
+#define IINC_LVAR_IDX(pc)        pc->operand.ii.i1
+#define IINC_DELTA(pc)           pc->operand.ii.i2
+#define INV_QUICK_ARGS(pc)       pc->operand.uu.u1
+#define INV_QUICK_IDX(pc)        pc->operand.uu.u2
+#define INV_INTF_IDX(pc)         pc->operand.uu.u1
+#define INV_INTF_CACHE(pc)       pc->operand.uu.u2
+#define MULTI_ARRAY_DIM(pc)      pc->operand.uui.u2
+#define GETFIELD_THIS_OFFSET(pc) pc->operand.i
+#define RESOLVED_CONSTANT(pc)    pc->operand.u
+#define RESOLVED_FIELD(pc)       ((FieldBlock*)pc->operand.pntr)
+#define RESOLVED_METHOD(pc)      ((MethodBlock*)pc->operand.pntr)
+#define RESOLVED_CLASS(pc)       (Class *)CP_INFO(cp, pc->operand.uui.u1)
 
 /* Macros for checking for common exceptions */
 

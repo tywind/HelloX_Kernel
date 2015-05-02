@@ -1,5 +1,5 @@
 ##
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012, 2013
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008
 ## Robert Lougher <rob@jamvm.org.uk>.
 ##
 ## This file is part of JamVM.
@@ -19,8 +19,8 @@
 ## Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 ##
 
-SUBDIRS = os interp classlib
-DIST_SUBDIRS = os arch interp classlib
+SUBDIRS = os interp
+DIST_SUBDIRS = os arch interp
 
 bin_PROGRAMS = jamvm
 include_HEADERS = jni.h
@@ -34,19 +34,15 @@ libcore_la_SOURCES = alloc.c alloc.h cast.c class.c dll.c excep.c execute.c \
                      thread.h utf8.c zip.c zip.h properties.c natives.h \
                      dll_ffi.c access.c frame.c init.c hooks.c class.h \
                      symbol.c symbol.h excep.h shutdown.c time.c reflect.h \
-                     jni-internal.h properties.h sig.c stubs.h stubs.c \
-                     jni-stubs.c annotations.h
+                     jni-internal.h properties.h sig.c
 
 jamvm_SOURCES = jam.c
 libjvm_la_SOURCES =
 
 jamvm_LDADD = libcore.la
 libjvm_la_LIBADD = libcore.la
-libjvm_la_LDFLAGS = -avoid-version
-libcore_la_LIBADD = interp/libinterp.la os/@os@/@arch@/libnative.la \
-                    os/@os@/libos.la classlib/@classlib@/libclasslib.la
+libcore_la_LIBADD = interp/libinterp.la os/@os@/@arch@/libnative.la os/@os@/libos.la
 
 AM_CPPFLAGS = -I$(top_srcdir)/src/interp/engine
 
-DISTCLEANFILES = arch.h classlib.h classlib-defs.h classlib-symbol.h \
-                 classlib-excep.h
+DISTCLEANFILES = arch.h

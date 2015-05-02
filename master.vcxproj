@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -13,17 +13,20 @@
   <PropertyGroup Label="Globals">
     <SccProjectName />
     <SccLocalPath />
+    <ProjectGuid>{156D873E-78D4-9A45-FEBE-A97A5EB779CB}</ProjectGuid>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -42,7 +45,7 @@
     <IntDir>.\Release\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <GenerateManifest>false</GenerateManifest>
-    <IncludePath>network;Lib;</IncludePath>
+    <IncludePath>jvm;network;Lib</IncludePath>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules />
     <CodeAnalysisRuleAssemblies />
@@ -57,7 +60,6 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <StringPooling>true</StringPooling>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -70,6 +72,9 @@
       <PrecompiledHeaderOutputFile>.\Release\master.pch</PrecompiledHeaderOutputFile>
       <ObjectFileName>.\Release\</ObjectFileName>
       <ProgramDataBaseFileName>.\Release\</ProgramDataBaseFileName>
+      <ExceptionHandling>false</ExceptionHandling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Midl>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -137,7 +142,7 @@
       <LinkDLL>true</LinkDLL>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <OutputFile>.\Debug\master.dll</OutputFile>
       <ImportLibrary>.\Debug\master.lib</ImportLibrary>
       <AdditionalOptions> /ALIGN:16</AdditionalOptions>
@@ -152,7 +157,42 @@
     <ClCompile Include="drivers\x86\IDEHD.C" />
     <ClCompile Include="drivers\x86\KEYBRD.C" />
     <ClCompile Include="drivers\x86\MOUSE.C" />
+    <ClCompile Include="jvm\access.c" />
+    <ClCompile Include="jvm\alloc.c" />
+    <ClCompile Include="jvm\cast.c" />
+    <ClCompile Include="jvm\class.c" />
+    <ClCompile Include="jvm\dll.c" />
+    <ClCompile Include="jvm\dll_ffi.c" />
+    <ClCompile Include="jvm\excep.c" />
+    <ClCompile Include="jvm\execute.c" />
+    <ClCompile Include="jvm\frame.c" />
+    <ClCompile Include="jvm\hash.c" />
+    <ClCompile Include="jvm\hooks.c" />
+    <ClCompile Include="jvm\interp\direct.c" />
+    <ClCompile Include="jvm\interp\engine\interp.c" />
+    <ClCompile Include="jvm\interp\engine\interp2.c" />
+    <ClCompile Include="jvm\interp\inlining.c" />
+    <ClCompile Include="jvm\jam.c" />
+    <ClCompile Include="jvm\jni.c" />
+    <ClCompile Include="jvm\jvm_init.c" />
+    <ClCompile Include="jvm\jvm_str.c" />
+    <ClCompile Include="jvm\jvm_time.c" />
+    <ClCompile Include="jvm\lock.c" />
+    <ClCompile Include="jvm\natives.c" />
+    <ClCompile Include="jvm\os\HelloX\i386\dll_md.c" />
+    <ClCompile Include="jvm\os\HelloX\i386\os_init.c" />
+    <ClCompile Include="jvm\os\HelloX\os.c" />
+    <ClCompile Include="jvm\properties.c" />
+    <ClCompile Include="jvm\reflect.c" />
+    <ClCompile Include="jvm\resolve.c" />
+    <ClCompile Include="jvm\shutdown.c" />
+    <ClCompile Include="jvm\sig.c" />
+    <ClCompile Include="jvm\symbol.c" />
+    <ClCompile Include="jvm\thread.c" />
+    <ClCompile Include="jvm\utf8.c" />
+    <ClCompile Include="jvm\zip.c" />
     <ClCompile Include="kernel\CharDisplay.C" />
+    <ClCompile Include="kernel\process.c" />
     <ClCompile Include="kthread\idle.c" />
     <ClCompile Include="kthread\logcat.c" />
     <ClCompile Include="arch\x86\ARCH_X86.C" />
@@ -168,11 +208,19 @@
     <ClCompile Include="fs\NTFS2.C" />
     <ClCompile Include="fs\NTFSDRV.C" />
     <ClCompile Include="lib\atox.c" />
+    <ClCompile Include="lib\ctype.c" />
+    <ClCompile Include="lib\errno.c" />
+    <ClCompile Include="lib\getenv.c" />
     <ClCompile Include="lib\io.c" />
+    <ClCompile Include="lib\math.c" />
     <ClCompile Include="lib\memory.c" />
     <ClCompile Include="lib\pthread.c" />
     <ClCompile Include="lib\pthread_mutex .c" />
     <ClCompile Include="lib\pthread_other.c" />
+    <ClCompile Include="lib\sched.c" />
+    <ClCompile Include="lib\setjmp.c" />
+    <ClCompile Include="lib\signal.c" />
+    <ClCompile Include="lib\stat.c" />
     <ClCompile Include="lib\stdio.c" />
     <ClCompile Include="lib\string.c" />
     <ClCompile Include="lib\sysmem.c" />
@@ -289,6 +337,7 @@
     <ClInclude Include="INCLUDE\PAGEIDX.H" />
     <ClInclude Include="INCLUDE\PCI_DRV.H" />
     <ClInclude Include="INCLUDE\PERF.H" />
+    <ClInclude Include="include\process.h" />
     <ClInclude Include="INCLUDE\RINGBUFF.H" />
     <ClInclude Include="INCLUDE\STATCPU.H" />
     <ClInclude Include="INCLUDE\StdAfx.h" />
@@ -305,20 +354,57 @@
     <ClInclude Include="arch\x86\ARCH.H" />
     <ClInclude Include="arch\x86\BIOS.H" />
     <ClInclude Include="arch\x86\SYN_MECH.H" />
+    <ClInclude Include="jvm\alloc.h" />
+    <ClInclude Include="jvm\arch\i386.h" />
+    <ClInclude Include="jvm\class.h" />
+    <ClInclude Include="jvm\config.h" />
+    <ClInclude Include="jvm\excep.h" />
+    <ClInclude Include="jvm\frame.h" />
+    <ClInclude Include="jvm\hash.h" />
+    <ClInclude Include="jvm\interp\engine\interp-direct.h" />
+    <ClInclude Include="jvm\interp\engine\interp-indirect.h" />
+    <ClInclude Include="jvm\interp\engine\interp-inlining.h" />
+    <ClInclude Include="jvm\interp\engine\interp-threading.h" />
+    <ClInclude Include="jvm\interp\engine\interp.h" />
+    <ClInclude Include="jvm\interp\inlining.h" />
+    <ClInclude Include="jvm\interp\shared.h" />
+    <ClInclude Include="jvm\jam.h" />
+    <ClInclude Include="jvm\jni-internal.h" />
+    <ClInclude Include="jvm\jni.h" />
+    <ClInclude Include="jvm\jvm_arch.h" />
+    <ClInclude Include="jvm\lock.h" />
+    <ClInclude Include="jvm\natives.h" />
+    <ClInclude Include="jvm\properties.h" />
+    <ClInclude Include="jvm\reflect.h" />
+    <ClInclude Include="jvm\sig.h" />
+    <ClInclude Include="jvm\symbol.h" />
+    <ClInclude Include="jvm\thread.h" />
+    <ClInclude Include="jvm\zip.h" />
     <ClInclude Include="kthread\idle.h" />
     <ClInclude Include="kthread\logcat.h" />
     <ClInclude Include="fs\FAT32.H" />
     <ClInclude Include="fs\fsstr.h" />
     <ClInclude Include="fs\NTFS.H" />
+    <ClInclude Include="lib\ctype.h" />
+    <ClInclude Include="lib\errno.h" />
     <ClInclude Include="lib\io.h" />
+    <ClInclude Include="lib\limits.h" />
+    <ClInclude Include="lib\math.h" />
     <ClInclude Include="lib\pthread.h" />
+    <ClInclude Include="lib\sched.h" />
+    <ClInclude Include="lib\setjmp.h" />
+    <ClInclude Include="lib\signal.h" />
     <ClInclude Include="lib\stddef.h" />
     <ClInclude Include="lib\stdint.h" />
     <ClInclude Include="lib\stdio.h" />
     <ClInclude Include="lib\stdlib.h" />
     <ClInclude Include="lib\string.h" />
+    <ClInclude Include="lib\sys\stat.h" />
+    <ClInclude Include="lib\sys\types.h" />
+    <ClInclude Include="lib\sys\utsname.h" />
     <ClInclude Include="lib\time.h" />
     <ClInclude Include="lib\time_pri.h" />
+    <ClInclude Include="lib\unistd.h" />
     <ClInclude Include="shell\EXTCMD.H" />
     <ClInclude Include="shell\FDISK.H" />
     <ClInclude Include="shell\FIBONACCI.H" />
@@ -344,6 +430,7 @@
   <ItemGroup>
     <None Include="Authors.txt" />
     <None Include="README.md" />
+    <None Include="revise.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

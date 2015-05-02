@@ -19,6 +19,11 @@
  * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+//HelloX Porting Code.
+#include <stdafx.h>
+#include <kapi.h>
+#include <io.h>
+
 #include "jam.h"
 
 static int (*vfprintf_hook)(FILE *stream, const char *fmt, va_list ap);
@@ -37,9 +42,8 @@ void jamvm_exit(int status) {
     (*exit_hook)(status);
 }
 
-int initialiseHooks(InitArgs *args) {
+void initialiseHooks(InitArgs *args) {
     vfprintf_hook = args->vfprintf;
     exit_hook = args->exit;
-    return TRUE;
 }
 

@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2009, 2010, 2011, 2012, 2014
- * Robert Lougher <rob@jamvm.org.uk>.
+ * Copyright (C) 2009 Robert Lougher <rob@jamvm.org.uk>.
  *
  * This file is part of JamVM.
  *
@@ -26,6 +25,28 @@
 
 #define getPrimTypeIndex(cb) (cb->state - CLASS_PRIM)
 
+#define getConsParamTypes(vm_cons_obj) \
+    INST_DATA(vm_cons_obj, Object*, vm_cons_param_offset)
+
+#define getMethodParamTypes(vm_method_obj) \
+    INST_DATA(vm_method_obj, Object*, vm_mthd_param_offset)
+
+#define getMethodReturnType(vm_method_obj) \
+    INST_DATA(vm_method_obj, Class*, vm_mthd_ret_offset)
+
+#define getFieldType(vm_field_obj) \
+    INST_DATA(vm_field_obj, Class*, vm_fld_type_offset)
+
+extern MethodBlock *getConsMethodBlock(Object *cons_ref_obj);
+extern int getConsAccessFlag(Object *cons_ref_obj);
+extern MethodBlock *getMethodMethodBlock(Object *mthd_ref_obj);
+extern int getMethodAccessFlag(Object *mthd_ref_obj);
+extern FieldBlock *getFieldFieldBlock(Object *fld_ref_obj);
+extern int getFieldAccessFlag(Object *fld_ref_obj);
+
+extern int vm_cons_param_offset, vm_mthd_param_offset, vm_mthd_ret_offset;
+extern int vm_fld_type_offset;
+
 extern Object *getClassConstructors(Class *class, int public);
 extern Object *getClassMethods(Class *class, int public);
 extern Object *getClassFields(Class *class, int public);
@@ -35,26 +56,20 @@ extern Class *getDeclaringClass(Class *class);
 extern Class *getEnclosingClass(Class *class);
 extern Object *getEnclosingMethodObject(Class *class);
 extern Object *getEnclosingConstructorObject(Class *class);
-extern Object *getMethodExceptionTypes(MethodBlock *mb);
-extern Object *getMethodParameterTypes(MethodBlock *mb);
-extern Class *getMethodReturnType(MethodBlock *mb);
-extern Class *getFieldType(FieldBlock *fb);
-
-extern Class *findClassFromSignature(char *type_name, Class *class);
+extern Object *getClassAnnotations(Class *class);
+extern Object *getFieldAnnotations(FieldBlock *fb);
+extern Object *getMethodAnnotations(MethodBlock *mb);
+extern Object *getMethodParameterAnnotations(MethodBlock *mb);
+extern Object *getMethodDefaultValue(MethodBlock *mb);
+extern Object *getExceptionTypes(MethodBlock *mb);
 
 extern Object *getReflectReturnObject(Class *type, void *pntr, int flags);
 extern int widenPrimitiveValue(int src_idx, int dest_idx, void *src,
                                void *dest, int flags);
 extern int unwrapAndWidenObject(Class *type, Object *arg, void *pntr,
                                 int flags);
-
-extern Object *constructorConstruct(MethodBlock *mb, Object *args_array,
-                                    Object *param_types, int no_access_check,
-                                    int depth);
-
-extern Object *methodInvoke(Object *ob, MethodBlock *mb, Object *args_array,
-                            Class *ret_type, Object *param_types,
-                            int no_access_check, int depth);
+extern Object *invoke(Object *ob, MethodBlock *mb, Object *arg_array,
+                      Object *param_types);
 
 extern MethodBlock *mbFromReflectObject(Object *reflect_ob);
 extern FieldBlock *fbFromReflectObject(Object *reflect_ob);
@@ -62,11 +77,4 @@ extern FieldBlock *fbFromReflectObject(Object *reflect_ob);
 extern Object *createReflectConstructorObject(MethodBlock *mb);
 extern Object *createReflectMethodObject(MethodBlock *mb);
 extern Object *createReflectFieldObject(FieldBlock *fb);
-extern int checkObject(Object *ob, Class *type);
-extern int getWrapperPrimTypeIndex(Object *arg);
-extern int numElementsInSig(char *sig);
-
-extern Class *convertSigElement2Class(char **sig_pntr, Class *declaring_class);
-extern Object *convertSig2ClassArray(char **sig_pntr, Class *declaring_class);
-
-extern Object *createWrapperObject(int prim_type_no, void *pntr, int flags);
+extern Class *getReflectMethodClass();

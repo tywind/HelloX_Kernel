@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2011, 2013
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009
  * Robert Lougher <rob@jamvm.org.uk>.
  *
  * This file is part of JamVM.
@@ -19,11 +19,16 @@
  * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+//HelloX Porting Code.
+#include <stdafx.h>
+#include <kapi.h>
+#include <io.h>
+
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
 #include <stdlib.h>
-#include <sys/time.h>
+#include <time.h>
 #include <limits.h>
 
 #include "jam.h"
@@ -33,8 +38,6 @@
 #include "lock.h"
 #include "symbol.h"
 #include "excep.h"
-#include "class.h"
-#include "classlib.h"
 
 /* Trace lock operations and inflation/deflation */
 #ifdef TRACELOCK
@@ -48,27 +51,44 @@
 #define HASHTABSZE 1<<5
 #define PREPARE(obj) allocMonitor(obj)
 #define HASH(obj) (getObjectHashcode(obj) >> LOG_OBJECT_GRAIN)
+
+/*
 #define COMPARE(obj, mon, hash1, hash2) hash1 == hash2 && mon->obj == obj
+*/
+
+//For debugging.Convet the COMPARE macro to functions,since the variable name may change.
+static int COMPARE(Object* obj,Monitor* mon,int hash1,int hash2)
+{
+	return ((hash1 == hash2) && (mon->obj == obj));
+}
+
+/*
 #define FOUND(ptr1, ptr2)                                    \
 ({                                                           \
      LOCKWORD_COMPARE_AND_SWAP(&ptr2->entering, UN_USED, 0); \
      ptr2;                                                   \
 })
+*/
+
+//For debugging.Change the MACRO's definition since it use non-standard ANSI C syntax.
+#define FOUND(ptr1,ptr2)                                     \
+(                                                            \
+	 LOCKWORD_COMPARE_AND_SWAP(&ptr2->entering, UN_USED, 0), \
+     ptr2                                                    \
+)
 
 /* lockword format in "thin" mode
-  63
   31                                         0
-  +---------------------------------+-------+-+
+   -------------------------------------------
   |              thread ID          | count |0|
-  +---------------------------------+-------+-+
+   -------------------------------------------
                                              ^ shape bit
 
   lockword format in "fat" mode
-  63
   31                                         0
-  +-----------------------------------------+-+
+   -------------------------------------------
   |                 Monitor*                |1|
-  +-----------------------------------------+-+
+   -------------------------------------------
                                              ^ shape bit
 */
 
@@ -81,6 +101,7 @@
 #define TID_SIZE    (32-TID_SHIFT)
 #define TID_MASK    (((1<<TID_SIZE)-1)<<TID_SHIFT)
 
+/*
 #define SCAVENGE(ptr)                                           \
 ({                                                              \
     Monitor *mon = (Monitor *)ptr;                              \
@@ -92,9 +113,87 @@
     }                                                           \
     res;                                                        \
 })
+*/
 
 static Monitor *mon_free_list = NULL;
 static HashTable mon_cache;
+
+//For debugging.Convert the SCAVENGE macro to functions,since it can not pass VS's comple.
+static char SCAVENGE(void* ptr)
+{                                                              
+    Monitor *mon = (Monitor *)ptr;                              
+    char res = LOCKWORD_READ(&mon->entering) == UN_USED;        
+    if(res) {                                                   
+        TRACE("Scavenging monitor %p (obj %p)", mon, mon->obj); 
+        mon->next = mon_free_list;                              
+        mon_free_list = mon;                                    
+    }                                                           
+    return res;                                                        
+}
+
+//The following function is converted from the macro with the same name,since it may lead compiling error under
+//Microsoft Visual Studio.
+static void _findHashEntry(HashTable* table,Object* ptr,Monitor* ptr2,int add_if_absent,int scavenge,int locked)
+{                                                                                  
+    int hash;                                                                      
+    int i;                                                                         
+	Thread *self;                                                                  
+                                                                                   
+	hash = HASH(ptr);                                                              
+    if(locked) {                                                                   
+        self = threadSelf();                                                       
+        lockHashTable0(table, self);                                              
+    }                                                                              
+                                                                                   
+    i = hash & (table->hash_size - 1);                                             
+                                                                                   
+    for(;;) {                                                                      
+        ptr2 = table->hash_table[i].data;                                          
+        if((ptr2 == NULL) || (COMPARE(ptr, ptr2, hash, table->hash_table[i].hash))) 
+            break;                                                                 
+                                                                                   
+        i = (i+1) & (table->hash_size - 1);                                        
+    }                                                                              
+                                                                                   
+    if(ptr2) {                                                                     
+        ptr2 = FOUND(ptr, ptr2);                                                   
+    } else                                                                         
+        if(add_if_absent) {                                                        
+            table->hash_table[i].hash = hash;                                      
+            ptr2 = table->hash_table[i].data = PREPARE(ptr);                       
+                                                                                   
+            if(ptr2) {                                                             
+                table->hash_count++;                                               
+                if((table->hash_count * 4) > (table->hash_size * 3)) {             
+                    int new_size;                                                  
+                    if(scavenge) {                                                 
+                        HashEntry *entry = table->hash_table;                      
+                        int cnt = table->hash_count;                               
+                        for(; cnt; entry++) {                                      
+                            void *data = entry->data;                              
+                            if(data) {                                             
+                                if(SCAVENGE(data)) {                               
+                                    entry->data = NULL;                            
+                                    table->hash_count--;                           
+                                }                                                  
+                                cnt--;                                             
+                            }                                                      
+                        }                                                          
+                        if((table->hash_count * 3) > (table->hash_size * 2))       
+                            new_size = table->hash_size*2;                         
+                        else                                                       
+                            new_size = table->hash_size;                           
+                    } else                                                         
+                        new_size = table->hash_size*2;                             
+                                                                                   
+                    resizeHash(table, new_size);                                  
+                }                                                                 
+            }                                                                     
+        }                                                                         
+                                                                                  
+    if(locked)                                                                    
+        unlockHashTable0(table, self);                                            
+}
 
 void monitorInit(Monitor *mon) {
     memset(mon, 0, sizeof(Monitor));
@@ -144,11 +243,11 @@ void monitorLock(Monitor *mon, Thread *self) {
 
             self->blocked_mon = mon;
             self->blocked_count++;
-            classlibSetThreadState(self, BLOCKED);
+            self->state = BLOCKED;
 
             pthread_mutex_lock(&mon->lock);
 
-            classlibSetThreadState(self, RUNNING);
+            self->state = RUNNING;
             self->blocked_mon = NULL;
 
             enableSuspend(self);
@@ -179,40 +278,41 @@ void monitorUnlock(Monitor *mon, Thread *self) {
     }
 }
 
-int monitorWait(Monitor *mon, Thread *self, long long ms, int ns,
-                int is_wait, int interruptible) {
-    char interrupted = interruptible && self->interrupted;
+int monitorWait0(Monitor *mon, Thread *self, long long ms, int ns,
+                 int blocked, int interruptible) {
+    char timed = (ms != 0) || (ns != 0);
+    char interrupted = FALSE;
+    char timeout = FALSE;
+    struct timespec ts;
+    int old_count;
 
     /* Check we own the monitor */
     if(mon->owner != self)
         return FALSE;
 
-    if(!interrupted) {
-        char timed = (ms != 0) || (ns != 0);
-        char timeout = FALSE;
-        struct timespec ts;
-        int old_count;
-        int state;
+    disableSuspend(self);
 
-        disableSuspend(self);
+    /* Unlock the monitor.  As it could be recursively
+       locked remember the recursion count */
+    old_count = mon->count;
+    mon->owner = NULL;
+    mon->count = 0;
 
-        /* Unlock the monitor.  As it could be recursively
-           locked remember the recursion count */
-        old_count = mon->count;
-        mon->owner = NULL;
-        mon->count = 0;
+    /* Counter used in thin-lock deflation */
+    mon->in_wait++;
 
-        /* Counter used in thin-lock deflation */
-        mon->in_wait++;
+    self->wait_mon = mon;
 
-        self->wait_mon = mon;
+    if(timed) {
+       getTimeoutRelative(&ts, ms, ns);
+       self->state = TIMED_WAITING;
+    } else
+       self->state = blocked ? BLOCKED : WAITING;
 
-        state = timed ? (is_wait ? OBJECT_TIMED_WAIT : SLEEPING)
-                      : (is_wait ? OBJECT_WAIT : BLOCKED);
-
-        classlibSetThreadState(self, state);
-
-        if(state == BLOCKED) {
+    if(interruptible && self->interrupted)
+        interrupted = TRUE;
+    else {
+        if(blocked) {
             self->blocked_mon = mon;
             self->blocked_count++;
         } else
@@ -222,9 +322,6 @@ int monitorWait(Monitor *mon, Thread *self, long long ms, int ns,
 
         /* Add the thread onto the end of the wait set */
         waitSetAppend(mon, self);
-
-        if(timed)
-            getTimeoutRelative(&ts, ms, ns);
 
         while(self->wait_next != NULL && !self->interrupting && !timeout)
             if(timed) {
@@ -240,42 +337,42 @@ int monitorWait(Monitor *mon, Thread *self, long long ms, int ns,
                 FPU_HACK;
             } else
                 pthread_cond_wait(&self->wait_cv, &mon->lock);
+    }
 
-        /* If we've been interrupted or timed-out, we will not have been
-           removed from the wait set.  If we have, we must have been
-           notified afterwards.  In this case, the notify has been lost,
-           and we must signal another thread */
+    /* If we've been interrupted or timed-out, we will not have been
+       removed from the wait set.  If we have, we must have been
+       notified afterwards.  In this case, the notify has been lost,
+       and we must signal another thread */
 
-        if(self->interrupting || timeout) {
-            /* An interrupt after a timeout remains pending */
-            interrupted = interruptible && !timeout;
+    if(self->interrupting || timeout) {
+        /* An interrupt after a timeout remains pending */
+        interrupted = interruptible && !timeout;
 
-            if(self->wait_next != NULL)
-                waitSetUnlinkThread(mon, self);
-            else {
-                /* Notify lost.  Signal another thread only if it
-                   was on the wait set at the time of the notify */
-                if(mon->wait_set != NULL &&
-                                mon->wait_set->wait_id < self->notify_id) {
-                    Thread *thread = waitSetSignalNext(mon);
-                    thread->notify_id = self->notify_id;
-                }
+        if(self->wait_next != NULL)
+            waitSetUnlinkThread(mon, self);
+        else {
+            /* Notify lost.  Signal another thread only if it
+               was on the wait set at the time of the notify */
+            if(mon->wait_set != NULL && mon->wait_set->wait_id <
+                                                self->notify_id) {
+                Thread *thread = waitSetSignalNext(mon);
+                thread->notify_id = self->notify_id;
             }
         }
-
-        classlibSetThreadState(self, RUNNING);
-        self->wait_mon = NULL;
-
-        if(state == BLOCKED)
-            self->blocked_mon = NULL;
-
-        /* Restore the monitor owner and recursion count */
-        mon->count = old_count;
-        mon->owner = self;
-        mon->in_wait--;
-
-        enableSuspend(self);
     }
+
+    self->state = RUNNING;
+    self->wait_mon = NULL;
+
+    if(blocked)
+        self->blocked_mon = NULL;
+
+   /* Restore the monitor owner and recursion count */
+    mon->count = old_count;
+    mon->owner = self;
+    mon->in_wait--;
+
+    enableSuspend(self);
 
     if(interrupted) {
         self->interrupted = FALSE;
@@ -306,7 +403,7 @@ int monitorNotifyAll(Monitor *mon, Thread *self) {
     return TRUE;
 }
 
-Monitor *allocMonitor(Object *obj) {
+Monitor* allocMonitor(Object *obj) {
     Monitor *mon;
 
     if(mon_free_list != NULL) {
@@ -331,7 +428,7 @@ Monitor *findMonitor(Object *obj) {
     else {
         Monitor *mon;
         /* Add if absent, scavenge, locked */
-        findHashEntry(mon_cache, obj, mon, TRUE, TRUE, TRUE);
+        _findHashEntry(&mon_cache, obj, mon, TRUE, TRUE, TRUE);
         return mon;
     }
 }
@@ -402,7 +499,7 @@ try_again2:
         if(LOCKWORD_COMPARE_AND_SWAP(&obj->lock, 0, thin_locked))
             inflate(obj, mon, self);
         else
-            monitorWait(mon, self, 0, 0, FALSE, FALSE);
+            monitorWait0(mon, self, 0, 0, TRUE, FALSE);
     }
 }
 
@@ -461,7 +558,7 @@ retry:
     }
 }
 
-void objectWait(Object *obj, long long ms, int ns, int interruptible) {
+void objectWait0(Object *obj, long long ms, int ns, int interruptible) {
     uintptr_t lockword = LOCKWORD_READ(&obj->lock);
     Thread *self = threadSelf();
     Monitor *mon;
@@ -480,7 +577,7 @@ void objectWait(Object *obj, long long ms, int ns, int interruptible) {
     } else
         mon = (Monitor*) (lockword & ~SHAPE_BIT);
 
-    if(monitorWait(mon, self, ms, ns, TRUE, interruptible))
+    if(monitorWait0(mon, self, ms, ns, FALSE, interruptible))
         return;
 
 not_owner:
@@ -558,11 +655,9 @@ Thread *objectLockedBy(Object *obj) {
     return owner;
 }
 
-int initialiseMonitor() {
+void initialiseMonitor() {
     /* Init hash table, create lock */
     initHashTable(mon_cache, HASHTABSZE, TRUE);
-
-    return TRUE;
 }
 
 /* Heap compaction support */

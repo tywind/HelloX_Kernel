@@ -188,12 +188,6 @@ END_DEFINE_OBJECT(__KERNEL_THREAD_MESSAGE)
 #define PRIORITY_LEVEL_LOWEST           PRIORITY_LEVEL_IDLE
 //#define PRIORITY_LEVEL_INVALID          0x00000000
 
-//#define DEFAULT_STACK_SIZE              0x00004000  //Default stack size,if the dwStackSize
-								                    //parameter of CreateKernelThread is 0,
-													//then the CreateKernelThread will allocate
-													//DEFAULT_STACK_SIZE bytes to be used as
-													//stack.
-
 //The maximal kernel objects number one kernel thread can wait at the same time.
 #define MAX_MULTIPLE_WAIT_NUM           0x08
 
@@ -206,6 +200,7 @@ BEGIN_DEFINE_OBJECT(__KERNEL_THREAD_OBJECT)
 	__KERNEL_THREAD_CONTEXT              KernelThreadContext;
     __KERNEL_THREAD_CONTEXT*             lpKernelThreadContext;   //Added in V1.5.
     DWORD                                dwThreadID;
+	__COMMON_OBJECT*                     lpOwnProcess;            //The process owns the kernel thread.
 	DWORD                                dwThreadStatus;          //Kernel Thread's current
 	                                                              //status.
 	__PRIORITY_QUEUE*                    lpWaitingQueue;          //Waiting queue of the
@@ -220,18 +215,13 @@ BEGIN_DEFINE_OBJECT(__KERNEL_THREAD_OBJECT)
 	DWORD                                dwScheduleCounter;       //Schedule counter,used to
 	                                                              //control the scheduler.
 	DWORD                                dwReturnValue;
-
 	DWORD                                dwTotalRunTime;
 	DWORD                                dwTotalMemSize;
-
 	LPVOID                               lpHeapObject;           //Pointing to the heap list.
 	LPVOID                               lpDefaultHeap;          //Default heap.
-
 	BOOL                                 bUsedMath;              //If used math co-process.
-
 	DWORD                                dwStackSize;
 	LPVOID                               lpInitStackPointer;
-
 	DWORD                                (*KernelThreadRoutine)(LPVOID);  //Start address.
 	LPVOID                               lpRoutineParam;
 
@@ -250,15 +240,30 @@ BEGIN_DEFINE_OBJECT(__KERNEL_THREAD_OBJECT)
 
 	//Used by synchronous object to indicate the waiting result.
 	volatile DWORD                       dwWaitingStatus;
-
 	//Multiple object waiting flags,the object index which first wakeup the thread
 	//also stored in this variable.
 	volatile DWORD                       dwMultipleWaitFlags;
-
 	//Kernel object number array the thread is waiting for.
 	__COMMON_OBJECT*                     MultipleWaitObjectArray[MAX_MULTIPLE_WAIT_NUM];
 
+	//TLS array.
+	LPVOID                               TLS[MAX_TLS_NUM];
+
+	//Suspending flags and suspending counter,used to manage the suspending operations for kernel thread.
+	//The meanings of each bit as follows:
+	// bit0 - bit15:  Suspending counter,incremented by SuspendKernelThread routine and decremented by
+	//                ResumeKernelThread routine;
+	// bit16 - bit31: Suspending flags,only the 31 bit is used,to indicate the suspending disable/enable
+	//                status.
+	// SUSPEND_FLAG_MASK is used to seperate these 2 parts.
+	volatile DWORD                       dwSuspendFlags;
+
 END_DEFINE_OBJECT(__KERNEL_THREAD_OBJECT)
+
+//Flags to control the suspending operation on kernel thread.
+#define SUSPEND_FLAG_MASK                0xFFFF0000
+#define SUSPEND_FLAG_DISABLE             0x80000000
+#define MAX_SUSPEND_COUNTER              0x0000FFF0
 
 //Flags to control the multiple objects waiting mechanism.
 #define MULTIPLE_WAITING_STATUS          0x80000000  //If set then the kernel is in multiple waiting status.
@@ -332,30 +337,35 @@ BEGIN_DEFINE_OBJECT(__KERNEL_THREAD_MANAGER)
 											  DWORD                     dwPriority,
 											  __KERNEL_THREAD_ROUTINE   lpStartRoutine,
 											  LPVOID                    lpRoutineParam,
-											  LPVOID                    lpReserved,
+											  LPVOID                    lpOwnerProcess,
 											  LPSTR                     lpszName);
 
 	VOID                                     (*DestroyKernelThread)(__COMMON_OBJECT* lpThis,
 		                                     __COMMON_OBJECT*           lpKernelThread
 											 );
 
+	BOOL                                     (*EnableSuspend)(
+		                                     __COMMON_OBJECT*           lpThis,
+											 __COMMON_OBJECT*           lpKernelThread,
+											 BOOL                       bSuspend);
+
 	BOOL                                     (*SuspendKernelThread)(
 		                                     __COMMON_OBJECT*           lpThis,
-											 __COMMON_OBJECT*           lpKernelThread
-											 );
+											 __COMMON_OBJECT*           lpKernelThread);
 
 	BOOL                                     (*ResumeKernelThread)(
 		                                     __COMMON_OBJECT*           lpThis,
-											 __COMMON_OBJECT*           lpKernelThread
-											 );
+											 __COMMON_OBJECT*           lpKernelThread);
 
 	VOID                                     (*ScheduleFromProc)(
 		                                     __KERNEL_THREAD_CONTEXT*   lpContext
 											 );
+
 	VOID                                     (*ScheduleFromInt)(
 		                                     __COMMON_OBJECT*           lpThis,
 											 LPVOID                     lpESP
 											 );
+
 	LPVOID                                   (*UniSchedule)(
 		                                     __COMMON_OBJECT*           lpThis,
 											 LPVOID                     lpESP);
@@ -369,9 +379,10 @@ BEGIN_DEFINE_OBJECT(__KERNEL_THREAD_MANAGER)
 		                                     __COMMON_OBJECT*           lpKernelThread
 											 );
 
-	DWORD                                    (*TerminalKernelThread)(
+	DWORD                                    (*TerminateKernelThread)(
 		                                     __COMMON_OBJECT*           lpThis,
-											 __COMMON_OBJECT*           lpKernelThread
+											 __COMMON_OBJECT*           lpKernelThread,
+											 DWORD                      dwExitCode
 											 );
 
 	BOOL                                     (*Sleep)(

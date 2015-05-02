@@ -502,3 +502,7 @@ char* _strdate(char*);
 char*   _strtime(char*);
 */
 
+int gettimeofday(struct timeval* tv,void* ptr)
+{
+	return 0;
+}

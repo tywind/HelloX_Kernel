@@ -34,3 +34,28 @@ typedef unsigned int     size_t;
 
 int _hx_sprintf(char* buf,const char* fmt,...);
 int _hx_printf(const char* fmt,...);
+int _hx_vsprintf(char *buf, const char *fmt, va_list args);
+int _hx_vfprintf(void* stream,const char* fmt,va_list args);
+
+int _hx_snprintf(char* buf,size_t n,const char* fmt,...);
+
+//Simulate standard printf routine.
+#ifndef printf
+#define printf _hx_printf
+#endif
+
+//Simulate standard sprintf routine.
+#ifndef sprintf
+#define sprintf _hx_sprintf
+#endif
+
+//vfprintf.
+#ifndef vfprintf
+#define vfprintf _hx_vfprintf
+#endif
+
+//snprintf.
+#ifndef snprintf
+#define snprintf _hx_snprintf
+#endif
+

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009
  * Robert Lougher <rob@jamvm.org.uk>.
  *
  * This file is part of JamVM.
@@ -19,6 +19,11 @@
  * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+//HelloX Porting Code.
+#include <stdafx.h>
+#include <kapi.h>
+#include <io.h>
+
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
@@ -27,9 +32,7 @@
 
 #include "jam.h"
 #include "symbol.h"
-#include "hash.h"
-#include "class.h"
-#include "classlib.h"
+#include "properties.h"
 
 #ifdef HAVE_LOCALE_H
 #include <locale.h>
@@ -37,7 +40,11 @@
 
 static Property *commandline_props;
 static int commandline_props_count;
-static char *java_home;
+
+void initialiseProperties(InitArgs *args) {
+    commandline_props = args->commandline_props;
+    commandline_props_count = args->props_count;
+}
 
 char *getCommandLineProperty(char *key) {
     int i;
@@ -47,14 +54,6 @@ char *getCommandLineProperty(char *key) {
             return commandline_props[i].value;
 
     return NULL;
-}
-
-int initialiseProperties(InitArgs *args) {
-    commandline_props = args->commandline_props;
-    commandline_props_count = args->props_count;
-
-    java_home = classlibDefaultJavaHome();
-    return TRUE;
 }
 
 void setProperty(Object *properties, char *key, char *value) {
@@ -129,26 +128,6 @@ char *getCwd() {
     }
 }
     
-char *getExecutionEngineName() {
-    return
-#ifdef THREADED
-#ifdef DIRECT
-#ifdef INLINING
-    "inline-"
-#else /* INLINING */
-    "direct-"
-#endif /* INLINING */
-#endif /* DIRECT */
-    "threaded interpreter"
-#ifdef USE_CACHE
-    " with stack-caching"
-#endif /* USE_CACHE */
-#else /* THREADED */
-    "switch-based interpreter"
-#endif /*THREADED */
-;
-}
-
 void setUserDirProperty(Object *properties) {
     char *cwd = getCwd();
 
@@ -166,39 +145,50 @@ void setOSProperties(Object *properties) {
 }
 
 char *getJavaHome() {
-    return java_home;
+    char *env = getenv("JAVA_HOME");
+    return env ? env : INSTALL_DIR;
 }
 
 void addDefaultProperties(Object *properties) {
     setProperty(properties, "java.vm.name", "JamVM");
     setProperty(properties, "java.vm.version", VERSION);
-    setProperty(properties, "java.vm.info", getExecutionEngineName());
     setProperty(properties, "java.vm.vendor", "Robert Lougher");
     setProperty(properties, "java.vm.vendor.url", "http://jamvm.org");
     setProperty(properties, "java.vm.specification.version", "1.0");
     setProperty(properties, "java.vm.specification.vendor",
-                            "Sun Microsystems Inc.");
+                            "Sun Microsystems, Inc.");
     setProperty(properties, "java.vm.specification.name",
                             "Java Virtual Machine Specification");
-
+    setProperty(properties, "java.runtime.version", VERSION);
+    setProperty(properties, "java.version", JAVA_COMPAT_VERSION);
+    setProperty(properties, "java.vendor", "GNU Classpath");
+    setProperty(properties, "java.vendor.url", "http://www.classpath.org");
     setProperty(properties, "java.home", getJavaHome());
+    setProperty(properties, "java.specification.version", "1.5");
+    setProperty(properties, "java.specification.vendor",
+                            "Sun Microsystems, Inc.");
+    setProperty(properties, "java.specification.name",
+                            "Java Platform API Specification");
+    setProperty(properties, "java.class.version", "48.0");
     setProperty(properties, "java.class.path", getClassPath());
     setProperty(properties, "sun.boot.class.path", getBootClassPath());
-    setProperty(properties, "sun.boot.library.path", getBootDllPath());
+    setProperty(properties, "java.boot.class.path", getBootClassPath());
+    setProperty(properties, "gnu.classpath.boot.library.path",
+                            getBootDllPath());
     setProperty(properties, "java.library.path", getDllPath());
-    setProperty(properties, "java.endorsed.dirs", getEndorsedDirs());
-    setProperty(properties, "java.ext.dirs", classlibDefaultExtDirs());
     setProperty(properties, "java.io.tmpdir", "/tmp");
+    setProperty(properties, "java.compiler", "");
+    setProperty(properties, "java.ext.dirs", "");
     setProperty(properties, "file.separator", "/");
     setProperty(properties, "path.separator", ":");
     setProperty(properties, "line.separator", "\n");
     setProperty(properties, "user.name", getenv("USER"));
     setProperty(properties, "user.home", getenv("HOME"));
+    setProperty(properties, "gnu.cpu.endian",
+                            IS_BIG_ENDIAN ? "big" : "little");
 
     setOSProperties(properties);
     setUserDirProperty(properties);
     setLocaleProperties(properties);
-
-    classlibAddDefaultProperties(properties);
 }
 

@@ -193,6 +193,9 @@ VOID HlpHandler(__CMD_PARA_OBJ* pCmdParaObj)           //Command 'help' 's handl
 	LPSTR strNetApp      = "    network      : Network diagnostic application.";
 	LPSTR strLoadappApp  = "    loadapp      : Load application module and execute it.";
 	LPSTR strGUIApp      = "    gui          : Load GUI module and enter GUI mode.";
+#ifdef __CFG_APP_JVM
+	LPSTR strJvmApp      = "    jvm          : Start Java VM to run Java Application.";
+#endif  //__CFG_APP_JVM
 	LPSTR strReboot      = "    reboot       : Reboot the system.";
 	LPSTR strCls         = "    cls          : Clear the whole screen.";
 
@@ -212,6 +215,9 @@ VOID HlpHandler(__CMD_PARA_OBJ* pCmdParaObj)           //Command 'help' 's handl
 	PrintLine(strFdiskApp);
 	PrintLine(strLoadappApp);
 	PrintLine(strGUIApp);
+#ifdef __CFG_APP_JVM
+	PrintLine(strJvmApp);
+#endif //__CFG_APP_JVM
 	PrintLine(strReboot);
 	PrintLine(strCls);
 }
@@ -388,7 +394,37 @@ __TERMINAL:
 //memory.
 VOID GUIHandler(__CMD_PARA_OBJ* pCmdParaObj)
 {
-	//LoadappHandler("hcngui.bin 160000");  //hcngui.bin is the GUI module's name,it's
-	                                      //start address after loaded into memory
-	                                      //is 0x160000.
+	HANDLE	hBinFile = NULL;
+	CHAR    FullPathName[64];  //Full name of binary file.
+	DWORD	dwStartAddr = 0x160000;
+
+	strcpy(FullPathName, "C:\\PTHOUSE\\hcngui.bin");
+	//Try to open the binary file.
+	hBinFile = CreateFile(
+		FullPathName,
+		FILE_ACCESS_READ,
+		0,
+		NULL);
+	if(NULL == hBinFile)
+	{
+		PrintLine("Can not open the specified file in OS root directory.");
+		goto __TERMINAL;
+	}
+	//Try to load and execute it.
+	if(!LoadBinModule(hBinFile,dwStartAddr))
+	{
+		PrintLine("Can not load the specified binary file.");
+		goto __TERMINAL;
+	}
+	if(!ExecuteBinModule(dwStartAddr,NULL))
+	{
+		PrintLine("Can not execute the binary module.");
+		goto __TERMINAL;
+	}
+
+__TERMINAL:
+	if(NULL != hBinFile)  //Destroy it.
+	{
+		CloseFile(hBinFile);
+	}
 }

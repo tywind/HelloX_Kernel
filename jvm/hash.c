@@ -18,14 +18,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
-#include <pthread.h>
+
+//HelloX Porting Code.
+#include <stdafx.h>
+#include <kapi.h>
+#include <io.h>
+
 #include <string.h>
 #include <stdlib.h>
-
 #include "jam.h"
 #include "hash.h"
-#include "class.h"
-#include "classlib.h"
 
 void lockHashTable0(HashTable *table, Thread *self) {
     if(!tryLockVMLock(table->lock, self)) {
@@ -42,7 +44,7 @@ void unlockHashTable0(HashTable *table, Thread *self) {
 }
 
 void resizeHash(HashTable *table, int new_size) {
-    HashEntry *new_table = gcMemMalloc(sizeof(HashEntry)*new_size);
+    HashEntry *new_table = (HashEntry*)gcMemMalloc(sizeof(HashEntry)*new_size);
     int i;
 
     memset(new_table, 0, sizeof(HashEntry)*new_size);

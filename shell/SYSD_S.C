@@ -16,7 +16,7 @@
 //***********************************************************************/
 
 #ifndef __STDAFX_H__
-#include "..\INCLUDE\StdAfx.h"
+#include "../INCLUDE/StdAfx.h"
 #endif
 
 #include "shell.h"
@@ -24,7 +24,7 @@
 #include "STAT_S.H"
 
 #ifndef __PCI_DRV_H__
-#include "..\INCLUDE\PCI_DRV.H"
+#include "../INCLUDE/PCI_DRV.H"
 #endif
 
 
@@ -157,10 +157,10 @@ DWORD SysDiagStart(LPVOID p)
 	Shell_Msg_Loop(SYSD_PROMPT_STR,CommandParser,QueryCmdName);	
 	return 0;
 }
+
 //
 //The exit command's handler.
 //
-
 static DWORD exit(__CMD_PARA_OBJ* lpCmdObj)
 {
 	return SHELL_CMD_PARSER_TERMINAL;

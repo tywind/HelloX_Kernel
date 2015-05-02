@@ -139,6 +139,7 @@ __INITOTHER:
 	pfse->dwFileSize       = dwInitSize;
 	pfse->wFirstClusHi     = (WORD)(dwFirstClus >> 16);
 	pfse->wFirstClusLow    = (WORD)dwFirstClus;
+	
 	bResult = TRUE;
 
 __TERMINAL:

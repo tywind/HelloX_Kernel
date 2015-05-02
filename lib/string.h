@@ -46,6 +46,7 @@ void* memset(void* dst,int val,size_t count);
 void* memzero(void* dst,size_t count); 
 int   memcmp(const void* p1,const void* p2,int count);
 void* memchr (const void * buf,int chr,size_t cnt);
+void *memmove(void *dst,const void *src,int n);
 
 //Standard C Lib string operations.
 char* strcat(char* dst,const char* src);
@@ -53,8 +54,12 @@ char* strcpy(char* dst,const char* src);
 char* strchr(const char* string,int ch);
 int strcmp(const char* src,const char* dst);
 int strlen(const char* s);
+char * strrchr(const char * str,int ch);
+char * strstr(const char *s1,const char *s2);
 
+//Array bound guaranteed string operations.
 char* strncpy(char *dest,char *src,unsigned int n);
+int strncmp ( char * s1, char * s2, size_t n);
 
 //Flags to control the trimming.
 #define TRIM_LEFT    0x1
@@ -65,7 +70,11 @@ void strtrim(char * dst,int flag);
 
 long atol(const char* nptr);
 int atoi(const char* nptr);
+int strtol(const char *nptr, char **endptr, int base);
 
 void ToCapital(LPSTR lpszString);
+
+//Find the first bit in a given integer.
+int ffs(int x);
 
 #endif //string.h

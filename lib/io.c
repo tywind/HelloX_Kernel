@@ -1,42 +1,39 @@
-
-
 /*
   2015.2.12：底层fat差一个文件清空的操作
-			
-  
 */
+
 #include <StdAfx.h>
 #include "stdio.h"
 #include "io.h"
 
+#define  JVM_ROOT_PATH  "C:\\JVM\\"
 
-int  	 remove (const char* name)
+int remove (const char* name)
 {
+	IOManager.DeleteFile((__COMMON_OBJECT*)&IOManager,name);
 	return S_OK;
 }
 
-int  	 rename (const char* sn, const char*  dn)
+int rename (const char* sn, const char*  dn)
 {
+	
 	return S_OK;
 }
 
-int     access (const char* name, int m)
+int access (const char* name, int m)
 {
 	switch(m)
 	{
 		case F_OK:
 			{
-
 			}
 			break;
 		case R_OK:
 			{
-
 			}
 			break;
 		case W_OK:
 			{
-
 			}
 			break;
 	}
@@ -46,6 +43,54 @@ int     access (const char* name, int m)
 
 int     chsize (int fd, long size)
 {
+	DWORD  dwFileSize = 0;
+
+	if(fd <= 0)
+	{
+		return -1;
+	}
+
+	dwFileSize = filelength(fd);
+	if(size == dwFileSize)
+	{
+		return size;
+	}
+	else if(size < dwFileSize)
+	{
+		long  dwOffset   = size;
+		
+		lseek(fd,dwOffset,SEEK_SET);
+		IOManager.SetEndOfFile((__COMMON_OBJECT*)&IOManager,(__COMMON_OBJECT*)fd);
+	}
+	else 
+	{
+		long   dwOffset    = dwFileSize;
+		char   temp[128]   = {0};
+		int    nLeftData   = size-dwFileSize;
+		int    nWriteCount = nLeftData/sizeof(temp);
+		int    i;
+
+		lseek(fd,dwOffset,SEEK_SET);
+
+		
+		//安装步长填充文件空白区间
+		for(i = 0; i<nWriteCount;i++)
+		{
+			write(fd,temp,sizeof(temp));
+		}
+
+		//填充文件空白剩余区间
+		if(nWriteCount&sizeof(temp))
+		{
+			nWriteCount = nWriteCount&sizeof(temp);
+
+			for(i = 0; i<nWriteCount;i++)
+			{
+				write(fd,temp,1);
+			}
+		}
+	}
+
 	return S_OK;
 }
 
@@ -61,7 +106,19 @@ int     dup2 (int fd, int d)
 }
 int    eof (int fd)
 {
-	return S_OK;
+	DWORD  dwOffset   = 0;
+	DWORD  dwCurPos   = 0;
+	DWORD  dwFileSize = 0;
+
+	if(fd <= 0)
+	{
+		return -1;
+	}
+
+	dwCurPos   = lseek(fd,dwOffset,SEEK_CUR);	
+	dwFileSize = filelength(fd);
+	
+	return (dwCurPos == dwFileSize-1)?TRUE:FALSE;
 }
 
 long    filelength (int fd)
@@ -91,16 +148,36 @@ int     open (const char* name , int oflag, ...)
 {
 	va_list  ap;
 	int      mode; 
+	char     filename[FILENAME_MAX];
+	char*    p;
 
 	__COMMON_OBJECT*   pFileHandle = NULL;
 	DWORD              dwFlage     = FILE_ACCESS_READ;
 	DWORD              dwMode      = FILE_OPEN_EXISTING;
 
-	if(name == NULL)
+	if(name == NULL || strlen(name) >= FILENAME_MAX)
 	{
 		return -1;
 	}
 	
+	p = filename;	
+	if(!strstr(name,":")) 
+	{
+		strcpy(filename,JVM_ROOT_PATH);	
+		p += strlen(JVM_ROOT_PATH);
+	}
+	strcpy(p,name);
+	
+	while(*p)	
+	{
+		if(*p == '/')
+		{
+			*p  = '\\';
+		}
+		p ++;
+	}
+
+
 	va_start(ap, oflag);
 	mode = va_arg(ap, int);
 	va_end(ap);
@@ -140,7 +217,7 @@ int     open (const char* name , int oflag, ...)
 	}
 
 	//打开文件
-	pFileHandle = IOManager.CreateFile((__COMMON_OBJECT*)&IOManager,(LPSTR)name,dwFlage,dwMode,NULL);
+	pFileHandle = IOManager.CreateFile((__COMMON_OBJECT*)&IOManager,(LPSTR)filename,dwFlage,dwMode,NULL);
 	if(NULL == pFileHandle)
 	{
 		return -1;
@@ -149,7 +226,7 @@ int     open (const char* name , int oflag, ...)
 	//清空文件，从头开始写
 	if((oflag&O_TRUNC) && ((oflag&O_WRONLY) || (oflag&O_RDWR)))
 	{
-		IOManager.SetEndOfFile((__COMMON_OBJECT*)&IOManager,pFileHandle/*,0,0,FILE_FROM_BEGIN*/);
+		IOManager.SetEndOfFile((__COMMON_OBJECT*)&IOManager,pFileHandle);
 	}
 
 	return (pFileHandle)?-1:(int)pFileHandle;
@@ -164,9 +241,8 @@ long  lseek (int fd, long p , int w)
 		return -1;
 	}
 		
-	IOManager.SetFilePointer((__COMMON_OBJECT*)&IOManager,(__COMMON_OBJECT*)fd,(DWORD*)&p,0,dwWhere);
-
-	return S_OK;
+	return IOManager.SetFilePointer((__COMMON_OBJECT*)&IOManager,(__COMMON_OBJECT*)fd,(DWORD*)&p,0,dwWhere);
+	
 }
 
 

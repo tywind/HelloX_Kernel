@@ -758,7 +758,7 @@ static DWORD _GetFileSize(__COMMON_OBJECT* lpThis,
 }
 
 //Implementation of SetFilePointer.
-static BOOL _SetFilePointer(__COMMON_OBJECT* lpThis,
+static DWORD _SetFilePointer(__COMMON_OBJECT* lpThis,
 							__COMMON_OBJECT* lpFileObject,
 							DWORD* pdwDistLow,
 							DWORD* pdwDistHigh,
@@ -771,16 +771,17 @@ static BOOL _SetFilePointer(__COMMON_OBJECT* lpThis,
 
 	if((NULL == pFileObject) || (NULL == pdwDistLow))  //Low part of offset must be not null.
 	{
-		return FALSE;
+		return -1;
 	}
-	if((FILE_FROM_BEGIN != dwWhereBegin) && (FILE_FROM_CURRENT != dwWhereBegin))
+		
+	if((FILE_FROM_BEGIN != dwWhereBegin) && (FILE_FROM_CURRENT != dwWhereBegin) && (FILE_FROM_END != dwWhereBegin))
 	{
-		return FALSE;
+		return -1;
 	}
 	//Check if file object's validity.
 	if(DEVICE_OBJECT_SIGNATURE != pFileObject->dwSignature)
 	{
-		return FALSE;
+		return -1;
 	}
 	pDrvObject = pFileObject->lpDriverObject;
 	//Create DRCB object and issue DeviceSeek command to file system driver.
@@ -789,14 +790,15 @@ static BOOL _SetFilePointer(__COMMON_OBJECT* lpThis,
 		OBJECT_TYPE_DRCB);
 	if(NULL == pDrcb)        //Failed to create DRCB object.
 	{
-		return FALSE;
+		return -1;
 	}
 
 	if(!pDrcb->Initialize((__COMMON_OBJECT*)pDrcb))  //Failed to initialize.
 	{
 		ObjectManager.DestroyObject(&ObjectManager,
 			(__COMMON_OBJECT*)pDrcb);
-		return FALSE;
+
+		return -1;
 	}
 
 	pDrcb->dwRequestMode   = DRCB_REQUEST_MODE_SEEK;
@@ -811,7 +813,8 @@ static BOOL _SetFilePointer(__COMMON_OBJECT* lpThis,
 		pDrcb);
 	ObjectManager.DestroyObject(&ObjectManager,
 		(__COMMON_OBJECT*)pDrcb);
-	return dwResult ? TRUE : FALSE;
+
+	return dwResult;
 }
 
 //Implementation of FlushFileBuffers.

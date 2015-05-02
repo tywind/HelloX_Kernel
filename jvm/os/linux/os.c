@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2014
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009
  * Robert Lougher <rob@jamvm.org.uk>.
  *
  * This file is part of JamVM.
@@ -22,24 +22,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <unistd.h>
+#include <dlfcn.h>
 #include <sys/sysinfo.h>
 
 #define __USE_GNU
-#include <dlfcn.h>
 #include <pthread.h>
 
 #include "../../jam.h"
-
-long long nativePhysicalMemory() {
-    /* Long longs are used here because with PAE, a 32-bit
-       machine can have more than 4GB of physical memory */
-
-    long long num_pages = sysconf(_SC_PHYS_PAGES);
-    long long page_size = sysconf(_SC_PAGESIZE);
-
-    return num_pages * page_size;
-}
 
 void *nativeStackBase() {
 #ifdef __UCLIBC__
@@ -90,19 +79,3 @@ char *nativeLibMapName(char *name) {
    sprintf(buff, "lib%s.so", name);
    return buff;
 }
-
-char *nativeJVMPath() {
-    Dl_info info;
-    char *path;
-
-    if(dladdr(nativeJVMPath, &info) == 0) {
-        printf("Error: dladdr failed.  Aborting VM\n");
-        exitVM(1);
-    }
-
-    path = sysMalloc(strlen(info.dli_fname) + 1);
-    strcpy(path, info.dli_fname);
-
-    return path;
-}
-

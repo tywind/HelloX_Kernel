@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2011
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009
  * Robert Lougher <rob@jamvm.org.uk>.
  *
  * This file is part of JamVM.
@@ -27,10 +27,6 @@
    is unnecessary on most architectures */
 #define FFI_RET_EXTEND
 
-/* The idivl instruction generates an exception on integer divide
-   overflow (INT_MIN/-1 can't be represented as a positive number) */
-#define CHECK_INTDIV_OVERFLOW
-
 #define HANDLER_TABLE_T static const void
 #define DOUBLE_1_BITS 0x3ff0000000000000LL
 
@@ -41,6 +37,7 @@
 extern void setDoublePrecision();
 #define FPU_HACK setDoublePrecision()
 
+/*
 #define COMPARE_AND_SWAP_32(addr, old_val, new_val) \
 ({                                                  \
     char result;                                    \
@@ -52,7 +49,10 @@ extern void setDoublePrecision();
     : "m" (*addr), "a" (old_val), "r" (new_val)     \
     : "memory");                                    \
     result;                                         \
-})
+})*/
+
+//For debugging.
+#define COMPARE_AND_SWAP_32(addr,old_val,new_val) (new_val)
 
 #ifdef USE_CMPXCHG8B
 #define COMPARE_AND_SWAP_64(addr, old_val, new_val) \
@@ -108,13 +108,28 @@ extern void setDoublePrecision();
                   signed int, patch_size);               \
 })
 
+#ifndef FLUSH_CACHE
 #define FLUSH_CACHE(addr, length)
+#endif
 
 #define LOCKWORD_READ(addr) *addr
 #define LOCKWORD_WRITE(addr, value) *addr = value
 #define LOCKWORD_COMPARE_AND_SWAP(addr, old_val, new_val) \
         COMPARE_AND_SWAP(addr, old_val, new_val)
 
-#define JMM_LOCK_MBARRIER() __asm__ __volatile__ ("" ::: "memory")
-#define JMM_UNLOCK_MBARRIER() __asm__ __volatile__ ("" ::: "memory")
-#define MBARRIER() __asm__ __volatile__ ("lock; addl $0,0(%%esp)" ::: "memory")
+//#define JMM_LOCK_MBARRIER() __asm__ __volatile__ ("" ::: "memory")
+//#define JMM_UNLOCK_MBARRIER() __asm__ __volatile__ ("" ::: "memory")
+
+//#define MBARRIER() __asm__ __volatile__ ("lock; addl $0,0(%%esp)" ::: "memory")
+
+//For debugging.
+#define MBARRIER() \
+	__asm{ \
+	lock add esp,0x00 \
+}
+
+#define JMM_LOCK_MBARRIER() MBARRIER()
+#define JMM_UNLOCK_MBARRIER() MBARRIER()
+
+//Return the default page size of CPU.
+#define getpagesize() 4096

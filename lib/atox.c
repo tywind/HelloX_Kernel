@@ -32,7 +32,8 @@
 #ifndef __STDAFX_H__
 #include "StdAfx.h"
 #endif
-  
+
+#include "stddef.h"
 #include "stdlib.h"
   
 /*** 

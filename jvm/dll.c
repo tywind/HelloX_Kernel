@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,
- * 2012, 2013 Robert Lougher <rob@jamvm.org.uk>.
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009
+ * Robert Lougher <rob@jamvm.org.uk>.
  *
  * This file is part of JamVM.
  *
@@ -19,6 +19,11 @@
  * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+//HelloX Porting code.
+#include <stdafx.h>
+#include <kapi.h>
+#include <io.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -28,33 +33,25 @@
 
 #ifndef NO_JNI
 #include "hash.h"
+#include "jni.h"
 #include "natives.h"
 #include "symbol.h"
 #include "excep.h"
-#include "jni.h"
-#include "stubs.h"
-#include "class.h"
-#include "thread.h"
-#include "classlib.h"
-#include "jni-internal.h"
 
 /* Set by call to initialise -- if true, prints out
     results of dynamic method resolution */
 static int verbose;
 
-static FILE *sig_trace_fd;
-static char *boot_dll_path;
-
 extern int nativeExtraArg(MethodBlock *mb);
 extern uintptr_t *callJNIMethod(void *env, Class *class, char *sig, int extra,
                                 uintptr_t *ostack, unsigned char *native_func,
                                 int args);
-extern void *jni_env;
-extern JavaVM jni_invoke_intf; 
+extern struct _JNINativeInterface Jam_JNINativeInterface;
+extern JavaVM invokeIntf; 
 
 #define HASHTABSZE 1<<4
 static HashTable hash_table;
-NativeMethod lookupLoadedDlls(MethodBlock *mb);
+void *lookupLoadedDlls(MethodBlock *mb);
 #endif
 
 /* Trace library loading and method lookup */
@@ -62,10 +59,6 @@ NativeMethod lookupLoadedDlls(MethodBlock *mb);
 #define TRACE(fmt, ...) jam_printf(fmt, ## __VA_ARGS__)
 #else
 #define TRACE(fmt, ...)
-#endif
-
-#ifdef HAVE_PROFILE_STUBS
-static int dump_stubs_profiles;
 #endif
 
 char *mangleString(char *utf8) {
@@ -163,7 +156,7 @@ char *mangleSignature(MethodBlock *mb) {
     return mangled;
 }
 
-NativeMethod lookupInternal(MethodBlock *mb) {
+void *lookupInternal(MethodBlock *mb) {
     ClassBlock *cb = CLASS_CB(mb->class);
     int i;
 
@@ -178,9 +171,7 @@ NativeMethod lookupInternal(MethodBlock *mb) {
 
         /* Found the class -- now try to locate the method */
         for(i = 0; methods[i].methodname &&
-            ((strcmp(mb->name, methods[i].methodname) != 0) ||
-               (methods[i].methodtype &&
-               (strcmp(mb->type, methods[i].methodtype) != 0))); i++);
+            (strcmp(mb->name, methods[i].methodname) != 0); i++);
 
         if(methods[i].methodname) {
             if(verbose)
@@ -194,101 +185,50 @@ NativeMethod lookupInternal(MethodBlock *mb) {
     return NULL;
 }
 
-NativeMethod resolveNativeMethod(MethodBlock *mb) {
-    NativeMethod method;
+void *resolveNativeMethod(MethodBlock *mb) {
+    void *func;
 
     if(verbose) {
-        char *classname = slash2DotsDup(CLASS_CB(mb->class)->name);
+        char *classname = slash2dots(CLASS_CB(mb->class)->name);
         jam_printf("[Dynamic-linking native method %s.%s ... ",
                    classname, mb->name);
         sysFree(classname);
     }
 
     /* First see if it's an internal native method */
-    method = lookupInternal(mb);
+    func = lookupInternal(mb);
 
 #ifndef NO_JNI
-    if(method == NULL)
-        method = lookupLoadedDlls(mb);
+    if(func == NULL)
+        func = lookupLoadedDlls(mb);
 #endif
 
     if(verbose)
         jam_printf("]\n");
 
-    return method;
+    return func;
 }
 
 uintptr_t *resolveNativeWrapper(Class *class, MethodBlock *mb,
                                 uintptr_t *ostack) {
 
-    NativeMethod method = resolveNativeMethod(mb);
+    void *func = resolveNativeMethod(mb);
 
-    if(method == NULL) {
+    if(func == NULL) {
         signalException(java_lang_UnsatisfiedLinkError, mb->name);
         return ostack;
     }
 
-    return (*method)(class, mb, ostack);
+    return (*(uintptr_t *(*)(Class*, MethodBlock*, uintptr_t*))func)
+           (class, mb, ostack);
 }
 
-int initialiseDll(InitArgs *args) {
+void initialiseDll(InitArgs *args) {
 #ifndef NO_JNI
     /* Init hash table, and create lock */
     initHashTable(hash_table, HASHTABSZE, TRUE);
-
-    if(args->trace_jni_sigs) {
-        sig_trace_fd = fopen("jni-signatures", "w");
-        if(sig_trace_fd == NULL) {
-            perror("Couldn't open signatures file for writing");
-            return FALSE;
-        }
-    }
 #endif
-
-    /* Set the boot path */
-
-    boot_dll_path = getCommandLineProperty("gnu.classpath.boot.library.path");
-
-    if(boot_dll_path == NULL)
-        boot_dll_path = getCommandLineProperty("sun.boot.library.path");
-
-    if(boot_dll_path == NULL)
-        boot_dll_path = classlibDefaultBootDllPath();
-
-    /* classlib specific initialisation */
-    if(!classlibInitialiseDll()) {
-        jam_fprintf(stderr, "Error initialising VM (initialiseDll)\n");
-        return FALSE;
-    }
-
     verbose = args->verbosedll;
-#ifdef HAVE_PROFILE_STUBS
-    dump_stubs_profiles = args->dump_stubs_profiles;
-#endif
-    return TRUE;
-}
-
-#ifdef HAVE_PROFILE_STUBS
-NativeMethod dumpJNIStubProfiles(JNIStub *stubs) {
-    char *static_str = stubs == jni_static_stubs ? "static " : "";
-    int i;
-
-    for(i = 0; stubs[i].signature != NULL ; i++)
-        printf("%7d %s%s\n", stubs[i].profile_count, static_str,
-                             stubs[i].signature);
-}
-#endif
-
-void shutdownDll() {
-    if(sig_trace_fd != NULL)
-        fclose(sig_trace_fd);
-
-#ifdef HAVE_PROFILE_STUBS
-    if(dump_stubs_profiles) {
-        dumpJNIStubProfiles(jni_stubs);
-        dumpJNIStubProfiles(jni_static_stubs);
-    }
-#endif
 }
 
 #ifndef NO_JNI
@@ -309,7 +249,6 @@ int dllNameHash(char *name) {
 
 int resolveDll(char *name, Object *loader) {
     DllEntry *dll;
-    Thread *self = threadSelf();
 
     TRACE("<DLL: Attempting to resolve library %s>\n", name);
 
@@ -325,21 +264,7 @@ int resolveDll(char *name, Object *loader) {
 
     if(dll == NULL) {
         DllEntry *dll2;
-        void *onload, *handle;
-
-        /* lookupLoadedDlls0 calls nativeLibSym with the hashtable
-           locked (which fast-disables suspension).  Internally, the
-           nativeLibXXX calls (may) acquire locks.  As the thread in
-           lookupLoadedDlls0 has suspension fast-disabled, the
-           suspension code will wait for it to self-suspend.  However,
-           if we are suspended holding the internal lock, the thread
-           in lookupLoadedDlls0 will block on the lock, and the
-           suspension code will wait forever.  We therefore must
-           disable suspension here to prevent us from being suspended
-           holding the lock */
-        fastDisableSuspend(self);
-        handle = nativeLibOpen(name);
-        fastEnableSuspend(self);
+        void *onload, *handle = nativeLibOpen(name);
 
         if(handle == NULL) {
             if(verbose) {
@@ -351,21 +276,17 @@ int resolveDll(char *name, Object *loader) {
             return FALSE;
         }
 
-        /* See comment above on nativeLibOpen */
-        fastDisableSuspend(self);
-        onload = nativeLibSym(handle, "JNI_OnLoad");
-        fastEnableSuspend(self);
-
-        if(onload != NULL) {
+        if((onload = nativeLibSym(handle, "JNI_OnLoad")) != NULL) {
             int ver;
 
             initJNILrefs();
-            ver = (*(jint (*)(JavaVM*, void*))onload)(&jni_invoke_intf, NULL);
+            ver = (*(jint (*)(JavaVM*, void*))onload)(&invokeIntf, NULL);
 
-            if(!isSupportedJNIVersion(ver)) {
+            if(ver != JNI_VERSION_1_2 && ver != JNI_VERSION_1_4) {
                 if(verbose)
                     jam_printf("[%s: JNI_OnLoad returned unsupported version"
-                               " number %d.\n]", name, ver);
+                               " number %d.\n>", name, ver);
+
                 return FALSE;
             }
         }
@@ -395,17 +316,8 @@ int resolveDll(char *name, Object *loader) {
            the bootstrap classloader will never be collected,
            therefore libraries loaded by it will never be
            unloaded */
-        if(loader != NULL) {
-            void *on_unload;
-
-            /* See comment above on nativeLibOpen */
-            fastDisableSuspend(self);
-            on_unload = nativeLibSym(dll->handle, "JNI_OnUnload");
-            fastEnableSuspend(self);
-
-            if(on_unload != NULL)
-                classlibNewLibraryUnloader(loader, dll);
-        }
+        if(loader != NULL && nativeLibSym(dll->handle, "JNI_OnUnload") != NULL)
+            newLibraryUnloader(loader, dll);
 
     } else
         if(dll->loader != loader) {
@@ -423,7 +335,7 @@ char *getDllPath() {
 }
 
 char *getBootDllPath() {
-    return boot_dll_path;
+    return CLASSPATH_INSTALL_DIR"/lib/classpath";
 }
 
 char *getDllName(char *name) {
@@ -431,73 +343,41 @@ char *getDllName(char *name) {
 }
 
 void *lookupLoadedDlls0(char *name, Object *loader) {
-    void *sym = NULL;
-
     TRACE("<DLL: Looking up %s loader %p in loaded DLL's>\n", name, loader);
 
 #define ITERATE(ptr)                                          \
 {                                                             \
     DllEntry *dll = (DllEntry*)ptr;                           \
     if(dll->loader == loader) {                               \
-        sym = nativeLibSym(dll->handle, name);                \
+        void *sym = nativeLibSym(dll->handle, name);          \
         if(sym != NULL)                                       \
-            goto out;                                         \
+            return sym;                                       \
     }                                                         \
 }
 
-    /* We need to explicitly lock the hashtable as hashIterate
-       doesn't grab the hashtable lock (hashIterate is normally
-       used during GC and as hashtables are accessed with
-       suspension fast-disabled, they can't be being accessed
-       during GC). */
-    lockHashTable(hash_table);
     hashIterate(hash_table);
-
-out:
-    unlockHashTable(hash_table);
-    return sym;
+    return NULL;
 }
 
-/* Called from an unloader object finalize method.  As this is
-   running on the finalizer thread we must be careful not to block
-   a thread within lookupLoadedDlls0 (see comment in resolveDll) */
-void unloaderUnloadDll(uintptr_t entry) {
-    DllEntry *dll = (DllEntry*)entry;
-    Thread *self = threadSelf();
-    void *on_unload;
-
-    fastDisableSuspend(self);
-    on_unload = nativeLibSym(dll->handle, "JNI_OnUnload");
-    fastEnableSuspend(self);
-
-    TRACE("<DLL: Unloading loader %p DLL %s\n", dll->loader, dll->name);
-
-    if(on_unload != NULL) {
-        initJNILrefs();
-        (*(void (*)(JavaVM*, void*))on_unload)(&jni_invoke_intf, NULL);
-    }
-
-    fastDisableSuspend(self);
-    nativeLibClose(dll->handle);
-    fastEnableSuspend(self);
-
-    sysFree(dll->name);
-    sysFree(dll);
-}
-
-/* Called from GC when unloading Dlls for an unreachable classloader.
-   This only handles Dlls without a JNI_OnUnload function as these
-   will be handled by an unloader object */
-void unloadDll(DllEntry *dll) {
+void unloadDll(DllEntry *dll, int unloader) {
     void *on_unload = nativeLibSym(dll->handle, "JNI_OnUnload");
 
-    if(on_unload == NULL) {
-        TRACE("<DLL: Unloading loader %p DLL %s\n", dll->loader, dll->name);
+    if(unloader || on_unload == NULL) {
+        TRACE("<DLL: Unloading DLL %s\n", dll->name);
+
+        if(on_unload != NULL) {
+            initJNILrefs();
+            (*(void (*)(JavaVM*, void*))on_unload)(&invokeIntf, NULL);
+        }
 
         nativeLibClose(dll->handle);
         sysFree(dll->name);
         sysFree(dll);
     }
+}
+
+void unloaderUnloadDll(uintptr_t entry) {
+    unloadDll((DllEntry*)entry, TRUE);
 }
 
 #undef ITERATE
@@ -522,7 +402,7 @@ void unloadClassLoaderDlls(Object *loader) {
 {                                                             \
     DllEntry *dll = (DllEntry*)*ptr;                          \
     if(dll->loader == loader) {                               \
-        unloadDll(dll);                                       \
+        unloadDll(dll, FALSE);                                \
         *ptr = NULL;                                          \
         unloaded++;                                           \
     }                                                         \
@@ -546,6 +426,8 @@ void unloadClassLoaderDlls(Object *loader) {
     }
 }
 
+static void *env = &Jam_JNINativeInterface;
+
 uintptr_t *callJNIWrapper(Class *class, MethodBlock *mb, uintptr_t *ostack) {
     TRACE("<DLL: Calling JNI method %s.%s%s>\n", CLASS_CB(class)->name,
           mb->name, mb->type);
@@ -553,84 +435,24 @@ uintptr_t *callJNIWrapper(Class *class, MethodBlock *mb, uintptr_t *ostack) {
     if(!initJNILrefs())
         return NULL;
 
-    return callJNIMethod(&jni_env,
-                         (mb->access_flags & ACC_STATIC) ? class : NULL,
-                         mb->simple_sig, mb->native_extra_arg, ostack,
-                         mb->code, mb->args_count);
+    return callJNIMethod(&env, (mb->access_flags & ACC_STATIC) ? class : NULL,
+                         mb->type, mb->native_extra_arg, ostack, mb->code,
+                         mb->args_count);
 }
 
-uintptr_t *callJNIWrapperRefReturn(Class *class, MethodBlock *mb,
-                                uintptr_t *ostack) {
-    uintptr_t *ret;
-
-    TRACE("<DLL: Calling JNI method %s.%s%s>\n", CLASS_CB(class)->name,
-          mb->name, mb->type);
-
-    if(!initJNILrefs())
-        return NULL;
-
-    ret = callJNIMethod(&jni_env,
-                        (mb->access_flags & ACC_STATIC) ? class : NULL,
-                        mb->simple_sig, mb->native_extra_arg, ostack,
-                        mb->code, mb->args_count);
-
-    *ostack = (uintptr_t)REF_TO_OBJ(*ostack);
-    return ret;
-}
-
-NativeMethod findJNIStub(char *sig, JNIStub *stubs) {
-    int i;
-
-    for(i = 0; stubs[i].signature != NULL &&
-               strcmp(sig, stubs[i].signature) != 0; i++);
-
-    if(stubs[i].signature == NULL)
-        return NULL;
-
-    return stubs[i].func;
-}
-
-NativeMethod setJNIMethod(MethodBlock *mb, void *func) {
-    char *simple = convertSig2Simple(mb->type);
-    NativeMethod invoker;
-
-    if(mb->access_flags & ACC_STATIC)
-        invoker = findJNIStub(simple, jni_static_stubs);
-    else
-        invoker = findJNIStub(simple, jni_stubs);
-
-    if(invoker == NULL) {
-        if(sig_trace_fd != NULL)
-            fprintf(sig_trace_fd, "%s%s\n", mb->access_flags & ACC_STATIC ?
-                                            "static " : "", mb->type);
-
-        if((mb->simple_sig = newUtf8(simple)) != simple)
-            sysFree(simple);
-
-        mb->native_extra_arg = nativeExtraArg(mb);
-
-        if(mb->simple_sig[strlen(mb->simple_sig)-1] == 'L')
-            invoker = &callJNIWrapperRefReturn;
-        else
-            invoker = &callJNIWrapper;
-    } else
-        sysFree(simple);
-
-    mb->code = func;
-    return mb->native_invoker = invoker;
-}
-
-NativeMethod lookupLoadedDlls(MethodBlock *mb) {
-    char *mangled = mangleClassAndMethodName(mb);
+void *lookupLoadedDlls(MethodBlock *mb) {
     Object *loader = (CLASS_CB(mb->class))->class_loader;
-    void *func = classlibLookupLoadedDlls(mangled, loader);
+    char *mangled = mangleClassAndMethodName(mb);
+    void *func;
+
+    func = lookupLoadedDlls0(mangled, loader);
 
     if(func == NULL) {
         char *mangledSig = mangleSignature(mb);
         char *fullyMangled = sysMalloc(strlen(mangled)+strlen(mangledSig)+3);
 
         sprintf(fullyMangled, "%s__%s", mangled, mangledSig);
-        func = classlibLookupLoadedDlls(fullyMangled, loader);
+        func = lookupLoadedDlls0(fullyMangled, loader);
 
         sysFree(fullyMangled);
         sysFree(mangledSig);
@@ -642,7 +464,9 @@ NativeMethod lookupLoadedDlls(MethodBlock *mb) {
         if(verbose)
             jam_printf("JNI");
 
-        return setJNIMethod(mb, func);
+        mb->code = (unsigned char *) func;
+        mb->native_extra_arg = nativeExtraArg(mb);
+        return mb->native_invoker = &callJNIWrapper;
     }
 
     return NULL;

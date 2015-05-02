@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2012
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2009
  * Robert Lougher <rob@jamvm.org.uk>.
  *
  * This file is part of JamVM.
@@ -19,20 +19,12 @@
  * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+//HelloX Porting code.
+#include <stdafx.h>
+#include <kapi.h>
+#include <io.h>
+
 #include "jam.h"
-#include "hash.h"
-#include "class.h"
-#include "thread.h"
-#include "classlib.h"
-
-int initialiseAccess() {
-    if(!classlibInitialiseAccess()) {
-        jam_fprintf(stderr, "Error initialising VM (initialiseAccess)\n");
-        return FALSE;
-    }
-
-    return TRUE;
-}
 
 static int isSameRuntimePackage(Class *class1, Class *class2) {
     if(class1 != class2) {
@@ -90,9 +82,6 @@ int checkClassAccess(Class *class1, Class *class2) {
     if(cb1->access_flags & ACC_PUBLIC)
         return TRUE;
 
-    if(classlibAccessCheck(class1, class2))
-        return TRUE;
-
     /* Or if they're members of the same runtime package */
     return isSameRuntimePackage(class1, class2);
 }
@@ -102,9 +91,6 @@ static int checkMethodOrFieldAccess(int access_flags, Class *decl_class,
 
     /* Public methods and fields are always accessible */
     if(access_flags & ACC_PUBLIC)
-        return TRUE;
-
-    if(classlibAccessCheck(decl_class, class))
         return TRUE;
 
     /* If the method or field is private, it must be declared in

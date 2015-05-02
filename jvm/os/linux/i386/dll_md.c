@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2009
  * Robert Lougher <rob@jamvm.org.uk>.
  *
  * This file is part of JamVM.
@@ -19,11 +19,11 @@
  * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include "jam.h"
+#include "../../../jam.h"
 
 #ifndef USE_FFI
 #include <string.h>
-#include "sig.h"
+#include "../../../sig.h"
 
 #define RET_VOID    0
 #define RET_DOUBLE  1
@@ -61,19 +61,18 @@ int nativeExtraArg(MethodBlock *mb) {
 u4 *callJNIMethod(void *env, Class *class, char *sig, int ret_type,
                   u4 *ostack, unsigned char *f, int args) {
 
+    u4 *opntr = ostack + args;
     int i;
-    u4 *sp;
-    u4 method_args[args + (class ? 2 : 1)];
-
-    asm volatile ("movl %%esp,%0" : "=m" (sp) :);
-
-    *sp++ = (u4)env;
-
-    if(class)
-        *sp++ = (u4)class;
 
     for(i = 0; i < args; i++)
-        sp[i] = ostack[i];
+        asm volatile ("pushl %0" :: "m" (*--opntr) : "sp");
+
+    if(class) {
+        asm volatile ("pushl %0" :: "m" (class) : "sp");
+	args++;
+    }
+
+    asm volatile ("pushl %0" :: "m" (env) : "sp");
 
     switch(ret_type) {
         case RET_VOID:
@@ -112,6 +111,8 @@ u4 *callJNIMethod(void *env, Class *class, char *sig, int ret_type,
             break;
     }
 
+    asm volatile ("addl %0,%%esp" :: "r" ((args + 1) * sizeof(u4)) 
+                  : "cc", "sp");
     return ostack;
 }
 #endif

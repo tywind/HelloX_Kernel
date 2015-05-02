@@ -12,12 +12,10 @@
 //    Lines number              :
 //***********************************************************************/
 
-#ifndef __STDAFX_H__
-#include "StdAfx.h"
-#endif
-
-#include "arch.h"
-#include "console.h"
+#include <stdafx.h>
+#include <arch.h>
+#include <console.h>
+#include <stdio.h>
 
 #ifdef __I386__  //Only available in x86 based PC platform.
 
@@ -244,15 +242,10 @@ VOID ErrorHandler(DWORD dwLevel,DWORD dwReason,LPSTR lpszMsg)
 //
 VOID __BUG(LPSTR lpszFileName,DWORD dwLineNum)
 {
-	CHAR    strBuff[12];
 	DWORD   dwFlags;
-
-	PrintLine("BUG oencountered.");
-	PrintStr("File name: ");
-	PrintStr(lpszFileName);
-	Hex2Str(dwLineNum,strBuff);
-	PrintLine("Lines: ");
-	PrintStr(strBuff);
+	
+	//Print out fatal error information.
+	_hx_printf("\r\nBUG oencountered.\r\nFile name: %s\r\nCode Lines:%d",lpszFileName,dwLineNum);
 
 	//Enter infinite loop.
 	__ENTER_CRITICAL_SECTION(NULL,dwFlags);

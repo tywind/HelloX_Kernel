@@ -29,12 +29,18 @@
    even though no object is ever tagged as such */
 #define CLEARED_WEAK_REF 0x0
 
+/*
 #define REF_TO_OBJ_WEAK_NULL_CHECK(ref) ({           \
     Object *_obj = REF_TO_OBJ(ref);                  \
     if(REF_TYPE(ref) == WEAK_GLOBAL_REF)             \
         _obj = isPlaceholderObj(_obj) ? NULL : _obj; \
     _obj;                                            \
 })
+*/
+
+//For debugging,change the macro to functions,since it applies GCC extension style code.
+//The implementation code of this routine is reside in jni.c file.
+Object* REF_TO_OBJ_WEAK_NULL_CHECK(jobject ref);
 
 #define REF_TYPE(ref)   (((uintptr_t)(ref))&REF_MASK)
 #define REF_TO_OBJ(ref) ((Object*)(((uintptr_t)(ref))&~REF_MASK))

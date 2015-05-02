@@ -38,7 +38,7 @@
 //
 static DWORD CommandParser(LPCSTR);
 static DWORD help(__CMD_PARA_OBJ*);        //help sub-command's handler.
-static DWORD exit(__CMD_PARA_OBJ*);        //exit sub-command's handler.
+static DWORD _exit(__CMD_PARA_OBJ*);        //exit sub-command's handler.
 static DWORD iflist(__CMD_PARA_OBJ*);
 static DWORD ping(__CMD_PARA_OBJ*);
 static DWORD route(__CMD_PARA_OBJ*);
@@ -58,7 +58,7 @@ static struct __FDISK_CMD_MAP{
 	{"iflist",     iflist,    "  iflist   : Show all network interface(s) in system."},
 	{"ping",       ping,      "  ping     : Check a specified host's reachbility."},
 	{"route",      route,     "  route    : List all route entry(ies) in system."},
-	{"exit",       exit,      "  exit     : Exit the application."},
+	{"exit",       _exit,      "  exit     : Exit the application."},
 	{"help",       help,      "  help     : Print out this screen."},
   {"showint",    showint,   "  showint  : Display ethernet interface's statistics information."},
   {"assoc",      assoc,     "  assoc    : Associate to a specified WiFi SSID."},
@@ -161,7 +161,7 @@ DWORD networkEntry(LPVOID p)
 //
 //The exit command's handler.
 //
-static DWORD exit(__CMD_PARA_OBJ* lpCmdObj)
+static DWORD _exit(__CMD_PARA_OBJ* lpCmdObj)
 {
 	return SHELL_CMD_PARSER_TERMINAL;
 }

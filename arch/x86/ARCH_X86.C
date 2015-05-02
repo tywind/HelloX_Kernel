@@ -24,7 +24,13 @@
 #include "StdAfx.h"
 #endif
 
+#ifndef __ARCH_H__
 #include "arch.h"
+#endif
+
+#ifndef __UTSNAME_H__
+#include <sys/utsname.h>
+#endif
 
 #ifdef __I386__  //Only available in x86 based PC platform.
 
@@ -389,6 +395,17 @@ __declspec(naked) VOID __outws(BYTE* pBuffer,DWORD dwBuffLen,WORD wPort)
 	}
 #else
 #endif
+}
+
+//Implemention of uname routine,which is hardware specified.
+int uname(struct utsname* __name)
+{
+	memset(__name,sizeof(struct utsname),0);
+	strcpy(__name->sysname,"HelloX OS");
+	strcpy(__name->version,OS_VERSION);
+	strcpy(__name->machine,"IA32");
+	strcpy(__name->release,OS_VERSION);
+	return 0;
 }
 
 #endif //__I386__

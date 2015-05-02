@@ -56,7 +56,7 @@ extern DWORD SysInfoHandler(__CMD_PARA_OBJ* pCmdParaObj);      //Handles the sys
 extern DWORD HlpHandler(__CMD_PARA_OBJ* pCmdParaObj);
 extern DWORD LoadappHandler(__CMD_PARA_OBJ* pCmdParaObj);
 extern DWORD GUIHandler(__CMD_PARA_OBJ* pCmdParaObj);          //Handler for GUI command,resides in
-extern DWORD FileWriteTest(__CMD_PARA_OBJ* pCmdParaObj); 
+//extern DWORD FileWriteTest(__CMD_PARA_OBJ* pCmdParaObj); 
 
 static DWORD CpuHandler(__CMD_PARA_OBJ* pCmdParaObj);
 static DWORD SptHandler(__CMD_PARA_OBJ* pCmdParaObj);
@@ -66,10 +66,15 @@ static DWORD SysNameHandler(__CMD_PARA_OBJ* pCmdParaObj);
 static DWORD TimeHandler(__CMD_PARA_OBJ* pCmdParaObj);
 static DWORD IoCtrlApp(__CMD_PARA_OBJ* pCmdParaObj);
 static DWORD SysDiagApp(__CMD_PARA_OBJ* pCmdParaObj);
+#ifdef __CFG_APP_JVM
+static DWORD JvmHandler(__CMD_PARA_OBJ* pCmdParaObj);
+#endif
 static DWORD Reboot(__CMD_PARA_OBJ* pCmdParaObj);
 static DWORD Poweroff(__CMD_PARA_OBJ* pCmdParaObj);
 static DWORD ComDebug(__CMD_PARA_OBJ* pCmdParaObj);
 static DWORD DebugHandler(__CMD_PARA_OBJ* pCmdParaObj);
+static DWORD FileWriteTest(__CMD_PARA_OBJ* pCmdParaObj);
+static DWORD FileReadTest(__CMD_PARA_OBJ* pCmdParaObj);
 
 //Internal command handler array.
 __CMD_OBJ  CmdObj[] = {
@@ -86,12 +91,18 @@ __CMD_OBJ  CmdObj[] = {
 	{"sysdiag"  ,    SysDiagApp},
 	{"loadapp"  ,    LoadappHandler},
 	{"gui"      ,    GUIHandler},
+#ifdef __CFG_APP_JVM  //Java VM is enabled.
+	{"jvm"      ,    JvmHandler},
+#endif
 	{"reboot"   ,    Reboot},
 	{"poff"     ,    Poweroff},
 	{"comdebug" ,    ComDebug},
 	{"cls"      ,    ClsHandler},
 	//You can add your specific command and it's handler here.
 	//{'yourcmd',    CmdHandler},
+	 {"fw"      ,   FileWriteTest},
+	 {"fr"      ,   FileReadTest},
+	
 	{"debug"    ,    DebugHandler},
 //	{"test"    ,    FileWriteTest},
 	//The last element of this array must be NULL.
@@ -239,12 +250,68 @@ DWORD IoCtrlApp(__CMD_PARA_OBJ* pCmdParaObj)
 	//thread until
 	//the IO control
 	//application end.
+	DeviceInputManager.SetFocusThread((__COMMON_OBJECT*)&DeviceInputManager,NULL);
 	KernelThreadManager.DestroyKernelThread((__COMMON_OBJECT*)&KernelThreadManager,
 		(__COMMON_OBJECT*)lpIoCtrlThread);  //Destroy the thread object.
 
 	return SHELL_CMD_PARSER_SUCCESS;
-
 }
+
+#ifdef __CFG_APP_JVM
+//Main entry point of java VM.
+extern int jvm_main(int argc, char* argv[]);
+//Wrapper of Java VM.
+static DWORD JvmEntryPoint(LPVOID pData)
+{
+	char* argv[] = {
+		"jvm",
+		(char*)pData };
+
+	if (NULL == pData)
+	{
+		_hx_printf("  JVM: Please input the class to be load.\r\n");
+		return 0;
+	}
+	//Call JVM's main entry.
+	return jvm_main(2, argv);
+}
+
+static DWORD JvmHandler(__CMD_PARA_OBJ* pCmdParaObj)
+{
+	__KERNEL_THREAD_OBJECT*    lpJVMThread = NULL;
+	char*                      className = "-version";
+
+	//Create Java VM thread.
+	lpJVMThread = KernelThreadManager.CreateKernelThread(
+		(__COMMON_OBJECT*)&KernelThreadManager,
+		0,
+		KERNEL_THREAD_STATUS_READY,
+		PRIORITY_LEVEL_NORMAL,
+		JvmEntryPoint,
+		className,
+		NULL,
+		"JVM");
+	if (NULL == lpJVMThread)    //Can not create the IO control thread.
+	{
+		PrintLine("Can not create Java VM thread.");
+		return SHELL_CMD_PARSER_SUCCESS;
+	}
+
+	DeviceInputManager.SetFocusThread((__COMMON_OBJECT*)&DeviceInputManager,
+		(__COMMON_OBJECT*)lpJVMThread);    //Set the current focus to IO control
+	//application.
+
+	lpJVMThread->WaitForThisObject((__COMMON_OBJECT*)lpJVMThread);  //Block the shell
+	//thread until
+	//the IO control
+	//application end.
+	DeviceInputManager.SetFocusThread((__COMMON_OBJECT*)&DeviceInputManager, NULL);
+	KernelThreadManager.DestroyKernelThread((__COMMON_OBJECT*)&KernelThreadManager,
+		(__COMMON_OBJECT*)lpJVMThread);  //Destroy the thread object.
+
+	return SHELL_CMD_PARSER_SUCCESS;
+}
+#endif
 
 //
 //System diag application's shell start code.
@@ -272,10 +339,142 @@ DWORD SysDiagApp(__CMD_PARA_OBJ* pCmdParaObj)
 		(__COMMON_OBJECT*)lpSysDiagThread);
 
 	lpSysDiagThread->WaitForThisObject((__COMMON_OBJECT*)lpSysDiagThread);
+	DeviceInputManager.SetFocusThread((__COMMON_OBJECT*)&DeviceInputManager,NULL);
 	KernelThreadManager.DestroyKernelThread((__COMMON_OBJECT*)&KernelThreadManager,
 		(__COMMON_OBJECT*)lpSysDiagThread);  //Destroy the kernel thread object.
 
 	return SHELL_CMD_PARSER_SUCCESS;
+}
+
+DWORD FileReadTest(__CMD_PARA_OBJ* pCmdParaObj)
+{
+	char   szFileBuf[512] = {0};
+	char   szInfoBuf[128] = {0};
+	DWORD  secondS        = 0;    
+	DWORD  secondE        = 0;   
+	DWORD  ReadRet         = 0;
+	DWORD  ReadCount     = 20480;
+	DWORD  dwFilePos      = 0;
+	DWORD  i              = 0;
+	HANDLE hFileObj       = NULL;
+
+	secondS = System.GetSysTick(NULL);  //Get system tick counter.
+	//Convert to second.
+	secondS *= SYSTEM_TIME_SLICE;
+	secondS /= 1000;
+
+	_hx_printf("Raed Start....\r\n");
+
+	hFileObj = CreateFile("C:\\wt.dat",FILE_ACCESS_READ|FILE_OPEN_EXISTING,0,NULL);
+
+	if(hFileObj == NULL || hFileObj == (HANDLE)-1)
+	{
+		_hx_printf("read Faild!\r\n");		
+		return S_OK;
+	}
+		
+	for(i=0;i<ReadCount;i++)
+	{
+		ReadFile(hFileObj,sizeof(szFileBuf),szFileBuf,&ReadRet);
+
+		if(ReadRet < sizeof(szFileBuf))
+		{
+			_hx_printf("Raed faild....step=%d\r\n",i);
+		}
+	}
+		
+	//_hx_printf("Close handle\r\n");
+	CloseFile(hFileObj);
+
+	secondE = System.GetSysTick(NULL);  //Get system tick counter.	
+	secondE *= SYSTEM_TIME_SLICE;
+	secondE /= 1000;
+
+	_hx_printf("Read Complete,Use Time= %d sec",secondE-secondS);
+
+	return S_OK;
+}
+
+DWORD FileModifyTest(__CMD_PARA_OBJ* pCmdParaObj)
+{
+	DWORD  dwFilePos      = 1024;
+	HANDLE hFileObj       = NULL;
+
+	hFileObj = CreateFile("C:\\test.bmp",FILE_ACCESS_WRITE|FILE_OPEN_ALWAYS,0,NULL);
+
+	_hx_printf("Modify Start!\r\n");		
+
+	if(hFileObj == NULL || hFileObj == (HANDLE)-1)
+	{
+		_hx_printf("Modify Faild!\r\n");		
+		return S_OK;
+	}
+
+	//移动文件
+	SetFilePointer(hFileObj,&dwFilePos,&dwFilePos,FILE_FROM_CURRENT);
+
+	//截断
+	SetEndOfFile(hFileObj);
+
+	CloseFile(hFileObj);
+
+	_hx_printf("Modify Complete!\r\n");		
+
+	return S_OK;
+}
+
+//Entry point of FileWriteTest.
+DWORD FileWriteTest(__CMD_PARA_OBJ* pCmdParaObj)
+{
+	static  char  s_temp = 'a';
+	char   szFileBuf[512] = {0};
+	char   szInfoBuf[128] = {0};
+	DWORD  secondS        = 0;    
+	DWORD  secondE        = 0;   
+	DWORD  Writed         = 0;
+	DWORD  WriteCount     = 10;
+	DWORD  dwFilePos      = 0;
+	DWORD  i              = 0;
+	HANDLE hFileObj       = NULL;
+
+	secondS = System.GetSysTick(NULL);  //Get system tick counter.
+	//Convert to second.
+	secondS *= SYSTEM_TIME_SLICE;
+	secondS /= 1000;
+
+	memset(szFileBuf,s_temp,sizeof(szFileBuf));
+	s_temp += 1;
+	_hx_printf("Write Start....\r\n");
+
+	hFileObj = CreateFile("C:\\wt.dat",FILE_ACCESS_WRITE|FILE_OPEN_ALWAYS,0,NULL);
+
+	if(hFileObj == NULL || hFileObj == (HANDLE)-1)
+	{
+		_hx_printf("Write Faild!\r\n");		
+		return S_OK;
+	}
+
+	//移动到文件尾
+	SetFilePointer(hFileObj,&dwFilePos,&dwFilePos,FILE_FROM_END);
+
+	//	_hx_printf("start write \r\n");
+	for(i=0;i<WriteCount;i++)
+	{
+		WriteFile(hFileObj,sizeof(szFileBuf),szFileBuf,&Writed);
+	}
+
+	WriteFile(hFileObj,2,"\r\n",&Writed);
+
+	//_hx_printf("Close handle\r\n");
+	CloseFile(hFileObj);
+
+	secondE = System.GetSysTick(NULL);  //Get system tick counter.	
+	secondE *= SYSTEM_TIME_SLICE;
+	secondE /= 1000;
+
+    _hx_printf("Write Complete,Use Time= %d sec\r\n",secondE-secondS);
+
+	return S_OK;
 }
 
 //Entry point of reboot.
@@ -389,21 +588,75 @@ DWORD SptHandler(__CMD_PARA_OBJ* pCmdParaObj)
 //Email  :	erwin.wang@qq.com
 //Date	 :  9th June, 2014
 //********************************
+static DWORD Process1(LPVOID pData)
+{
+	int i = 0;
+	for(i = 0;i < 5;i ++)
+	{
+		_hx_printf("  I'm process 1.\r\n");
+		DumpProcess();
+		Sleep(10);
+	}
+	return 0;
+}
+
+static DWORD Process2(LPVOID pData)
+{
+	int i = 0;
+	for(i = 0;i < 5;i ++)
+	{
+		_hx_printf("  I'm process 2.\r\n");
+		DumpProcess();
+		Sleep(20);
+	}
+	return 0;
+}
+
 DWORD DebugHandler(__CMD_PARA_OBJ* pCmdParaObj)
 {
-	/*char buf[256] = {'0'};
-	int count = 0;
-	while(TRUE)
+	__PROCESS_OBJECT* pProcess1  = NULL;
+	__PROCESS_OBJECT* pProcess2  = NULL;
+	int round = 1000;
+
+	for(round = 0;round < 20480;round ++)
 	{
-		count++;
-		Sleep(1000);
-		DebugManager.Logcat(&DebugManager, buf, 0);
-		if(buf[0] != '0')
+		pProcess1 = ProcessManager.CreateProcess(
+			(__COMMON_OBJECT*)&ProcessManager,
+			0,
+			PRIORITY_LEVEL_NORMAL,
+			Process1,
+			NULL,
+			NULL,
+			"Process1");
+		if(NULL == pProcess1)
 		{
-			PrintLine(buf);
+			_hx_printf("  Create Process1 failed.\r\n");
+			return SHELL_CMD_PARSER_SUCCESS;
 		}
-		if(count == 10)break;
-	}*/
+		_hx_printf("  Create Process1 successfully.\r\n");
+
+		pProcess2 = ProcessManager.CreateProcess(
+			(__COMMON_OBJECT*)&ProcessManager,
+			0,
+			PRIORITY_LEVEL_NORMAL,
+			Process2,
+			NULL,
+			NULL,
+			"Process2");
+		if(NULL == pProcess2)
+		{
+			_hx_printf("  Create Process2 failed.\r\n");
+			return SHELL_CMD_PARSER_SUCCESS;
+		}
+		_hx_printf("  Create Process2 successfully.\r\n");
+		
+		pProcess1->WaitForThisObject((__COMMON_OBJECT*)pProcess1);
+		pProcess2->WaitForThisObject((__COMMON_OBJECT*)pProcess2);
+		ProcessManager.DestroyProcess((__COMMON_OBJECT*)&ProcessManager,(__COMMON_OBJECT*)pProcess1);
+		ProcessManager.DestroyProcess((__COMMON_OBJECT*)&ProcessManager,(__COMMON_OBJECT*)pProcess2);
+		_hx_printf("  Debug round [ %d ]run over.\r\n",round);
+	}
+
 	return SHELL_CMD_PARSER_SUCCESS;
 }
 
@@ -495,12 +748,11 @@ static DWORD  CommandParser(LPSTR pCmdBuf)
 				DeviceInputManager.SetFocusThread((__COMMON_OBJECT*)&DeviceInputManager,
 					(__COMMON_OBJECT*)hKernelThread);  //Give the current input focus to this thread.
 				hKernelThread->WaitForThisObject((__COMMON_OBJECT*)hKernelThread);
-
+				DeviceInputManager.SetFocusThread((__COMMON_OBJECT*)&DeviceInputManager,NULL);
 				KernelThreadManager.DestroyKernelThread(
 					(__COMMON_OBJECT*)&KernelThreadManager,
 					(__COMMON_OBJECT*)hKernelThread);  //Destroy it.
 				//Set focus thread to shell.
-				DeviceInputManager.SetFocusThread((__COMMON_OBJECT*)&DeviceInputManager,NULL);
 			}
 			
 			dwResult = SHELL_CMD_PARSER_SUCCESS;
@@ -523,11 +775,14 @@ __END:
 //Entry point of the text mode shell.
 //
 DWORD ShellEntryPoint(LPVOID pData)
-{			
-	StrCpy(DEF_PROMPT_STR,&s_szPrompt[0]);
+{
+	WORD x, y;
 
+	StrCpy(DEF_PROMPT_STR,&s_szPrompt[0]);
 	CD_PrintString(VERSION_INFO,TRUE);
-	CD_SetCursorPos(0,SHELL_INPUT_START_Y_FIRST);
+	//CD_SetCursorPos(0,SHELL_INPUT_START_Y_FIRST);
+	CD_GetCursorPos(&x, &y);
+	CD_SetCursorPos(0, y + 1);
 	
 	Shell_Msg_Loop(s_szPrompt,CommandParser,QueryCmdName);
 

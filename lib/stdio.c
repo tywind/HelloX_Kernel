@@ -704,3 +704,31 @@ int _hx_printf(const char* fmt,...)
 
 	return 0;
 }
+
+//_hx_snprintf routine,same as snprintf routine in libc.
+int _hx_snprintf(char *buf,size_t n, const char *fmt, ...)
+{
+  va_list args;
+  int len;
+#if DEFAULT_STACK_SIZE < 2048
+  char buff[128];
+#else
+  char buff[256];
+#endif
+
+  va_start(args, fmt);
+  len = _hx_vsprintf(buff, fmt, args);
+  va_end(args);
+
+  //Now copy the result into buf.
+  strncpy(buf,buff,n - 1);
+  buf[n - 1] = 0;
+
+  return n;
+}
+
+//vfprintf's implementation.
+int _hx_vfprintf(void* stream,const char* fmt,va_list args)
+{
+	return 0;
+}

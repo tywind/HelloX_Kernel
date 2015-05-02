@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008, 2010 Robert Lougher <rob@jamvm.org.uk>.
+ * Copyright (C) 2008 Robert Lougher <rob@jamvm.org.uk>.
  *
  * This file is part of JamVM.
  *
@@ -18,10 +18,15 @@
  * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+//HelloX Porting Code.
+#include <stdafx.h>
+#include <kapi.h>
+#include <io.h>
+
 #include "jam.h"
 
-void shutdownVM() {
+void shutdownVM(int status) {
     shutdownInterpreter();
-    shutdownDll();
+    jamvm_exit(status);
 }
 

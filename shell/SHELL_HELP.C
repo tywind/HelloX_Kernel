@@ -17,6 +17,9 @@
 #include "../include/CharDisplay.h"
 #include "shell.h"
 
+
+#define  EXIT_SHELL_COMMAND  0x1001
+
 #define  ERROR_STR   "  You entered incorrect command name."
 #define  ERROR_STR2  "  Failed to process the command."
 
@@ -148,6 +151,103 @@ static 	void LoadHisCmd(SHELL_MSG_INFO*  pShellInfo,BOOL bUp)
 
 }
 
+static INT OnExecCommand(SHELL_MSG_INFO*  pShellInfo,const CHAR* pCmdBuf)
+{
+	CHAR   szCmdBuf[CMD_MAX_LEN] = {0};		
+	CHAR*  pCountPos             = NULL;
+	INT    nExecCount            = 1;
+	INT    i                     = 0;
+	
+
+	strcpy(szCmdBuf,pCmdBuf);
+
+	//get exec count 
+	pCountPos = strstr(szCmdBuf,"@");
+	if(pCountPos != NULL)
+	{
+		*pCountPos = 0; pCountPos ++;
+		nExecCount = atoi(pCountPos);
+
+		if(nExecCount <= 0)
+		{
+			nExecCount = 1;
+		}
+	}
+	
+	if(strlen(szCmdBuf) <= 0)
+	{
+		return S_OK;
+	}
+
+	//exec
+	for( i=0;i<nExecCount;i++)
+	{
+		switch(pShellInfo->pCmdRoute(szCmdBuf))
+		{
+			case SHELL_CMD_PARSER_TERMINAL: //Exit command is entered.
+			{
+				return EXIT_SHELL_COMMAND;
+			}
+			break;
+			case SHELL_CMD_PARSER_INVALID:  //Can not parse the command.
+			{
+				CD_PrintString(ERROR_STR,TRUE);
+			}							
+			break;
+			case SHELL_CMD_PARSER_FAILED:
+			{
+				CD_PrintString(ERROR_STR2,TRUE);
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+	return S_OK;
+}
+
+static INT OnAnalyseCommands(SHELL_MSG_INFO*  pShellInfo,const CHAR* pCmdBuf)
+{
+	CHAR*  pCmdPos         = pCmdBuf;
+	CHAR*  pSubCmd         = NULL;
+	INT    nExecCount      = 1;	
+	INT    nRet            = S_OK;
+	INT    i               = 0;
+
+
+	if(strlen(pCmdBuf) <= 0)
+	{
+		return nRet;
+	}
+
+	His_SaveCmd(pShellInfo->hHisInfoObj,pCmdBuf);	
+
+	pSubCmd = strstr(pCmdPos,";");
+	while(pSubCmd)
+	{
+		CHAR   szOneCmd[CMD_MAX_LEN] = {0};		
+
+		strncpy(szOneCmd,pCmdPos,(pSubCmd-pCmdPos));
+		nRet = OnExecCommand(pShellInfo,szOneCmd);
+
+		if(EXIT_SHELL_COMMAND == nRet)
+		{
+			break;
+		}
+
+
+		//find next cmd
+		pCmdPos = pSubCmd+1;
+		pSubCmd = strstr(pCmdPos,";");
+	}
+	
+	//last cmd
+	nRet = OnExecCommand(pShellInfo,pCmdPos);
+
+	return nRet;
+}
+
 //key  msg 
 static INT OnKeyControl(SHELL_MSG_INFO*  pShellInfo,BYTE   bt )
 {
@@ -166,32 +266,11 @@ static INT OnKeyControl(SHELL_MSG_INFO*  pShellInfo,BYTE   bt )
 			strtrim(szCmdBuffer,TRIM_LEFT|TRIM_RIGHT);
 			CD_ChangeLine();
 
-			if(strlen(szCmdBuffer) > 0)
+			if(OnAnalyseCommands(pShellInfo,szCmdBuffer) == EXIT_SHELL_COMMAND)				
 			{
-				His_SaveCmd(pShellInfo->hHisInfoObj,szCmdBuffer);
-								
-				switch(pShellInfo->pCmdRoute(szCmdBuffer))
-				{
-					case SHELL_CMD_PARSER_TERMINAL: //Exit command is entered.
-					{
-						return FALSE;
-					}
-					break;
-					case SHELL_CMD_PARSER_INVALID:  //Can not parse the command.
-					{
-						CD_PrintString(ERROR_STR,TRUE);
-					}							
-					break;
-					case SHELL_CMD_PARSER_FAILED:
-					{
-						CD_PrintString(ERROR_STR2,TRUE);
-					}
-					break;
-				default:
-					break;
-				}
+				return FALSE;
 			}
-
+			
 			PrintPrompt(pShellInfo);
 		}
 		break;

@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012
- * 2014 Robert Lougher <rob@jamvm.org.uk>.
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009
+ * Robert Lougher <rob@jamvm.org.uk>.
  *
  * This file is part of JamVM.
  *
@@ -19,19 +19,22 @@
  * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+//HelloX Porting Code.
+#include <stdafx.h>
+#include <kapi.h>
+#include <io.h>
+
+
 #ifndef NO_JNI
 #include <string.h>
 #include <stdlib.h>
 #include "jni.h"
 #include "jam.h"
-#include "hash.h"
 #include "thread.h"
-#include "class.h"
 #include "lock.h"
 #include "symbol.h"
 #include "excep.h"
 #include "reflect.h"
-#include "classlib.h"
 #include "jni-internal.h"
 #include "alloc.h"
 
@@ -59,16 +62,51 @@ void Jam_DeleteGlobalRef(JNIEnv *env, jobject obj);
 JNIFrame *ensureJNILrefCapacity(int cap);
 static void initJNIGrefs();
 
-int initialiseJNI() {
+/* Cached values initialised on startup for JNI 1.4 NIO support */
+static int buffCap_offset, buffAddr_offset, rawdata_offset;
+static Class *buffImpl_class, *rawdata_class;
+static MethodBlock *buffImpl_init_mb;
+static char nio_init_OK = FALSE;
+
+void initialiseJNI() {
+    FieldBlock *buffCap_fb, *buffAddr_fb, *rawdata_fb;
+    Class *buffer_class;
+
     /* Initialise the global reference tables */
     initJNIGrefs();
 
-    if(!classlibInitialiseJNI()) {
-        jam_fprintf(stderr, "Error initialising VM (initialiseJNI)\n");
-        return FALSE;
-    }
+    /* Cache class and method/fields for JNI 1.4 NIO support */
 
-    return TRUE;
+    buffer_class = findSystemClass0(SYMBOL(java_nio_Buffer));
+    buffImpl_class = findSystemClass0(
+                         SYMBOL(java_nio_DirectByteBufferImpl_ReadWrite));
+    rawdata_class = findSystemClass0(sizeof(uintptr_t) == 4
+                                            ? SYMBOL(gnu_classpath_Pointer32)
+                                            : SYMBOL(gnu_classpath_Pointer64));
+
+    if(buffer_class == NULL || buffImpl_class == NULL || rawdata_class == NULL)
+        return;
+
+    buffImpl_init_mb = findMethod(buffImpl_class, SYMBOL(object_init),
+                      SYMBOL(_java_lang_Object_gnu_classpath_Pointer_III__V));
+
+    buffCap_fb = findField(buffer_class, SYMBOL(cap), SYMBOL(I));
+    rawdata_fb = findField(rawdata_class, SYMBOL(data),
+                           sizeof(uintptr_t) == 4 ? SYMBOL(I) : SYMBOL(J));
+    buffAddr_fb = findField(buffer_class, SYMBOL(address),
+                            SYMBOL(sig_gnu_classpath_Pointer));
+
+    if(buffImpl_init_mb == NULL || buffCap_fb == NULL || rawdata_fb == NULL
+                                || buffAddr_fb == NULL)
+        return;
+
+    registerStaticClassRef(&buffImpl_class);
+    registerStaticClassRef(&rawdata_class);
+
+    buffCap_offset = buffCap_fb->u.offset;
+    buffAddr_offset = buffAddr_fb->u.offset;
+    rawdata_offset = rawdata_fb->u.offset;
+    nio_init_OK = TRUE;
 }
 
 /* ---------- Local reference support functions ---------- */
@@ -107,19 +145,8 @@ JNIFrame *ensureJNILrefCapacity(int cap) {
         if(incr < sizeof(JNIFrame)/sizeof(Object*))
             incr = sizeof(JNIFrame)/sizeof(Object*);
 
-        if((frame = expandJNILrefs(ee, frame, incr)) == NULL) {
-            if(ee->overflow++) {
-                /* Overflow when we're already throwing stack
-                   overflow.  Stack extension should be enough
-                   to throw exception, so something's seriously
-                   gone wrong - abort the VM! */
-                jam_fprintf(stderr, "Fatal stack overflow!  Aborting VM.\n");
-                exitVM(1);
-            }
-            ee->stack_end += STACK_RED_ZONE_SIZE;
-            signalException(java_lang_StackOverflowError,
-                            "JNI local references");
-        }
+        if((frame = expandJNILrefs(ee, frame, incr)) == NULL)
+            signalException(java_lang_OutOfMemoryError, "JNI local references");
     }
 
     return frame;
@@ -347,18 +374,50 @@ jobjectRefType Jam_GetObjectRefType(JNIEnv *env, jobject obj) {
 /* Extensions added to JNI in JDK 1.4 */
 
 jobject Jam_NewDirectByteBuffer(JNIEnv *env, void *addr, jlong capacity) {
-    Object *buff = classlibNewDirectByteBuffer(addr, capacity);
+    Object *buff, *rawdata;
+
+    if(!nio_init_OK)
+        return NULL;
+
+    if((buff = allocObject(buffImpl_class)) != NULL &&
+            (rawdata = allocObject(rawdata_class)) != NULL) {
+
+        INST_DATA(rawdata, void*, rawdata_offset) = addr;
+        executeMethod(buff, buffImpl_init_mb, NULL, rawdata, (int)capacity,
+                      (int)capacity, 0);
+    }
+
     return addJNILref(buff);
 }
 
 static void *Jam_GetDirectBufferAddress(JNIEnv *env, jobject buffer) {
     Object *buff = REF_TO_OBJ(buffer);
-    return classlibGetDirectBufferAddress(buff);
+
+    if(!nio_init_OK)
+        return NULL;
+
+    if(buff != NULL) {
+        Object *rawdata = INST_DATA(buff, Object*, buffAddr_offset);
+        if(rawdata != NULL)
+            return INST_DATA(rawdata, void*, rawdata_offset);
+    }
+
+    return NULL;
 }
 
 jlong Jam_GetDirectBufferCapacity(JNIEnv *env, jobject buffer) {
     Object *buff = REF_TO_OBJ(buffer);
-    return classlibGetDirectBufferCapacity(buff);
+
+    if(!nio_init_OK)
+        return -1;
+
+    if(buff != NULL) {
+        Object *rawdata = INST_DATA(buff, Object*, buffAddr_offset);
+        if(rawdata != NULL)
+            return INST_DATA(buff, jlong, buffCap_offset);
+    }
+
+    return -1;
 }
 
 /* Extensions added to JNI in JDK 1.2 */
@@ -399,6 +458,15 @@ jint Jam_PushLocalFrame(JNIEnv *env, jint capacity) {
 jobject Jam_PopLocalFrame(JNIEnv *env, jobject result) {
     popJNILrefFrame();
     return addJNILref(REF_TO_OBJ(result));
+}
+
+//Here is the converted implementation code of macro with the same name.
+Object* REF_TO_OBJ_WEAK_NULL_CHECK(jobject ref)
+{
+    Object *_obj = REF_TO_OBJ(ref);                
+    if(REF_TYPE(ref) == WEAK_GLOBAL_REF)             
+        _obj = isPlaceholderObj(_obj) ? NULL : _obj; 
+    return _obj;
 }
 
 jobject Jam_NewLocalRef(JNIEnv *env, jobject obj) {
@@ -492,9 +560,6 @@ jclass Jam_DefineClass(JNIEnv *env, const char *name, jobject loader,
     Class *class = defineClass((char*)name, (char *)buf, 0,
                                (int)bufLen, REF_TO_OBJ(loader));
 
-    if(class != NULL)
-        linkClass(class);
-
     return addJNILref(class);
 }
 
@@ -506,12 +571,13 @@ jclass Jam_FindClass(JNIEnv *env, const char *name) {
     Object *loader;
     Class *class;
 
-    if(last->prev != NULL) {
-        loader = CLASS_CB(last->mb->class)->class_loader;
+    if(last->prev) {
+        ClassBlock *cb = CLASS_CB(last->mb->class);
+        loader = cb->class_loader;
 
         /* Ensure correct context if called from JNI_OnLoad */
-        if(loader == NULL)
-            loader = classlibCheckIfOnLoad(last);
+        if(loader == NULL && cb->name == SYMBOL(java_lang_VMRuntime))
+            loader = (Object*)last->lvars[1];
     } else
         loader = getSystemClassLoader();
 
@@ -715,8 +781,6 @@ void Jam_ReleaseStringChars(JNIEnv *env, jstring string, const jchar *chars) {
 }
 
 jstring Jam_NewStringUTF(JNIEnv *env, const char *bytes) {
-    if(bytes == NULL)
-        return NULL;
     return addJNILref(createString((char*)bytes));
 }
 
@@ -782,25 +846,48 @@ jobject Jam_NewObjectV(JNIEnv *env, jclass clazz, jmethodID methodID,
 jarray Jam_NewObjectArray(JNIEnv *env, jsize length, jclass elementClass_ref,
                           jobject initialElement_ref) {
 
-    Object *initial_element = REF_TO_OBJ(initialElement_ref);
-    Class *element_class = REF_TO_OBJ(elementClass_ref);
-    Object *array;
+    Object *initialElement = REF_TO_OBJ(initialElement_ref);
+    Class *elementClass = REF_TO_OBJ(elementClass_ref);
+    char *element_name = CLASS_CB(elementClass)->name;
+    //char ac_name[strlen(element_name) + 4];
+	char* ac_name;
+    Class *array_class;
+
+	//Allocate the ac_name since here to fit VS IDE.
+	//HelloX porting code.
+	ac_name = sysMalloc(strlen(element_name) + 4);
+	if(0 == ac_name)  
+	{
+		return NULL;
+	}
 
     if(length < 0) {
         signalException(java_lang_NegativeArraySizeException, NULL);
+		sysFree(ac_name); //HelloX porting code.
         return NULL;
     }
 
-    array = allocObjectArray(element_class, length);
+    if(element_name[0] == '[')
+        strcat(strcpy(ac_name, "["), element_name);
+    else
+        strcat(strcat(strcpy(ac_name, "[L"), element_name), ";");
 
-    if(array != NULL && initial_element != NULL) {
-        Object **data = ARRAY_DATA(array, Object*);
+    array_class = findArrayClassFromClass(ac_name, elementClass);
+    if(array_class != NULL) {
+        Object *array = allocArray(array_class, length, sizeof(Object*));
+        if(array != NULL) {
+            if(initialElement != NULL) {
+                Object **data = ARRAY_DATA(array, Object*);
 
-        while(length--)
-           *data++ = initial_element;
+                while(length--)
+                   *data++ = initialElement;
+            }
+			sysFree(ac_name);  //HelloX porting code.
+            return addJNILref(array);
+        }
     }
-
-    return addJNILref(array);
+	sysFree(ac_name);  //HelloX porting code.
+    return NULL;
 }
 
 jarray Jam_GetObjectArrayElement(JNIEnv *env, jobjectArray array, jsize index) {
@@ -810,31 +897,11 @@ jarray Jam_GetObjectArrayElement(JNIEnv *env, jobjectArray array, jsize index) {
 void Jam_SetObjectArrayElement(JNIEnv *env, jobjectArray array, jsize index,
                                jobject value) {
 
-    ARRAY_DATA(REF_TO_OBJ(array), Object*)[index] = REF_TO_OBJ(value);
+    ARRAY_DATA(REF_TO_OBJ(array), Object*)[index] = value;
 }
 
 jint Jam_RegisterNatives(JNIEnv *env, jclass clazz,
                          const JNINativeMethod *methods, jint nMethods) {
-
-    int i;
-    Class *class = REF_TO_OBJ(clazz);
-
-    for(i = 0; i < nMethods; i++) {
-        MethodBlock *mb = NULL;
-        char *method_name = findUtf8(methods[i].name);
-        char *method_sig = findUtf8(methods[i].signature);
-
-        if(method_name != NULL && method_sig != NULL)
-            mb = findMethod(class, method_name, method_sig);
-
-        if(mb == NULL || !(mb->access_flags & ACC_NATIVE)) {
-            signalException(java_lang_NoSuchMethodError, methods[i].name);
-            return JNI_ERR;
-        }
-
-        setJNIMethod(mb, methods[i].fnPtr);
-    }
-
     return JNI_OK;
 }
 
@@ -853,10 +920,10 @@ jint Jam_MonitorExit(JNIEnv *env, jobject obj) {
 }
 
 struct _JNIInvokeInterface Jam_JNIInvokeInterface;
-JavaVM jni_invoke_intf = &Jam_JNIInvokeInterface; 
+JavaVM invokeIntf = &Jam_JNIInvokeInterface; 
 
 jint Jam_GetJavaVM(JNIEnv *env, JavaVM **vm) {
-    *vm = &jni_invoke_intf;
+    *vm = &invokeIntf;
     return JNI_OK;
 }
 
@@ -953,7 +1020,7 @@ void Jam_SetObjectField(JNIEnv *env, jobject obj, jfieldID fieldID,
     Object *ob = REF_TO_OBJ(obj);
     FieldBlock *fb = fieldID;
 
-    INST_DATA(ob, jobject, fb->u.offset) = REF_TO_OBJ(value);
+    INST_DATA(ob, jobject, fb->u.offset) = value;
 }
 
 jobject Jam_GetStaticObjectField(JNIEnv *env, jclass clazz, jfieldID fieldID) {
@@ -1428,24 +1495,12 @@ struct _JNINativeInterface Jam_JNINativeInterface = {
 
 jint Jam_DestroyJavaVM(JavaVM *vm) {
     mainThreadWaitToExitVM();
-    classlibVMShutdown();
+    exitVM(0);
 
     return JNI_OK;
 }
 
-/* Common definition of env */
-void *jni_env = &Jam_JNINativeInterface;
-
-int isSupportedJNIVersion(int version) {
-    return version == JNI_VERSION_1_6 ||
-           version == JNI_VERSION_1_4 ||
-           version == JNI_VERSION_1_2;
-}
-
-int isSupportedJNIVersion_1_1(int version) {
-    return version == JNI_VERSION_1_1 ||
-           isSupportedJNIVersion(version);
-} 
+static void *env = &Jam_JNINativeInterface;
 
 static jint attachCurrentThread(void **penv, void *args, int is_daemon) {
     if(threadSelf() == NULL) {
@@ -1454,8 +1509,9 @@ static jint attachCurrentThread(void **penv, void *args, int is_daemon) {
 
         if(args != NULL) {
             JavaVMAttachArgs *attach_args = (JavaVMAttachArgs*)args;
-
-            if(!isSupportedJNIVersion(attach_args->version))
+            if(attach_args->version != JNI_VERSION_1_6 &&
+               attach_args->version != JNI_VERSION_1_4 &&
+               attach_args->version != JNI_VERSION_1_2)
                 return JNI_EVERSION;
 
             name = attach_args->name;
@@ -1465,11 +1521,10 @@ static jint attachCurrentThread(void **penv, void *args, int is_daemon) {
         if(attachJNIThread(name, is_daemon, group) == NULL)
             return JNI_ERR;
 
-        if(!initJNILrefs())
-            return JNI_ERR;
+        initJNILrefs();
     }
 
-    *penv = &jni_env;
+    *penv = &env;
     return JNI_OK;
 }
 
@@ -1492,7 +1547,8 @@ jint Jam_DetachCurrentThread(JavaVM *vm) {
 }
 
 jint Jam_GetEnv(JavaVM *vm, void **penv, jint version) {
-    if(!isSupportedJNIVersion_1_1(version)) {
+    if((version != JNI_VERSION_1_6) && (version != JNI_VERSION_1_4) &&
+       (version != JNI_VERSION_1_2) && (version != JNI_VERSION_1_1)) {
         *penv = NULL;
         return JNI_EVERSION;
     }
@@ -1502,7 +1558,7 @@ jint Jam_GetEnv(JavaVM *vm, void **penv, jint version) {
         return JNI_EDETACHED;
     }
 
-    *penv = &jni_env;
+    *penv = &env;
     return JNI_OK;
 }
 
@@ -1520,84 +1576,151 @@ struct _JNIInvokeInterface Jam_JNIInvokeInterface = {
 jint JNI_GetDefaultJavaVMInitArgs(void *args) {
     JavaVMInitArgs *vm_args = (JavaVMInitArgs*) args;
 
-    if(!isSupportedJNIVersion(vm_args->version))
+    if(vm_args->version != JNI_VERSION_1_6 &&
+       vm_args->version != JNI_VERSION_1_4 &&
+       vm_args->version != JNI_VERSION_1_2)
         return JNI_EVERSION;
 
     return JNI_OK;
 }
 
 jint parseInitOptions(JavaVMInitArgs *vm_args, InitArgs *args) {
-    Property props[vm_args->nOptions];
+    //Property props[vm_args->nOptions];
+	Property* props;  //HelloX porting code.
+    int props_count = 0;
     int i;
 
-    args->commandline_props = &props[0];
+	//Allocate props arrary first,to fit VS environment.The original implementation is VLA under GCC.
+	//HelloX porting code.
+	props = (Property*)sysMalloc(sizeof(Property) * vm_args->nOptions);
+	if(0 == props)
+	{
+		return JNI_ERR;
+	}
 
     for(i = 0; i < vm_args->nOptions; i++) {
         char *string = vm_args->options[i].optionString;
 
-        switch(parseCommonOpts(string, args, TRUE)) {
-            case OPT_OK:
-                break;
+        if(strcmp(string, "vfprintf") == 0)
+            args->vfprintf = vm_args->options[i].extraInfo;
 
-            case OPT_ERROR:
+        else if(strcmp(string, "exit") == 0)
+            args->exit = vm_args->options[i].extraInfo;
+
+        else if(strcmp(string, "abort") == 0)
+            args->abort = vm_args->options[i].extraInfo;
+
+        else if(strncmp(string, "-verbose:", 9) == 0) {
+            char *type = &string[8];
+
+            do {
+                type++;
+
+                if(strncmp(type, "class", 5) == 0) {
+                    args->verboseclass = TRUE;
+                    type += 5;
+                 }
+                else if(strncmp(type, "gc", 2) == 0) {
+                    args->verbosegc = TRUE;
+                    type += 2;
+                }
+                else if(strncmp(type, "jni", 3) == 0) {
+                    args->verbosedll = TRUE;
+                    type += 3;
+                }
+            } while(*type == ',');
+
+        } else if(strcmp(string, "-Xasyncgc") == 0)
+            args->asyncgc = TRUE;
+
+        else if(strncmp(string, "-Xms", 4) == 0) {
+            args->min_heap = parseMemValue(string + 4);
+            if(args->min_heap < MIN_HEAP)
                 goto error;
 
-            case OPT_UNREC:
-            default:
-                if(strcmp(string, "vfprintf") == 0)
-                    args->vfprintf = vm_args->options[i].extraInfo;
+        } else if(strncmp(string, "-Xmx", 4) == 0) {
+            args->max_heap = parseMemValue(string + 4);
+            if(args->max_heap < MIN_HEAP)
+                goto error;
 
-                else if(strcmp(string, "exit") == 0)
-                    args->exit = vm_args->options[i].extraInfo;
+        } else if(strncmp(string, "-Xss", 4) == 0) {
+            args->java_stack = parseMemValue(string + 4);
+            if(args->java_stack < MIN_STACK)
+                goto error;
 
-                else if(strcmp(string, "abort") == 0)
-                    args->abort = vm_args->options[i].extraInfo;
+        } else if(strncmp(string, "-D", 2) == 0) {
+            char *pntr;
+            char *key = strcpy(sysMalloc(strlen(string+2) + 1), string+2);
 
-                else if(strcmp(string, "-verbose") == 0)
-                    args->verboseclass = TRUE;
+            for(pntr = key; *pntr && (*pntr != '='); pntr++);
+            if(pntr == key)
+                goto error;
 
-                else if(strncmp(string, "-verbose:", 9) == 0) {
-                    char *type = &string[8];
+            *pntr++ = '\0';
+            props[props_count].key = key;
+            props[props_count++].value = pntr;
 
-                    do {
-                        type++;
+        } else if(strncmp(string, "-Xbootclasspath:", 16) == 0) {
 
-                        if(strncmp(type, "class", 5) == 0) {
-                            args->verboseclass = TRUE;
-                            type += 5;
-                         }
-                        else if(strncmp(type, "gc", 2) == 0) {
-                            args->verbosegc = TRUE;
-                            type += 2;
-                        }
-                        else if(strncmp(type, "jni", 3) == 0) {
-                            args->verbosedll = TRUE;
-                            type += 3;
-                        }
-                    } while(*type == ',');
+            args->bootpathopt = '\0';
+            args->bootpath = string + 16;
 
-                } else if(!vm_args->ignoreUnrecognized) {
-                    optError(args, "Unrecognised option: %s\n", string);
-                    goto error;
-                }
-        }
+        } else if(strncmp(string, "-Xbootclasspath/a:", 18) == 0 ||
+                  strncmp(string, "-Xbootclasspath/p:", 18) == 0 ||
+                  strncmp(string, "-Xbootclasspath/c:", 18) == 0 ||
+                  strncmp(string, "-Xbootclasspath/v:", 18) == 0) {
+
+            args->bootpathopt = string[16];
+            args->bootpath = string + 18;
+
+        } else if(strcmp(string, "-Xnocompact") == 0) {
+            args->compact_specified = TRUE;
+            args->do_compact = FALSE;
+
+        } else if(strcmp(string, "-Xcompactalways") == 0) {
+            args->compact_specified = args->do_compact = TRUE;
+#ifdef INLINING
+        } else if(strcmp(string, "-Xnoinlining") == 0) {
+            /* Turning inlining off is equivalent to setting
+               code memory to zero */
+            args->codemem = 0;
+
+        } else if(strncmp(string, "-Xreplication:", 14) == 0) {
+            char *pntr = string + 14;
+
+            if(strcmp(pntr, "none") == 0)
+                args->replication_threshold = INT_MAX;
+            else
+                if(strcmp(pntr, "always") == 0)
+                    args->replication_threshold = 0;
+                else
+                    args->replication_threshold = strtol(pntr, NULL, 0);
+
+        } else if(strncmp(string, "-Xcodemem:", 10) == 0) {
+            char *pntr = string + 10;
+
+            args->codemem = strncmp(pntr, "unlimited", 10) == 0 ?
+                INT_MAX : parseMemValue(pntr);
+#endif
+        } else if(!vm_args->ignoreUnrecognized)
+            goto error;
     }
 
-    if(args->min_heap > args->max_heap) {
-        optError(args, "Minimum heap size greater than max!\n");
+    if(args->min_heap > args->max_heap)
         goto error;
-    }
 
-    if(args->props_count) {
-        args->commandline_props = sysMalloc(args->props_count *
-                                            sizeof(Property));
-        memcpy(args->commandline_props, &props[0], args->props_count *
+    if((args->props_count = props_count)) {
+        args->commandline_props = sysMalloc(props_count * sizeof(Property));
+        memcpy(args->commandline_props, &props[0], props_count *
                                                    sizeof(Property));
     }
 
+	//Destroy the props array.
+	sysFree(props);  //HelloX porting code.
     return JNI_OK;
 
 error:
+	sysFree(props);  //HelloX porting code.
     return JNI_ERR;
 }
 
@@ -1605,7 +1728,9 @@ jint JNI_CreateJavaVM(JavaVM **pvm, void **penv, void *args) {
     JavaVMInitArgs *vm_args = (JavaVMInitArgs*) args;
     InitArgs init_args;
 
-    if(!isSupportedJNIVersion(vm_args->version))
+    if(vm_args->version != JNI_VERSION_1_6 &&
+       vm_args->version != JNI_VERSION_1_4 &&
+       vm_args->version != JNI_VERSION_1_2)
         return JNI_EVERSION;
 
     setDefaultInitArgs(&init_args);
@@ -1614,22 +1739,18 @@ jint JNI_CreateJavaVM(JavaVM **pvm, void **penv, void *args) {
         return JNI_ERR;
 
     init_args.main_stack_base = nativeStackBase();
+    initVM(&init_args);
+    initJNILrefs();
 
-    if(!initVM(&init_args))
-        return JNI_ERR;
-
-    if(!initJNILrefs())
-        return JNI_ERR;
-
-    *penv = &jni_env;
-    *pvm = &jni_invoke_intf;
+    *penv = &env;
+    *pvm = &invokeIntf;
 
     return JNI_OK;
 }
 
 jint JNI_GetCreatedJavaVMs(JavaVM **buff, jsize buff_len, jsize *num) {
     if(buff_len > 0) {
-        *buff = &jni_invoke_intf;
+        *buff = &invokeIntf;
         *num = 1;
         return JNI_OK;
     }

@@ -102,15 +102,6 @@ typedef long   *LPLONG;
 
 //#include <sched.h>
 
-
-#ifndef HAVE_STRUCT_TIMESPEC
-#define HAVE_STRUCT_TIMESPEC 1
-struct timespec {
-        long tv_sec;
-        long tv_nsec;
-};
-#endif /* HAVE_STRUCT_TIMESPEC */
-
 #ifndef SIG_BLOCK
 #define SIG_BLOCK 0
 #endif /* SIG_BLOCK */
@@ -324,8 +315,6 @@ extern "C"
 #define SEM_VALUE_MAX                           INT_MAX
 
 
-
-
 /*
  * The Open Watcom C/C++ compiler uses a non-standard calling convention
  * that passes function args in registers unless __cdecl is explicitly specified
@@ -354,26 +343,37 @@ typedef struct {
 
 struct pthread_mutex_t_
 {
-  int  lock_idx;		/* Provides exclusive access to mutex state
+  int  lock_idx;   /* Provides exclusive access to mutex state
 				   via the Interlocked* mechanism.
 				    0: unlocked/free.
 				    1: locked - no other waiters.
 				   -1: locked - with possible other waiters.
-				*/
+				   */
   int recursive_count;		/* Number of unlocks a thread needs to perform
 				   before the lock is released (recursive
 				   mutexes only). */
   int kind;			/* Mutex type. */
   ptw32_handle_t ownerThread;
-  void* event;			/* Mutex release notification to waiting
-				   threads. */
+  void* event;			/* Mutex release notification to waiting threads. */
 };
 
+struct pthread_cond_t_
+{
+	void*    cond;
+};
 
-typedef ptw32_handle_t pthread_t;
+//Thread attributes.
+struct pthread_attr_t_{
+	void*      stack_ptr;
+	size_t     stack_size;
+	int        detach_state;
+	int        priority;
+};
+
+typedef HANDLE pthread_t;
 typedef struct pthread_attr_t_ * pthread_attr_t;
 typedef struct pthread_once_t_ pthread_once_t;
-typedef struct pthread_key_t_ * pthread_key_t;
+typedef DWORD pthread_key_t;  //HelloX use DWORD as TLS key.
 typedef struct pthread_mutex_t_ * pthread_mutex_t;
 typedef struct pthread_mutexattr_t_ * pthread_mutexattr_t;
 typedef struct pthread_cond_t_ * pthread_cond_t;
@@ -507,12 +507,8 @@ enum
   PTHREAD_MUTEX_DEFAULT = PTHREAD_MUTEX_NORMAL
 };
 
-
 typedef struct ptw32_cleanup_t ptw32_cleanup_t;
-
-
 typedef void (*  ptw32_cleanup_callback_t)(void *);
-
 
 struct ptw32_cleanup_t
 {
@@ -733,8 +729,6 @@ struct ptw32_cleanup_t
  int  pthread_setspecific (pthread_key_t key, const void *value);
 
  void *  pthread_getspecific (pthread_key_t key);
-
-
 
 
 /*

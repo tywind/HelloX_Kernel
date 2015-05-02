@@ -1,6 +1,6 @@
 
-#ifndef	_IO_H_
-#define	_IO_H_
+#ifndef	__IO_H__
+#define	__IO_H__
 
 /*
  * Attributes of files as returned by _findfirst et al.
@@ -53,7 +53,7 @@
 
 
 typedef int intptr_t;
-typedef	unsigned long	_fsize_t;
+typedef	unsigned long _fsize_t;
 
 
 /*
@@ -64,7 +64,6 @@ typedef	unsigned long	_fsize_t;
 #ifndef FILENAME_MAX
 #define	FILENAME_MAX	(260)
 #endif
-
 
 #ifdef	__cplusplus
 extern "C" {
@@ -129,8 +128,13 @@ extern "C" {
  int     fseek(FILE *, long, int);
  long    ftell(FILE *);
 
+ //stdin,stdout,stderr definition.
+#define stdin  NULL
+#define stdout NULL
+#define stderr NULL
+
 #ifdef	__cplusplus
 }
 #endif
 
-#endif	/* _IO_H_ not defined */
+#endif	//__IO_H__

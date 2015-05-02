@@ -130,7 +130,7 @@ static BOOL GetVolumeLbl(__FAT32_FS* pFat32Fs,CHAR* pVolumeLbl)
 		pfse = (__FAT32_SHORTENTRY*)pBuffer;
 		for(i = 0;i < pFat32Fs->SectorPerClus * 16;i ++)
 		{
-			if((BYTE)0xE5 == pfse->FileName[0])  //Empty entry.
+			if(0xE5 == (BYTE)pfse->FileName[0])  //Empty entry.
 			{
 				pfse += 1;  //Seek to the next entry.
 				continue;
@@ -236,7 +236,7 @@ static BOOL CheckPartition(__COMMON_OBJECT* lpThis,  //FAT32 driver device objec
 	/*
 	//Debug only.
 	ppe = (__PARTITION_EXTENSION*)pPartition->lpDevExtension;
-	_hx_sprintf(DevName," PT is : %X, attr is : %X",
+	sprintf(DevName," PT is : %X, attr is : %X",
 		ppe->PartitionType,
 		pPartition->dwAttribute);
 	PrintLine(DevName);
@@ -367,6 +367,7 @@ static __COMMON_OBJECT* FatDeviceOpen(__COMMON_OBJECT* lpDrv,
 	{
 		goto __TERMINAL;
 	}
+	
 	if(FILE_ATTR_DIRECTORY & ShortEntry.FileAttributes)  //Is a directory.
 	{
 		goto __TERMINAL;
@@ -665,7 +666,7 @@ static BOOL FillFindData(__FAT32_FIND_HANDLE* pFindHandle,FS_FIND_DATA* pFindDat
 		//Now try to find a valid directory short entry.
 		for(i;i < pFindHandle->dwClusterSize / 32;i ++)
 		{
-			if((BYTE)0xE5 == pShortEntry->FileName[0])
+			if(0xE5 == (BYTE)pShortEntry->FileName[0])
 			{
 				pShortEntry += 1;
 				pFindHandle->dwClusterOffset += 32;
@@ -782,12 +783,16 @@ __TERMINAL:
 }
 
 //Implementation of GetFileSize.
-static DWORD GetFileSize(__COMMON_OBJECT* lpThis,
+/*static DWORD GetFileSize(__COMMON_OBJECT* lpThis,
 		                 __COMMON_OBJECT* pFileHandle,
 						 DWORD* pdwSizeHigh)
 {
-	return 0;
-}
+	__FAT32_FS*         pFat32Fs      = NULL;
+	
+	pFat32Fs = (__FAT32_FS*)(((__DEVICE_OBJECT*)lpThis)->lpDevExtension);
+
+	return pFat32Fs->pFileList->dwFileSize;
+}*/
 
 //Implementation of RemoveDirectory.
 static BOOL RemoveDirectory(__COMMON_OBJECT* lpDev,
@@ -804,24 +809,166 @@ static BOOL RemoveDirectory(__COMMON_OBJECT* lpDev,
 }
 
 //Implementation of SetEndOfFile.
-static BOOL SetEndOfFile(__COMMON_OBJECT* lpThis,
-		                 __COMMON_OBJECT* pFileObject)
+static BOOL SetEndOfFile( __COMMON_OBJECT* lpDev)
 {
-	return FALSE;
+	__FAT32_FS*             pFat32Fs      = NULL;
+	__FAT32_FILE*           pFat32File    = NULL;	
+	BYTE*                   pClusBuffer   = NULL;
+	__FAT32_SHORTENTRY*     pfse          = NULL;	
+	DWORD                   dwNextCluster = 0;
+	DWORD                   dwSector      = 0;
+	BOOL                    bSetOk        = FALSE;
+
+
+	pFat32File   = (__FAT32_FILE*)(((__DEVICE_OBJECT*)lpDev)->lpDevExtension);
+	pFat32Fs     = pFat32File->pFileSystem;
+
+	pClusBuffer  = (BYTE*)KMemAlloc(pFat32Fs->dwClusterSize,KMEM_SIZE_TYPE_ANY);
+	if(NULL == pClusBuffer)  //Can not allocate buffer.
+	{
+		goto __TERMINAL;
+	}
+
+	//Now update the file's directory entry.
+	dwSector = GetClusterSector(pFat32Fs,pFat32File->dwParentClus);
+	if(0 == dwSector)
+	{		
+		goto __TERMINAL;
+	}
+	if(!ReadDeviceSector((__COMMON_OBJECT*)pFat32Fs->pPartition,
+		dwSector,
+		pFat32Fs->SectorPerClus,
+		pClusBuffer))
+	{
+		goto __TERMINAL;
+	}
+	pfse = (__FAT32_SHORTENTRY*)(pClusBuffer + pFat32File->dwParentOffset);
+
+	//文件大小为当前位置
+	pFat32File->dwFileSize = pFat32File->dwCurrPos;
+	pfse->dwFileSize       = pFat32File->dwFileSize;
+
+	WriteDeviceSector((__COMMON_OBJECT*)pFat32Fs->pPartition,
+		dwSector,
+		pFat32Fs->SectorPerClus,
+		pClusBuffer);
+
+	//释放剩余的空间
+	if(pFat32File->dwCurrPos < pFat32Fs->dwClusterSize )
+	{
+		dwNextCluster = 1;
+	}
+	else
+	{
+		dwNextCluster = pFat32File->dwCurrPos/pFat32Fs->dwClusterSize;
+		if((pFat32File->dwCurrPos+1)%pFat32Fs->dwClusterSize)
+		{
+				dwNextCluster ++;
+		}
+	}	
+	dwNextCluster ++;
+	ReleaseClusterChain(pFat32Fs,dwNextCluster);
+
+	bSetOk = TRUE;
+
+__TERMINAL:
+	if(pClusBuffer)
+	{
+		KMemFree(pClusBuffer,KMEM_SIZE_TYPE_ANY,0);
+	}
+
+	return bSetOk;
 }
 
 //Implementation of SetFilePointer.
-static DWORD FatDeviceSeek(__COMMON_OBJECT* lpDrv,
-		                   __COMMON_OBJECT* lpDev,
-						   __DRCB* lpDrcb)
-{
-	return 0;
+static DWORD FatDeviceSeek(__COMMON_OBJECT* lpDrv, __COMMON_OBJECT* lpDev,__DRCB* lpDrcb)
+{	
+	__FAT32_FILE*    pFatFile  = NULL;
+	DWORD	         dwSeekRet = -1;
+
+	if((NULL == lpDrv) || (NULL == lpDev) || (NULL == lpDrcb))
+	{
+		return dwSeekRet;
+	}
+
+	pFatFile = (__FAT32_FILE*)(((__DEVICE_OBJECT*)lpDev)->lpDevExtension);
+	if( NULL != pFatFile)
+	{
+		__FAT32_FS* pFatFs       = pFatFile->pFileSystem;		
+		DWORD       dwWhereBegin = (DWORD)lpDrcb->lpInputBuffer;//((DWORD*)lpDrcb->lpInputBuffer);
+		DWORD       dwOffsetPos  = *((INT*)lpDrcb->dwExtraParam1);		
+		DWORD       dwClusterNum = 0;		
+		DWORD       i            = 0;
+				
+		//_hx_printf("FatDeviceSeek: where=%d,pos=%d\r\n",dwWhereBegin,dwOffsetPos);
+
+		switch(dwWhereBegin)
+		{
+			case FILE_FROM_BEGIN:
+			{
+				pFatFile->dwCurrPos = dwOffsetPos;
+			}
+			break;
+			case FILE_FROM_CURRENT:
+			{			
+				pFatFile->dwCurrPos += dwOffsetPos;				
+			}
+			break;
+			case FILE_FROM_END:
+			{
+				pFatFile->dwCurrPos = pFatFile->dwFileSize;	
+			}
+			break;
+		default:
+			{
+			return dwSeekRet;
+			}
+		}
+		
+		//位置是否溢出
+		if(pFatFile->dwCurrPos > pFatFile->dwFileSize)
+		{
+			pFatFile->dwCurrPos = pFatFile->dwFileSize;		
+		}
+
+		//确认 Cluster 个数
+		if(pFatFile->dwCurrPos < pFatFs->dwClusterSize )
+		{
+			dwClusterNum = 1;
+		}
+		else
+		{
+			dwClusterNum = pFatFile->dwCurrPos/pFatFs->dwClusterSize;
+			if((pFatFile->dwCurrPos+1)%pFatFs->dwClusterSize)
+			{
+				dwClusterNum ++;
+			}
+		}	
+								
+		//根据Cluster个数 计算出 文件Cluster 实际位置
+		pFatFile->dwCurrClusNum = pFatFile->dwStartClusNum;
+		for(i=0; i< (dwClusterNum-1); i++)
+		{
+			DWORD dwNextNum = pFatFile->dwCurrClusNum;
+
+			if(!GetNextCluster(pFatFs,&dwNextNum))
+			{
+				return dwSeekRet;
+			}
+
+			pFatFile->dwCurrClusNum = dwNextNum;
+		}
+
+		//计算 Cluster 内偏移
+		pFatFile->dwClusOffset = pFatFile->dwCurrPos % pFatFs->dwClusterSize;
+		dwSeekRet              = pFatFile->dwCurrPos;
+	}
+		
+	return dwSeekRet;	
 }
 
 //Implementation of DeviceCtrl routine.
-static DWORD FatDeviceCtrl(__COMMON_OBJECT* lpDrv,
-						   __COMMON_OBJECT* lpDev,
-						   __DRCB* lpDrcb)
+static DWORD FatDeviceCtrl(__COMMON_OBJECT* lpDrv,__COMMON_OBJECT* lpDev, __DRCB* lpDrcb)
 {
 	__COMMON_OBJECT*       pFindHandle = NULL;
 
@@ -899,6 +1046,20 @@ static DWORD FatDeviceCtrl(__COMMON_OBJECT* lpDrv,
 			return 0;
 		}
 		break;
+	case IOCONTROL_FS_SETENDFILE:
+		{
+		if(SetEndOfFile(lpDev))
+			{
+				lpDrcb->dwStatus = DRCB_STATUS_SUCCESS;
+				return 1;
+			}
+			else
+			{
+				lpDrcb->dwStatus = DRCB_STATUS_FAIL;
+				return 0;
+			}
+		}
+		break;
 	default:
 		break;
 	}
@@ -921,6 +1082,7 @@ BOOL FatDriverEntry(__DRIVER_OBJECT* lpDriverObject)
 	lpDriverObject->DeviceSeek    = FatDeviceSeek;
 	lpDriverObject->DeviceWrite   = FatDeviceWrite;
 	lpDriverObject->DeviceCreate  = FatDeviceCreate;
+	lpDriverObject->DeviceSize    = FatDeviceSize;
 
 	//Create FAT file system driver object now.
 	pFatObject = IOManager.CreateDevice((__COMMON_OBJECT*)&IOManager,

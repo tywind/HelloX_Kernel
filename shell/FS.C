@@ -163,6 +163,12 @@ static DWORD CommandParser(LPCSTR lpszCmdLine)
 
 DWORD fsEntry(LPVOID p)
 {
+	if(0 == init())  //Can not finish the initialization work.
+	{
+		PrintLine("  Can not initialize the FS thread.");
+		return 0;
+	}
+
 	return Shell_Msg_Loop(FS_PROMPT_STR,CommandParser,QueryCmdName);	
 }
 
@@ -243,13 +249,14 @@ static DWORD dir(__CMD_PARA_OBJ* pCmdObj)
 		strcat(Buffer,pCmdObj->Parameter[1]);
 	}
 	ToCapital(Buffer);  //Convert to capital.
+	
 	pFindHandle = IOManager.FindFirstFile((__COMMON_OBJECT*)&IOManager,
 		Buffer,
 		&ffd);
 
 	if(NULL == pFindHandle)  //Can not open the target directory.
 	{
-		PrintLine("  Can not open the specified or current directory to display.");
+		PrintLine("Can not open the specified or current directory to display.");
 		goto __TERMINAL;
 	}
 	//Dump out the directory's content.

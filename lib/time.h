@@ -7,13 +7,18 @@
  * processor time is measured and is returned by 'clock'.
  */
 
+#ifndef _TIME_T_DEFINED
+#define _TIME_T_DEFINED
 typedef	 __int64	 time_t;
+#endif
+
 typedef	 __int64     clock_t;
 typedef  __int64   __time64_t;
 
 #define	CLOCKS_PER_SEC	((clock_t)1000)
 #define	CLK_TCK		CLOCKS_PER_SEC
 
+#ifndef _TM_DEFINED
 /*
  * A structure for storing all kinds of useful information about the
  * current (or another) time.
@@ -31,6 +36,8 @@ struct tm
 	int	tm_isdst;	/* +1 Daylight Savings Time, 0 No DST,
 				 * -1 don't know */
 };
+#define _TM_DEFINED
+#endif  //_TM_DEFINED.
 
 #ifdef	__cplusplus
 extern "C" {
@@ -48,6 +55,22 @@ extern "C" {
  char*  	    _strdate(char*);
  char*  	    _strtime(char*);
 
+ struct timeval{
+	 long tv_sec;
+	 long tv_usec;
+ };
+
+ int gettimeofday(struct timeval* tv,void* ptr);
+
+#ifndef HAVE_STRUCT_TIMESPEC
+#define HAVE_STRUCT_TIMESPEC
+
+ //timespec object.
+ struct timespec{
+	 long long tv_sec;
+	 long long tv_nsec;
+ };
+#endif
 
 #ifdef	__cplusplus
 }

@@ -25,6 +25,21 @@
 #include "StdAfx.h"
 #endif
 
+//A helper routine,to check if a given kernel thread should be suspended.
+//It will be invoked by GetReadyKernelThread.
+static BOOL ShouldSuspend(__KERNEL_THREAD_OBJECT* lpKernelThread)
+{
+	if(lpKernelThread->dwSuspendFlags & SUSPEND_FLAG_DISABLE)
+	{
+		return FALSE;
+	}
+	if(0 == (lpKernelThread->dwSuspendFlags & ~SUSPEND_FLAG_MASK))
+	{
+		return FALSE;
+	}
+	return TRUE;
+}
+
 //
 //This routine tris to get a schedulable kernel thread from ready queue,
 //the target kernel thread's priority must larger or equal dwPriority.
@@ -52,6 +67,16 @@ __KERNEL_THREAD_OBJECT* GetScheduleKernelThread(__COMMON_OBJECT* lpThis,
 			NULL);
 		if(lpKernel)  //Found one successfully.
 		{
+			if(ShouldSuspend(lpKernel))
+			{
+				//Suspend the kernel thread.
+				lpKernel->dwThreadStatus = KERNEL_THREAD_STATUS_SUSPENDED;
+				lpMgr->lpSuspendedQueue->InsertIntoQueue(
+					(__COMMON_OBJECT*)lpMgr->lpSuspendedQueue,
+					(__COMMON_OBJECT*)lpKernel,
+					lpKernel->dwThreadPriority);
+				continue;
+			}
 			return lpKernel;
 		}
 	}
@@ -177,7 +202,7 @@ VOID CallThreadHook(DWORD dwHookType,
 		//Call begin schedule hook now.
 		KernelThreadManager.lpBeginScheduleHook(lpNext,&lpNext->dwUserData);
 	}
-	if(dwHookType & THREAD_HOOK_TYPE_TERMINAL) //Should cal terminal hook.
+	if(dwHookType & THREAD_HOOK_TYPE_TERMINAL) //Should call terminal hook.
 	{
 		if(NULL == lpPrev)
 		{
@@ -205,14 +230,13 @@ VOID CallThreadHook(DWORD dwHookType,
 //
 VOID KernelThreadWrapper(__COMMON_OBJECT* lpKThread)
 {
-	__KERNEL_THREAD_OBJECT*        lpKernelThread      = NULL;
+	__KERNEL_THREAD_OBJECT*        lpKernelThread      = (__KERNEL_THREAD_OBJECT*)lpKThread;
 	__KERNEL_THREAD_OBJECT*        lpWaitingThread     = NULL;
 	__PRIORITY_QUEUE*              lpWaitingQueue      = NULL;
 	DWORD                          dwRetValue          = 0;
 	DWORD                          dwFlags             = 0;
 
-	lpKernelThread = (__KERNEL_THREAD_OBJECT*)lpKThread;
-
+	//lpKernelThread = (__KERNEL_THREAD_OBJECT*)lpKThread;
 	//Execute user defined kernel thread function.
 	dwRetValue = lpKernelThread->KernelThreadRoutine(lpKernelThread->lpRoutineParam);
 
@@ -249,6 +273,58 @@ VOID KernelThreadWrapper(__COMMON_OBJECT* lpKThread)
 	return;        //***** CAUTION! ***** : This instruction will never reach.
 }
 
+//Half bottom part of a kernel thread,responds for the cleaning of a kernel thread's
+//context.
+//This routine is used for supporting the implementation of TerminateKernelThread,which
+//in furthar supports the implementations of exit() and abort() C lib routine.
+VOID KernelThreadClean(__COMMON_OBJECT* lpKThread,DWORD dwExitCode)
+{
+	__KERNEL_THREAD_OBJECT*        lpKernelThread      = (__KERNEL_THREAD_OBJECT*)lpKThread;
+	__KERNEL_THREAD_OBJECT*        lpWaitingThread     = NULL;
+	__PRIORITY_QUEUE*              lpWaitingQueue      = NULL;
+	DWORD                          dwFlags             = 0;
+
+	if(NULL == lpKernelThread)
+	{
+		return;
+	}
+
+	//Set the exit code.
+	lpKernelThread->dwReturnValue = dwExitCode;
+
+	//Begin clean the execution context of the specified kernel thread.
+	__ENTER_CRITICAL_SECTION(NULL,dwFlags);
+	lpKernelThread->dwThreadStatus   = KERNEL_THREAD_STATUS_TERMINAL;  //Change the status.
+	//Insert the current kernel thread object into TERMINAL queue.
+	KernelThreadManager.lpTerminalQueue->InsertIntoQueue((__COMMON_OBJECT*)KernelThreadManager.lpTerminalQueue,
+		(__COMMON_OBJECT*)lpKernelThread,
+		0);
+	//
+	//The following code wakeup all kernel thread(s) who waiting for this kernel thread 
+	//object.
+	//
+	lpWaitingQueue  = lpKernelThread->lpWaitingQueue;
+	lpWaitingThread = (__KERNEL_THREAD_OBJECT*)lpWaitingQueue->GetHeaderElement(
+		(__COMMON_OBJECT*)lpWaitingQueue,
+		NULL);
+	while(lpWaitingThread)
+	{
+		lpWaitingThread->dwThreadStatus   = KERNEL_THREAD_STATUS_READY;
+		lpWaitingThread->dwWaitingStatus &= ~OBJECT_WAIT_MASK;
+		lpWaitingThread->dwWaitingStatus |= OBJECT_WAIT_RESOURCE;
+		KernelThreadManager.AddReadyKernelThread(
+			(__COMMON_OBJECT*)&KernelThreadManager,
+			lpWaitingThread);  //Add to ready queue.
+		lpWaitingThread = (__KERNEL_THREAD_OBJECT*)lpWaitingQueue->GetHeaderElement(
+			(__COMMON_OBJECT*)lpWaitingQueue,
+			NULL);
+	}
+	__LEAVE_CRITICAL_SECTION(NULL,dwFlags);
+
+	KernelThreadManager.ScheduleFromProc(NULL);  //Re-schedule kernel thread.
+	return;
+}
+
 //
 //The implementation of WaitForKernelThreadObject,because this routine calls ScheduleFromproc,
 //so we implement it here(After the implementation of ScheduleFromProc).
@@ -260,17 +336,15 @@ VOID KernelThreadWrapper(__COMMON_OBJECT* lpKThread)
 //
 DWORD WaitForKernelThreadObject(__COMMON_OBJECT* lpThis)
 {
-	__KERNEL_THREAD_OBJECT*           lpKernelThread = NULL;
+	__KERNEL_THREAD_OBJECT*           lpKernelThread = (__KERNEL_THREAD_OBJECT*)lpThis;
 	__KERNEL_THREAD_OBJECT*           lpCurrent      = NULL;
 	__PRIORITY_QUEUE*                 lpWaitingQueue = NULL;
 	DWORD                             dwFlags        = 0;
 	
-	if(NULL == lpThis)    //Parameter check.
+	if(NULL == lpKernelThread)    //Parameter check.
 	{
 		return 0;
 	}
-
-	lpKernelThread = (__KERNEL_THREAD_OBJECT*)lpThis;
 
 	__ENTER_CRITICAL_SECTION(NULL,dwFlags);
 	if(KERNEL_THREAD_STATUS_TERMINAL == lpKernelThread->dwThreadStatus)  //If the object's
@@ -294,8 +368,6 @@ DWORD WaitForKernelThreadObject(__COMMON_OBJECT* lpThis)
 		(__COMMON_OBJECT*)lpCurrent,
 		0);    //Insert into the current kernel thread into waiting queue.
 	__LEAVE_CRITICAL_SECTION(NULL,dwFlags);
-
 	KernelThreadManager.ScheduleFromProc(NULL);
-
 	return 0;
 }

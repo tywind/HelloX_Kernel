@@ -16,6 +16,10 @@
 #include "..\include\StdAfx.h"
 #endif
 
+#ifndef __STDDEF_H__
+#include "stddef.h"
+#endif
+
 #ifndef __STDLIB_H__
 #include "stdlib.h"
 #endif
@@ -42,4 +46,23 @@ void* _hx_calloc(size_t n,size_t s)
 	}
 	memset(p,0,n * s);
 	return p;
+}
+
+//mmap routine of POSIX.
+void* mmap(void* start,size_t length,int prot,int flags,int fd,off_t offset)
+{
+	return KMemAlloc(length,KMEM_SIZE_TYPE_ANY);
+}
+
+//munmap routine of POSIX.
+int munmap(void* start,size_t length)
+{
+	KMemFree(start,KMEM_SIZE_TYPE_ANY,0);
+	return 0;
+}
+
+//Allocate memory from STACK.Should be implemented later and put into arch related files.
+void* _hx_alloca(size_t size)
+{
+	return NULL;
 }

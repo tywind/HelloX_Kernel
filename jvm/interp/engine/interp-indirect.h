@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2012, 2013, 2014
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009
  * Robert Lougher <rob@jamvm.org.uk>.
  *
  * This file is part of JamVM.
@@ -56,12 +56,10 @@ unused:
 
 /* Macros for handler/bytecode rewriting */
 
-#define OPCODE_CHANGED(opcode) (pc[0] != opcode)
-
 #define WITH_OPCODE_CHANGE_CP_DINDEX(opcode, index)        \
     index = DOUBLE_INDEX(pc);                              \
     MBARRIER();                                            \
-    if(OPCODE_CHANGED(opcode))                             \
+    if(pc[0] != opcode)                                    \
         DISPATCH(0, 0);
 
 #define OPCODE_REWRITE(opcode)                             \
@@ -137,10 +135,10 @@ opc##x##_##y##_##z:
         BODY
 
 #define DEF_OPC_JMP(TYPE, BODY)                 \
-    DEF_OPC_210(OPC_##TYPE, ({                  \
+    DEF_OPC_210(OPC_##TYPE, {                  \
         BODY                                    \
         BRANCH(TYPE, 0, TRUE);                  \
-    });)
+    })
 
 #define DEF_OPC_FLOAT(opcode, BODY)             \
     DEF_OPC_210(opcode, BODY)
@@ -252,10 +250,10 @@ opc##x##_##y##_##z:
         BODY
 
 #define DEF_OPC_210(opcode, BODY)               \
-    DEF_OPC_012(opcode, ({BODY});)
+    DEF_OPC_012(opcode, BODY)
 
 #define DEF_OPC_210_2(op1, op2, BODY)           \
-    DEF_OPC_012_2(op1, op2, ({BODY});)
+    DEF_OPC_012_2(op1, op2, BODY)
 
 #endif /* USE_CACHE */
 
@@ -292,19 +290,7 @@ opc##x##_##y##_##z:
 #define RESOLVED_CONSTANT(pc)    CP_INFO(cp, SINGLE_INDEX(pc))
 #define RESOLVED_FIELD(pc)       ((FieldBlock*)CP_INFO(cp, DOUBLE_INDEX(pc)))
 #define RESOLVED_METHOD(pc)      ((MethodBlock*)CP_INFO(cp, DOUBLE_INDEX(pc)))
-#define RESOLVED_POLYMETHOD(pc)  ((PolyMethodBlock*)CP_INFO(cp, DOUBLE_INDEX(pc)))
 #define RESOLVED_CLASS(pc)       ((Class *)CP_INFO(cp, DOUBLE_INDEX(pc)))
-#define INTRINSIC_ARGS(pc)       (RESOLVED_METHOD(pc)->args_count)
-
-#define RESOLVED_INVDYNMETHOD(pc)                           \
-({                                                          \
-    ResolvedInvDynCPEntry *entry = (ResolvedInvDynCPEntry*) \
-                             CP_INFO(cp, DOUBLE_INDEX(pc)); \
-    InvDynMethodBlock *idmb = entry->cache;                 \
-    if(idmb->id != pc[3])                                   \
-        idmb = resolvedCallSite(entry, pc[3]);              \
-    idmb;                                                   \
-})
 
 /* Macros for checking for common exceptions */
 
