@@ -258,9 +258,9 @@ BOOL VGA_GetString(WORD CursorX,WORD CursorY,LPSTR pString,INT nBufLen)
 
 	for(i=0;i<nBufLen;i++)
 	{		
-		BYTE  ch   = (BYTE)(*pVideoBuf&0xFF);
+		BYTE  ch   = (BYTE)(*pVideoBuf&0x7F);
 
-		if(ch < 0x20 || ch >=  0x7f || ch == 95)
+		if(ch < 0x20 || ch >  0x7E /*|| ch == 0x5F*/)
 		{
 			break;
 		}

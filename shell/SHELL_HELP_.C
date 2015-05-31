@@ -209,7 +209,7 @@ static INT OnExecCommand(SHELL_MSG_INFO*  pShellInfo,const CHAR* pCmdBuf)
 
 static INT OnAnalyseCommands(SHELL_MSG_INFO*  pShellInfo,const CHAR* pCmdBuf)
 {
-	CHAR*  pCmdPos         = pCmdBuf;
+	CHAR*  pCmdPos         = (CHAR*)pCmdBuf;
 	CHAR*  pSubCmd         = NULL;
 	INT    nExecCount      = 1;	
 	INT    nRet            = S_OK;
@@ -235,7 +235,8 @@ static INT OnAnalyseCommands(SHELL_MSG_INFO*  pShellInfo,const CHAR* pCmdBuf)
 		{
 			break;
 		}
-		
+
+
 		//find next cmd
 		pCmdPos = pSubCmd+1;
 		pSubCmd = strstr(pCmdPos,";");
@@ -261,11 +262,9 @@ static INT OnKeyControl(SHELL_MSG_INFO*  pShellInfo,BYTE   bt )
 
 			//µÃµ½ÃüÁîÊäÈë´®
 			CD_GetCursorPos(&CursorX,&CursorY);		
-			CD_GetString(strlen(pShellInfo->pPrompt),CursorY,szCmdBuffer,sizeof(szCmdBuffer));	
-			
-			strtrim(szCmdBuffer,TRIM_LEFT|TRIM_RIGHT);			
+			CD_GetString(strlen(pShellInfo->pPrompt),CursorY,szCmdBuffer,sizeof(szCmdBuffer));
+			strtrim(szCmdBuffer,TRIM_LEFT|TRIM_RIGHT);
 			CD_ChangeLine();
-					
 
 			if(OnAnalyseCommands(pShellInfo,szCmdBuffer) == EXIT_SHELL_COMMAND)				
 			{

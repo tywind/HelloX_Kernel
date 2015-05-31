@@ -207,20 +207,16 @@ BOOL Fat32Init(__FAT32_FS* pFat32Fs,BYTE* pSector0)
 	DataSec -= (FATSz * pFat32Fs->FatNum);
 	DataSec -= RootDirSector;  //We now have got the data sector number.
 	CountOfCluster = DataSec / pFat32Fs->SectorPerClus;  //Get the total cluster counter.
+
+	
 	if(CountOfCluster < 4085)
 	{
 		//This partition is FAT12,we can not handle it currently.
 		goto __TERMINAL;
 	}
-	else
-	{
-		if(CountOfCluster < 65525)
-		{
-			//This partiton is FAT16,we also can not handle it now.
-			goto __TERMINAL;
-		}
-	}
+	
 	//The FAT partition is FAT32.
+
 	bResult = TRUE;
 
 __TERMINAL:

@@ -34,6 +34,9 @@ VOID InitKernelThreadContext(__KERNEL_THREAD_OBJECT* lpKernelThread,
 //Enable VMM mechanism.
 VOID EnableVMM(void);
 
+//Halt the system in case of idle.
+VOID HaltSystem();
+
 //Switch to a new kernel thread from interrupt context.
 VOID __SwitchTo(__KERNEL_THREAD_CONTEXT* lpContext);
 

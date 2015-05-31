@@ -5,7 +5,7 @@
 #endif
 
 /* GNU Classpath installation directory (prefix) */
-#define CLASSPATH_INSTALL_DIR "C:\jvm\classlib"
+#define CLASSPATH_INSTALL_DIR "C:\\jvm\\classlib"
 
 /* Define to one of `_getb67', `GETB67', `getb67' for Cray-2 and Cray-YMP
    systems. This function is required for `alloca.c' support on those systems.

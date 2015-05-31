@@ -57,7 +57,7 @@ typedef long _off_t;                    /* file offset value */
 
 #if !__STDC__
 /* Non-ANSI name for compatibility */
-typedef long off_t;
+//typedef long off_t;
 #endif  /* !__STDC__ */
 
 #define _OFF_T_DEFINED

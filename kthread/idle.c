@@ -40,5 +40,7 @@ DWORD SystemIdle(LPVOID lpData)
 		{
 			dwIdleCounter = 0;
 		}
+		//Halt the current CPU.
+		HaltSystem();
 	}
 }

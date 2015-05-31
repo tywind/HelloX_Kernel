@@ -232,7 +232,6 @@ static VOID PrintDir(FS_FIND_DATA* pFindData)
 			pFindData->cAlternateFileName,
 		pFindData->nFileSizeLow,
 		(pFindData->dwFileAttribute & FILE_ATTR_DIRECTORY) ? "DIR" : "FILE");
-
 	PrintLine(Buffer);	
 }
 
@@ -508,6 +507,7 @@ static DWORD type(__CMD_PARA_OBJ* pCmdObj)
 	strcpy(FullName,FsGlobalData.CurrentDir);
 	strcat(FullName,pCmdObj->Parameter[1]);
 	ToCapital(FullName);
+		
 	//Try to open the target file.
 	hFile = IOManager.CreateFile((__COMMON_OBJECT*)&IOManager,
 		FullName,

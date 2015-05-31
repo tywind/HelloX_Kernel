@@ -640,6 +640,7 @@ int _hx_printf(const char* fmt,...)
 	va_list args;
 	int n;
 	int i = 0;
+	DWORD x, y; //Cursor position control.
 	WORD wr = 0x0700;
 
 	//Try to acquire the synchronizing mutex object,create it
@@ -689,6 +690,14 @@ int _hx_printf(const char* fmt,...)
 		{
 			GotoHome();
 			i ++;
+			continue;
+		}
+		if ('\t' == buff[i])
+		{
+			CD_GetCursorPos(&x, &y);
+			x = x + TAB_SPACE_NUM - (x % TAB_SPACE_NUM);
+			CD_SetCursorPos(x,y);
+			i++;
 			continue;
 		}
 		wr += buff[i];

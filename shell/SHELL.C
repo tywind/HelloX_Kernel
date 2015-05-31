@@ -263,23 +263,22 @@ extern int jvm_main(int argc, char* argv[]);
 //Wrapper of Java VM.
 static DWORD JvmEntryPoint(LPVOID pData)
 {
-	char* argv[] = {
-		"jvm",
-		(char*)pData };
-
+	__CMD_PARA_OBJ* pCmdParaObj = (__CMD_PARA_OBJ*)pData;
+	
 	if (NULL == pData)
 	{
-		_hx_printf("  JVM: Please input the class to be load.\r\n");
+		_hx_printf("  No parameter specified.\r\n");
 		return 0;
 	}
+	
 	//Call JVM's main entry.
-	return jvm_main(2, argv);
+	return jvm_main(pCmdParaObj->byParameterNum, pCmdParaObj->Parameter);
 }
 
 static DWORD JvmHandler(__CMD_PARA_OBJ* pCmdParaObj)
 {
 	__KERNEL_THREAD_OBJECT*    lpJVMThread = NULL;
-	char*                      className = "-version";
+	//char*                      className = "-version";
 
 	//Create Java VM thread.
 	lpJVMThread = KernelThreadManager.CreateKernelThread(
@@ -288,7 +287,7 @@ static DWORD JvmHandler(__CMD_PARA_OBJ* pCmdParaObj)
 		KERNEL_THREAD_STATUS_READY,
 		PRIORITY_LEVEL_NORMAL,
 		JvmEntryPoint,
-		className,
+		pCmdParaObj,
 		NULL,
 		"JVM");
 	if (NULL == lpJVMThread)    //Can not create the IO control thread.

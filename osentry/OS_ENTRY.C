@@ -39,9 +39,9 @@
 #endif
 
 //Welcome information.
-char* pszStartMsg1 = "Hello China is running now.If you have any question,";
+char* pszStartMsg1 = "HelloX is running now.If you have any question,";
 char* pszStartMsg2 = "please send email to : garryxin@yahoo.com.cn.";
-char* pszWelcome   = "Welcome to use Hello China!";
+char* pszWelcome   = "Welcome to use HelloX!";
 
 //Help information.
 char* pszHelpInfo = "Any help please press 'help' + return.";
@@ -53,12 +53,12 @@ extern __DRIVER_ENTRY DriverEntryArray[];
 //A dead loop routine.
 static void DeadLoop(BOOL bDisableInt)
 {
-	DWORD dwFlags;
+	//DWORD dwFlags;
 	if (bDisableInt)
 	{
-		__ENTER_CRITICAL_SECTION(NULL, dwFlags);
+		//__ENTER_CRITICAL_SECTION(NULL, dwFlags);
 		while (TRUE);
-		__LEAVE_CRITICAL_SECTION(NULL, dwFlags);
+		//__LEAVE_CRITICAL_SECTION(NULL, dwFlags);
 	}
 	else
 	{

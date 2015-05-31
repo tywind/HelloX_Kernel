@@ -39,6 +39,8 @@ int _hx_vfprintf(void* stream,const char* fmt,va_list args);
 
 int _hx_snprintf(char* buf,size_t n,const char* fmt,...);
 
+#define TAB_SPACE_NUM 8  //How many space in a tab key.
+
 //Simulate standard printf routine.
 #ifndef printf
 #define printf _hx_printf

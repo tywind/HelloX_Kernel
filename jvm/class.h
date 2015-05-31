@@ -38,12 +38,23 @@
    the classes will be contained in ZIP files, else they will be
    separate class files in a directory structure */
 
+/*
 #ifdef USE_ZIP
 #define JAMVM_CLASSES INSTALL_DIR"/share/jamvm/classes.zip"
 #define CLASSPATH_CLASSES CLASSPATH_INSTALL_DIR"/share/classpath/glibj.zip"
 #else
 #define JAMVM_CLASSES INSTALL_DIR"/share/jamvm/classes"
 #define CLASSPATH_CLASSES CLASSPATH_INSTALL_DIR"/share/classpath"
+#endif
+*/
+
+//HelloX Porting code.
+#ifdef USE_ZIP
+#define JAMVM_CLASSES INSTALL_DIR"\\share\\jamvm\\classes.zip"
+#define CLASSPATH_CLASSES CLASSPATH_INSTALL_DIR"\\share\\classpath\\glibj.zip"
+#else
+#define JAMVM_CLASSES INSTALL_DIR"\\share\\jamvm\\classes"
+#define CLASSPATH_CLASSES CLASSPATH_INSTALL_DIR"\\share\\classpath"
 #endif
 
 #define DFLT_BCP JAMVM_CLASSES":"CLASSPATH_CLASSES

@@ -157,6 +157,12 @@ BOOL WriteDeviceSector(__COMMON_OBJECT* pPartition,DWORD dwStartSectorNum,
 BOOL Fat32Init(__FAT32_FS* pFatFs,BYTE* pSector0);       //Initialize FAT32 file system.
 
 BOOL GetNextCluster(__FAT32_FS* pFat32Fs,DWORD* pdwCluster);  //Get next cluster given current 1.
+
+//Get one free cluster and mark the cluster as used.
+//If find,TRUE will be returned and the cluster number will be set in pdwFreeCluster,
+//else FALSE will be returned without any changing to pdwFreeCluster.
+BOOL GetFreeCluster(__FAT32_FS* pFat32Fs, DWORD dwStartToFind, DWORD* pdwFreeCluster);
+
 DWORD GetClusterSector(__FAT32_FS* pFat32Fs,DWORD dwCluster); //Get cluster's start sector no.
 BOOL ConvertName(__FAT32_SHORTENTRY* pfse,BYTE* pResult);     //Convert to regular file name string.
 BOOL GetShortEntry(__FAT32_FS* pFat32Fs,

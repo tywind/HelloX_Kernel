@@ -24,7 +24,7 @@
 //************************************************************************
 
 #define OS_VERSION   "    HelloX V1.78"
-#define VERSION_INFO "    HelloX [Version 1.780(Beta),build in 2015/05/01,by Garry.Xin]"
+#define VERSION_INFO "    HelloX [Version 1.780(Beta),build in 2015/05/09,by Garry.Xin]"
 #define SLOGAN_INFO  "    HelloX OS,through which you can talk to everything."
 
 //************************************************************************
@@ -146,7 +146,7 @@
 #define __CFG_DRV_IDE
 
 //Include COM driver in OS.
-#define __CFG_DRV_COM
+//#define __CFG_DRV_COM
 
 //Include USART driver in OS,specific for STM32 or ARM platform.
 //#define __CFG_DRV_USART
@@ -170,7 +170,7 @@
 #define __CFG_FS_FAT32
 
 //Include NTFS file system function in OS.
-#define __CFG_FS_NTFS
+//#define __CFG_FS_NTFS
 
 //Include RAM file system in OS.
 //#define __CFG_FS_RAM

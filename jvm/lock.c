@@ -426,7 +426,7 @@ Monitor *findMonitor(Object *obj) {
     if(lockword & SHAPE_BIT)
         return (Monitor*) (lockword & ~SHAPE_BIT);
     else {
-        Monitor *mon;
+		Monitor *mon = NULL;
         /* Add if absent, scavenge, locked */
         _findHashEntry(&mon_cache, obj, mon, TRUE, TRUE, TRUE);
         return mon;

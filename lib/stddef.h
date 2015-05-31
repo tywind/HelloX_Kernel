@@ -29,6 +29,9 @@ typedef int uid_t;
 typedef int pid_t;
 
 //Definition of standard wchar_t type.
-typedef short int wchar_t;
+#ifndef _WCHAR_T_DEFINED
+typedef unsigned short wchar_t;
+#define _WCHAR_T_DEFINED
+#endif  /* _WCHAR_T_DEFINED */
 
 #endif

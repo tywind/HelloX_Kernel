@@ -396,7 +396,7 @@ VOID GUIHandler(__CMD_PARA_OBJ* pCmdParaObj)
 {
 	HANDLE	hBinFile = NULL;
 	CHAR    FullPathName[64];  //Full name of binary file.
-	DWORD	dwStartAddr = 0x160000;
+	DWORD	dwStartAddr = 0x170000;
 
 	strcpy(FullPathName, "C:\\PTHOUSE\\hcngui.bin");
 	//Try to open the binary file.

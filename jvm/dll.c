@@ -334,8 +334,14 @@ char *getDllPath() {
     return env ? env : "";
 }
 
+/*
 char *getBootDllPath() {
     return CLASSPATH_INSTALL_DIR"/lib/classpath";
+}*/
+
+//HelloX Porting code.
+char *getBootDllPath() {
+	return CLASSPATH_INSTALL_DIR"\\lib\\classpath";
 }
 
 char *getDllName(char *name) {

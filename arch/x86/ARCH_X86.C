@@ -138,6 +138,14 @@ VOID EnableVMM()
 	}
 }
 
+//Halt current CPU in case of IDLE,it will be called by IDLE thread.
+VOID HaltSystem()
+{
+	__asm{
+		hlt
+	}
+}
+
 //
 //This routine initializes a kernel thread's context.
 //This routine's action depends on different platform.
