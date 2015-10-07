@@ -45,7 +45,7 @@
     <IntDir>.\Release\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <GenerateManifest>false</GenerateManifest>
-    <IncludePath>jvm;network;Lib</IncludePath>
+    <IncludePath>jvm;network;Lib;drivers</IncludePath>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules />
     <CodeAnalysisRuleAssemblies />
@@ -104,6 +104,7 @@
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <EntryPointSymbol>__OS_Entry</EntryPointSymbol>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateMapFile>true</GenerateMapFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -152,12 +153,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="appldr\AppLoader.C" />
+    <ClCompile Include="appldr\AppLoader_ELF.C" />
+    <ClCompile Include="appldr\AppLoader_PE.C" />
+    <ClCompile Include="appldr\AppLoader_STM32.C" />
     <ClCompile Include="arch\x86\BIOSVGA.C" />
     <ClCompile Include="drivers\x86\com.c" />
     <ClCompile Include="drivers\x86\IDEBASE.C" />
     <ClCompile Include="drivers\x86\IDEHD.C" />
     <ClCompile Include="drivers\x86\KEYBRD.C" />
     <ClCompile Include="drivers\x86\MOUSE.C" />
+    <ClCompile Include="drivers\x86\pcnet.c" />
     <ClCompile Include="jvm\access.c" />
     <ClCompile Include="jvm\alloc.c" />
     <ClCompile Include="jvm\cast.c" />
@@ -216,7 +222,7 @@
     <ClCompile Include="lib\math.c" />
     <ClCompile Include="lib\memory.c" />
     <ClCompile Include="lib\pthread.c" />
-    <ClCompile Include="lib\pthread_mutex .c" />
+    <ClCompile Include="lib\pthread_mutex.c" />
     <ClCompile Include="lib\pthread_other.c" />
     <ClCompile Include="lib\sched.c" />
     <ClCompile Include="lib\setjmp.c" />
@@ -234,7 +240,7 @@
     <ClCompile Include="shell\FIBONACCI.C" />
     <ClCompile Include="shell\FS.C" />
     <ClCompile Include="shell\HEDIT.C" />
-    <ClCompile Include="shell\HISCMD .C" />
+    <ClCompile Include="shell\hiscmd.c" />
     <ClCompile Include="shell\HYPERTRM.C" />
     <ClCompile Include="shell\IOCTRL_S.C" />
     <ClCompile Include="shell\network.c" />
@@ -270,7 +276,6 @@
     <ClCompile Include="kernel\STATCPU.C" />
     <ClCompile Include="kernel\SYNOBJ.C" />
     <ClCompile Include="kernel\synobj2.c" />
-    <ClCompile Include="kernel\SYSCALL.C" />
     <ClCompile Include="kernel\SYSTEM.C" />
     <ClCompile Include="kernel\TYPES.C" />
     <ClCompile Include="kernel\VMM.C" />
@@ -308,12 +313,31 @@
     <ClCompile Include="network\api\tcpip.c" />
     <ClCompile Include="network\core\timers.c" />
     <ClCompile Include="network\core\udp.c" />
+    <ClCompile Include="syscall\SYSCALL.C" />
+    <ClCompile Include="syscall\SYSCALL_IO.C" />
+    <ClCompile Include="syscall\SYSCALL_KERNEL.C" />
+    <ClCompile Include="syscall\SYSCALL_SOCKET.C" />
+    <ClCompile Include="usb\ehci_pci.c" />
+    <ClCompile Include="usb\ent_ary.c" />
+    <ClCompile Include="usb\usb.c" />
+    <ClCompile Include="usb\usb_ehci.c" />
+    <ClCompile Include="usb\usb_hd.c" />
+    <ClCompile Include="usb\usb_hub.c" />
+    <ClCompile Include="usb\usb_ohci.c" />
+    <ClCompile Include="usb\usb_storage.c" />
+    <ClCompile Include="usb\xhci.c" />
+    <ClCompile Include="usb\xhci_mem.c" />
+    <ClCompile Include="usb\xhci_pci.c" />
+    <ClCompile Include="usb\xhci_ring.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="arch\x86\BIOSVGA.H" />
     <ClInclude Include="dispaly\BIOSVGA.H" />
+    <ClInclude Include="drivers\x86\pcnet.h" />
+    <ClInclude Include="include\align.h" />
     <ClInclude Include="include\arch\bpstruct.h" />
     <ClInclude Include="INCLUDE\BUFFMGR.H" />
+    <ClInclude Include="include\byteord.h" />
     <ClInclude Include="include\CharDisplay.H" />
     <ClInclude Include="INCLUDE\COMMOBJ.H" />
     <ClInclude Include="INCLUDE\COMQUEUE.H" />
@@ -342,7 +366,6 @@
     <ClInclude Include="INCLUDE\RINGBUFF.H" />
     <ClInclude Include="INCLUDE\STATCPU.H" />
     <ClInclude Include="INCLUDE\StdAfx.h" />
-    <ClInclude Include="INCLUDE\SYSCALL.H" />
     <ClInclude Include="include\sysnet.h" />
     <ClInclude Include="INCLUDE\SYSTEM.H" />
     <ClInclude Include="INCLUDE\TYPES.H" />
@@ -406,6 +429,7 @@
     <ClInclude Include="lib\time.h" />
     <ClInclude Include="lib\time_pri.h" />
     <ClInclude Include="lib\unistd.h" />
+    <ClInclude Include="network\ethernet\ethif.h" />
     <ClInclude Include="shell\EXTCMD.H" />
     <ClInclude Include="shell\FDISK.H" />
     <ClInclude Include="shell\FIBONACCI.H" />
@@ -419,7 +443,6 @@
     <ClInclude Include="shell\SYSD_S.H" />
     <ClInclude Include="config\config.h" />
     <ClInclude Include="include\arch\cc.h" />
-    <ClInclude Include="network\nicdrv\ethif.h" />
     <ClInclude Include="include\lwipopts.h" />
     <ClInclude Include="include\lwip\netif.h" />
     <ClInclude Include="include\lwip\opt.h" />
@@ -427,6 +450,21 @@
     <ClInclude Include="include\lwip\sockets.h" />
     <ClInclude Include="include\lwip\sys.h" />
     <ClInclude Include="include\arch\sys_arch.h" />
+    <ClInclude Include="syscall\K_API_DEF.H" />
+    <ClInclude Include="syscall\SYSCALL.H" />
+    <ClInclude Include="syscall\SYSCALL_KERNEL.H" />
+    <ClInclude Include="usb\ch9.h" />
+    <ClInclude Include="usb\ehci.h" />
+    <ClInclude Include="usb\errno.h" />
+    <ClInclude Include="usb\hxadapt.h" />
+    <ClInclude Include="usb\ohci.h" />
+    <ClInclude Include="usb\scsi.h" />
+    <ClInclude Include="usb\usb.h" />
+    <ClInclude Include="usb\usbdescriptors.h" />
+    <ClInclude Include="usb\usbdev_storage.h" />
+    <ClInclude Include="usb\usbroothubdes.h" />
+    <ClInclude Include="usb\usb_defs.h" />
+    <ClInclude Include="usb\xhci.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="arch\x86\BOOTSECT.ASM" />

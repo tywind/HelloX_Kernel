@@ -1,4 +1,4 @@
-//***********************************************************************/
+ï»¿//***********************************************************************/
 //    Author                    : Garry
 //    Original Date             : May,27 2004
 //    Module Name               : shell.cpp
@@ -11,6 +11,7 @@
 //                                2.
 //    Lines number              :
 //***********************************************************************/
+
 #ifndef __STDAFX_H__
 #include "StdAfx.h"
 #endif
@@ -25,10 +26,12 @@
 #include "console.h"
 #include "stdio.h"
 #include "string.h"
+#include <buffmgr.h>
+
 
 #if defined(__I386__)
 #ifndef __BIOS_H__
-#include "../arch/x86/BIOS.H"
+#include "../arch/x86/bios.h"
 #endif
 #endif
 
@@ -56,6 +59,7 @@ extern DWORD SysInfoHandler(__CMD_PARA_OBJ* pCmdParaObj);      //Handles the sys
 extern DWORD HlpHandler(__CMD_PARA_OBJ* pCmdParaObj);
 extern DWORD LoadappHandler(__CMD_PARA_OBJ* pCmdParaObj);
 extern DWORD GUIHandler(__CMD_PARA_OBJ* pCmdParaObj);          //Handler for GUI command,resides in
+extern DWORD BatHandler(__CMD_PARA_OBJ* pCmdParaObj);
 //extern DWORD FileWriteTest(__CMD_PARA_OBJ* pCmdParaObj); 
 
 static DWORD CpuHandler(__CMD_PARA_OBJ* pCmdParaObj);
@@ -90,6 +94,7 @@ __CMD_OBJ  CmdObj[] = {
 	{"ioctrl"   ,    IoCtrlApp},
 	{"sysdiag"  ,    SysDiagApp},
 	{"loadapp"  ,    LoadappHandler},
+	{"la"       ,    LoadappHandler},
 	{"gui"      ,    GUIHandler},
 #ifdef __CFG_APP_JVM  //Java VM is enabled.
 	{"jvm"      ,    JvmHandler},
@@ -409,10 +414,10 @@ DWORD FileModifyTest(__CMD_PARA_OBJ* pCmdParaObj)
 		return S_OK;
 	}
 
-	//ÒÆ¶¯ÎÄ¼þ
+	//ï¿½Æ¶ï¿½ï¿½Ä¼ï¿½
 	SetFilePointer(hFileObj,&dwFilePos,&dwFilePos,FILE_FROM_CURRENT);
 
-	//½Ø¶Ï
+	//ï¿½Ø¶ï¿½
 	SetEndOfFile(hFileObj);
 
 	CloseFile(hFileObj);
@@ -453,7 +458,7 @@ DWORD FileWriteTest(__CMD_PARA_OBJ* pCmdParaObj)
 		return S_OK;
 	}
 
-	//ÒÆ¶¯µ½ÎÄ¼þÎ²
+	//ï¿½Æ¶ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½Î²
 	SetFilePointer(hFileObj,&dwFilePos,&dwFilePos,FILE_FROM_END);
 
 	//	_hx_printf("start write \r\n");
@@ -712,6 +717,15 @@ static DWORD  CommandParser(LPSTR pCmdBuf)
 	}
 	
 	dwIndex = 0;
+
+	//is bat file?
+	if(strstr(lpCmdParamObj->Parameter[0],"./"))
+	{
+		BatHandler(lpCmdParamObj);
+		dwResult = SHELL_CMD_PARSER_SUCCESS;
+		goto __END;
+	}
+
 	while(CmdObj[dwIndex].CmdStr)
 	{
 		if(StrCmp(CmdObj[dwIndex].CmdStr,lpCmdParamObj->Parameter[0]))
@@ -763,10 +777,7 @@ static DWORD  CommandParser(LPSTR pCmdBuf)
 	//DefaultHandler(NULL); //Call the default command handler.	
 __END:
 
-	if(NULL != lpCmdParamObj)
-	{
-		ReleaseParameterObj(lpCmdParamObj);
-	}
+	ReleaseParameterObj(lpCmdParamObj);
 	
 	return dwResult;		
 }

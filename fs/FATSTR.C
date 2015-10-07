@@ -14,18 +14,18 @@
 //    Lines number              :
 //***********************************************************************/
 #ifndef __STDAFX_H__
-#include "..\INCLUDE\StdAfx.h"
+#include <StdAfx.h>
 #endif
 
 #ifndef __FAT32_H__
-#include "FAT32.H"
+#include "fat32.h"
 #endif
 
 #ifndef __FSSTR_H__
 #include "fsstr.h"
 #endif
 
-#include "..\lib\stdio.h"
+#include "../lib/stdio.h"
 
 //This module will be available if and only if the DDF function is enabled.
 #ifdef __CFG_SYS_DDF
@@ -63,10 +63,21 @@ static VOID InitDotdot(__FAT32_SHORTENTRY* pfse)
 	}
 	return;
 }
+
+VOID  AddSpace(CHAR* pStrBuf,INT nCount)
+{
+	INT nSpaceCount = nCount;
+
+	while(nSpaceCount)
+	{
+		strcat(pStrBuf," ");
+		nSpaceCount --;
+	}
+}
+
 //Initialize a FAT32 shortentry given it's name,start cluster number,and other
 //information.
-BOOL InitShortEntry(__FAT32_SHORTENTRY* pfse,CHAR* pszName,DWORD dwFirstClus,
-					DWORD dwInitSize,BYTE FileAttr)
+BOOL InitShortEntry(__FAT32_SHORTENTRY* pfse,CHAR* pszName,DWORD dwFirstClus,DWORD dwInitSize,BYTE FileAttr)
 {
 	BOOL            bResult    = FALSE;
 	CHAR*           pDotPos    = NULL;
@@ -77,6 +88,7 @@ BOOL InitShortEntry(__FAT32_SHORTENTRY* pfse,CHAR* pszName,DWORD dwFirstClus,
 	{
 		goto __TERMINAL;
 	}
+
 	memzero(pfse,sizeof(__FAT32_SHORTENTRY));
 	if(StrCmp(pszName,"."))
 	{
@@ -86,6 +98,13 @@ BOOL InitShortEntry(__FAT32_SHORTENTRY* pfse,CHAR* pszName,DWORD dwFirstClus,
 	if(StrCmp(pszName,".."))
 	{
 		InitDotdot(pfse);
+		goto __INITOTHER;
+	}
+
+	//long file name. don't change 
+	if(strstr(pszName,"~"))
+	{
+		memcpy(pfse->FileName,pszName,FAT32_SHORTDIR_FILENAME_LEN);
 		goto __INITOTHER;
 	}
 	//Now convert the name to directory format.
@@ -152,17 +171,17 @@ BOOL ConvertShortEntry(__FAT32_SHORTENTRY* pfse,FS_FIND_DATA* pffd)
 	BOOL    bResult    = FALSE;
 	CHAR*   pExtStart  = NULL;
 	CHAR*   pStart     = NULL;
-	int     i,end,j;
-	//BYTE    Buffer[128];
+	int     i,end,j;	
 	WORD    ch = 0x0700;
 
 	if((NULL == pfse) || (NULL == pffd))
 	{
 		goto __TERMINAL;
 	}
-	memzero(pffd,sizeof(FS_FIND_DATA));  //Clear the target object.
+
 	pffd->dwFileAttribute   = pfse->FileAttributes;
 	pffd->nFileSizeLow      = pfse->dwFileSize;
+		
 	//Process file's name now.
 	pStart    = &pfse->FileName[0];
 	pExtStart = &pfse->FileName[8];
@@ -209,7 +228,7 @@ __TERMINAL:
 //  @pfse    : The short entry with the name to convert;
 //  @pResult : The converting result,pointing to a string whose length must
 //             longer or equal to 13.
-BOOL ConvertName(__FAT32_SHORTENTRY* pfse,BYTE* pResult)
+/*BOOL ConvertName(__FAT32_SHORTENTRY* pfse,BYTE* pResult)
 {
 	int i,j = 0;
 
@@ -258,6 +277,6 @@ BOOL ConvertName(__FAT32_SHORTENTRY* pfse,BYTE* pResult)
 	}
 	pResult[j] = 0;
 	return TRUE;
-}
+}*/
 
 #endif

@@ -26,7 +26,6 @@
 typedef struct HIS_CMD_OBJ
 {
 	CHAR    CmdStr[64];  //Command text.
-
 } HIS_CMD_OBJ;
 
 
@@ -45,12 +44,9 @@ typedef struct HIS_CMD_OBJ
 
 typedef struct tag__CMD_PARA_OBJ
 {
-	BYTE         byParameterNum;         //How many parameters  followed.
-	WORD         wReserved;
-
+	BYTE        byParameterNum;         //How many parameters  followed.
+	WORD        wReserved;
 	CHAR*       Parameter[CMD_PARAMETER_COUNT];
-	//CHAR         Parameter[CMD_PARAMETER_COUNT][CMD_PARAMETER_LEN + 1]; //The parameters.
-
 }__CMD_PARA_OBJ;
 
 typedef DWORD (*__CMD_HANDLER)(__CMD_PARA_OBJ* pCmdParaObj);  //Command handler.
@@ -72,6 +68,12 @@ typedef struct{
 //Form the parameter objects link from a command line string.
 //
 __CMD_PARA_OBJ* FormParameterObj(LPCSTR);
+
+//Copy one parameter objects to a new parameter object.
+__CMD_PARA_OBJ* CopyParameterObj(__CMD_PARA_OBJ* lpParamObj, BYTE nStart);
+
+//Clear all invisible Char in a string.
+VOID ClearUnVisableChar(LPCSTR pszStr);
 
 //
 //Release the command line object created by FormParameterObj routine.
