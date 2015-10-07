@@ -9,8 +9,11 @@
 //  Last udpated content   : 
 //------------------------------------------------------------------------
 
-#include "..\INCLUDE\StdAfx.h"
- 
+#ifndef __STDAFX_H__
+#include <StdAfx.h>
+#endif
+
+
 #ifndef __FSSTR_H__
 #include "fsstr.h"
 #endif
@@ -83,10 +86,11 @@ BOOL GetFullNameLevel(CHAR* pFullName,DWORD* pdwLevel)
 BOOL GetSubDirectory(CHAR* pFullName,DWORD dwLevel,CHAR* pSubDir)
 {
 	BOOL       bResult         = FALSE;
+	BYTE       buffer[256]     = {0};  //Contain sub-directory name temporary.
 	DWORD      dwTotalLevel    = 0;
 	DWORD      i = 0;
 	DWORD      j = 0;
-	BYTE       buffer[16];  //Contain sub-directory name temporary.
+	
 
 	if((NULL == pFullName) || (NULL == pSubDir) || (0 == dwLevel))  //Level shoud not be zero.
 	{
@@ -141,7 +145,7 @@ BOOL GetSubDirectory(CHAR* pFullName,DWORD dwLevel,CHAR* pSubDir)
 BOOL GetPathName(CHAR* pFullName,CHAR* pDir,CHAR* pFileName)
 {
 	BYTE        DirName[MAX_FILE_NAME_LEN];
-	BYTE        FileName[13];
+	BYTE        FileName[MAX_FILE_NAME_LEN];
 	BYTE        tmp;
 	int         i = 0;
 	int         j = 0;

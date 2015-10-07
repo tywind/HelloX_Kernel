@@ -59,9 +59,6 @@
     <Filter Include="Header Files\config">
       <UniqueIdentifier>{7b4d4319-ff66-4f08-aae8-99160a6344a5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\nethdr">
-      <UniqueIdentifier>{a890e948-fd9d-4f30-bbb4-02baa24bacf6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{9d761576-26cf-4ef6-b103-ced7e0f1229c}</UniqueIdentifier>
       <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
@@ -80,6 +77,30 @@
     </Filter>
     <Filter Include="Source Files\jvm\OS">
       <UniqueIdentifier>{9b2777b6-45f4-4178-871a-27eb7c63381e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\bsdip">
+      <UniqueIdentifier>{d45c3103-01e8-481b-9e83-bf10a1ee10c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\bsd_hdr">
+      <UniqueIdentifier>{7a17f3ee-f237-47d6-8aaa-a729083628f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\net_hdr">
+      <UniqueIdentifier>{a890e948-fd9d-4f30-bbb4-02baa24bacf6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\syscall">
+      <UniqueIdentifier>{e736a1b5-dcfa-4982-b45d-bae346dad8c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\syscal_hdr">
+      <UniqueIdentifier>{d72ec52d-18dc-4466-a6d4-00b287ffea25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\appldr">
+      <UniqueIdentifier>{28af8e30-bdd5-4a37-a179-3215341883a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\usb_hdr">
+      <UniqueIdentifier>{cb733ba1-12a4-4080-b1e3-541f7679fe01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\usb">
+      <UniqueIdentifier>{7a6869ef-f128-4f8b-ba8d-6c3421ea7ebb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -260,9 +281,6 @@
     <ClCompile Include="kernel\synobj2.c">
       <Filter>Source Files\kernel</Filter>
     </ClCompile>
-    <ClCompile Include="kernel\SYSCALL.C">
-      <Filter>Source Files\kernel</Filter>
-    </ClCompile>
     <ClCompile Include="kernel\SYSTEM.C">
       <Filter>Source Files\kernel</Filter>
     </ClCompile>
@@ -374,9 +392,6 @@
     <ClCompile Include="network\core\udp.c">
       <Filter>Source Files\network</Filter>
     </ClCompile>
-    <ClCompile Include="shell\HISCMD .C">
-      <Filter>Source Files\shell</Filter>
-    </ClCompile>
     <ClCompile Include="shell\SHELL_HELP.C">
       <Filter>Source Files\shell</Filter>
     </ClCompile>
@@ -402,9 +417,6 @@
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\pthread.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\pthread_mutex .c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\pthread_other.c">
@@ -551,6 +563,75 @@
     <ClCompile Include="lib\stat.c">
       <Filter>Source Files\jvm</Filter>
     </ClCompile>
+    <ClCompile Include="lib\pthread_mutex.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="shell\hiscmd.c">
+      <Filter>Source Files\shell</Filter>
+    </ClCompile>
+    <ClCompile Include="drivers\x86\pcnet.c">
+      <Filter>Source Files\drivers</Filter>
+    </ClCompile>
+    <ClCompile Include="syscall\SYSCALL.C">
+      <Filter>Source Files\syscall</Filter>
+    </ClCompile>
+    <ClCompile Include="syscall\SYSCALL_IO.C">
+      <Filter>Source Files\syscall</Filter>
+    </ClCompile>
+    <ClCompile Include="syscall\SYSCALL_KERNEL.C">
+      <Filter>Source Files\syscall</Filter>
+    </ClCompile>
+    <ClCompile Include="syscall\SYSCALL_SOCKET.C">
+      <Filter>Source Files\syscall</Filter>
+    </ClCompile>
+    <ClCompile Include="appldr\AppLoader.C">
+      <Filter>Source Files\appldr</Filter>
+    </ClCompile>
+    <ClCompile Include="appldr\AppLoader_ELF.C">
+      <Filter>Source Files\appldr</Filter>
+    </ClCompile>
+    <ClCompile Include="appldr\AppLoader_PE.C">
+      <Filter>Source Files\appldr</Filter>
+    </ClCompile>
+    <ClCompile Include="appldr\AppLoader_STM32.C">
+      <Filter>Source Files\appldr</Filter>
+    </ClCompile>
+    <ClCompile Include="usb\usb.c">
+      <Filter>Source Files\usb</Filter>
+    </ClCompile>
+    <ClCompile Include="usb\usb_ehci.c">
+      <Filter>Source Files\usb</Filter>
+    </ClCompile>
+    <ClCompile Include="usb\usb_hub.c">
+      <Filter>Source Files\usb</Filter>
+    </ClCompile>
+    <ClCompile Include="usb\ehci_pci.c">
+      <Filter>Source Files\usb</Filter>
+    </ClCompile>
+    <ClCompile Include="usb\usb_ohci.c">
+      <Filter>Source Files\usb</Filter>
+    </ClCompile>
+    <ClCompile Include="usb\usb_storage.c">
+      <Filter>Source Files\usb</Filter>
+    </ClCompile>
+    <ClCompile Include="usb\usb_hd.c">
+      <Filter>Source Files\usb</Filter>
+    </ClCompile>
+    <ClCompile Include="usb\xhci_mem.c">
+      <Filter>Source Files\usb</Filter>
+    </ClCompile>
+    <ClCompile Include="usb\xhci_ring.c">
+      <Filter>Source Files\usb</Filter>
+    </ClCompile>
+    <ClCompile Include="usb\xhci.c">
+      <Filter>Source Files\usb</Filter>
+    </ClCompile>
+    <ClCompile Include="usb\xhci_pci.c">
+      <Filter>Source Files\usb</Filter>
+    </ClCompile>
+    <ClCompile Include="usb\ent_ary.c">
+      <Filter>Source Files\usb</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\arch\bpstruct.h">
@@ -635,9 +716,6 @@
       <Filter>Header Files\include</Filter>
     </ClInclude>
     <ClInclude Include="INCLUDE\StdAfx.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="INCLUDE\SYSCALL.H">
       <Filter>Header Files\include</Filter>
     </ClInclude>
     <ClInclude Include="include\sysnet.h">
@@ -728,31 +806,28 @@
       <Filter>Header Files\config</Filter>
     </ClInclude>
     <ClInclude Include="include\arch\cc.h">
-      <Filter>Header Files\nethdr</Filter>
-    </ClInclude>
-    <ClInclude Include="network\nicdrv\ethif.h">
-      <Filter>Header Files\nethdr</Filter>
+      <Filter>Header Files\net_hdr</Filter>
     </ClInclude>
     <ClInclude Include="include\lwipopts.h">
-      <Filter>Header Files\nethdr</Filter>
+      <Filter>Header Files\net_hdr</Filter>
     </ClInclude>
     <ClInclude Include="include\lwip\netif.h">
-      <Filter>Header Files\nethdr</Filter>
+      <Filter>Header Files\net_hdr</Filter>
     </ClInclude>
     <ClInclude Include="include\lwip\opt.h">
-      <Filter>Header Files\nethdr</Filter>
+      <Filter>Header Files\net_hdr</Filter>
     </ClInclude>
     <ClInclude Include="include\arch\perf.h">
-      <Filter>Header Files\nethdr</Filter>
+      <Filter>Header Files\net_hdr</Filter>
     </ClInclude>
     <ClInclude Include="include\lwip\sockets.h">
-      <Filter>Header Files\nethdr</Filter>
+      <Filter>Header Files\net_hdr</Filter>
     </ClInclude>
     <ClInclude Include="include\lwip\sys.h">
-      <Filter>Header Files\nethdr</Filter>
+      <Filter>Header Files\net_hdr</Filter>
     </ClInclude>
     <ClInclude Include="include\arch\sys_arch.h">
-      <Filter>Header Files\nethdr</Filter>
+      <Filter>Header Files\net_hdr</Filter>
     </ClInclude>
     <ClInclude Include="include\CharDisplay.H">
       <Filter>Header Files\include</Filter>
@@ -903,6 +978,63 @@
     </ClInclude>
     <ClInclude Include="lib\sys\stat.h">
       <Filter>Source Files\lib\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="drivers\x86\pcnet.h">
+      <Filter>Header Files\drv_hdr</Filter>
+    </ClInclude>
+    <ClInclude Include="network\ethernet\ethif.h">
+      <Filter>Header Files\net_hdr</Filter>
+    </ClInclude>
+    <ClInclude Include="syscall\K_API_DEF.H">
+      <Filter>Header Files\syscal_hdr</Filter>
+    </ClInclude>
+    <ClInclude Include="syscall\SYSCALL.H">
+      <Filter>Header Files\syscal_hdr</Filter>
+    </ClInclude>
+    <ClInclude Include="syscall\SYSCALL_KERNEL.H">
+      <Filter>Header Files\syscal_hdr</Filter>
+    </ClInclude>
+    <ClInclude Include="include\byteord.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\align.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="usb\usb_defs.h">
+      <Filter>Header Files\usb_hdr</Filter>
+    </ClInclude>
+    <ClInclude Include="usb\usb.h">
+      <Filter>Header Files\usb_hdr</Filter>
+    </ClInclude>
+    <ClInclude Include="usb\hxadapt.h">
+      <Filter>Header Files\usb_hdr</Filter>
+    </ClInclude>
+    <ClInclude Include="usb\usbdescriptors.h">
+      <Filter>Header Files\usb_hdr</Filter>
+    </ClInclude>
+    <ClInclude Include="usb\errno.h">
+      <Filter>Header Files\usb_hdr</Filter>
+    </ClInclude>
+    <ClInclude Include="usb\ch9.h">
+      <Filter>Header Files\usb_hdr</Filter>
+    </ClInclude>
+    <ClInclude Include="usb\ehci.h">
+      <Filter>Header Files\usb_hdr</Filter>
+    </ClInclude>
+    <ClInclude Include="usb\ohci.h">
+      <Filter>Header Files\usb_hdr</Filter>
+    </ClInclude>
+    <ClInclude Include="usb\usbroothubdes.h">
+      <Filter>Header Files\usb_hdr</Filter>
+    </ClInclude>
+    <ClInclude Include="usb\scsi.h">
+      <Filter>Header Files\usb_hdr</Filter>
+    </ClInclude>
+    <ClInclude Include="usb\usbdev_storage.h">
+      <Filter>Header Files\usb_hdr</Filter>
+    </ClInclude>
+    <ClInclude Include="usb\xhci.h">
+      <Filter>Header Files\usb_hdr</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

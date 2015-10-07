@@ -17,6 +17,10 @@
 #ifndef __IOMGR_H__
 #define __IOMGR_H__
 
+
+#include "commobj.h"
+#include "ktmgr.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -74,6 +78,7 @@ BEGIN_DEFINE_OBJECT(FS_FIND_DATA)
 	DWORD              nFileSizeLow;
 	DWORD              dwReserved0;
 	DWORD              dwReserved1;
+	BOOL               bGetLongName;
 	CHAR               cFileName[MAX_FILE_NAME_LEN];
 	CHAR               cAlternateFileName[13];
 END_DEFINE_OBJECT(FS_FIND_DATA)
@@ -344,6 +349,12 @@ VOID DevObjUninitialize(__COMMON_OBJECT*);
 //
 typedef BOOL (*__DRIVER_ENTRY)(__DRIVER_OBJECT*);
 
+//A array object to manage the drivers in system.
+typedef struct{
+	__DRIVER_ENTRY Entry;
+	char*          pszDriverName;
+}__DRIVER_ENTRY_ARRAY;
+
 //
 //The following is the definition of __IO_MANAGER.
 //This object is one of the core object in Hello China,it is used to manage all device(s) 
@@ -367,7 +378,7 @@ typedef struct tag__IO_MANAGER{
     __DRIVER_OBJECT*               lpDriverRoot;      //Pointes to driver object's list.
 	__FS_ARRAY_ELEMENT             FsArray[FILE_SYSTEM_NUM];
 	__COMMON_OBJECT*               FsCtrlArray[FS_CTRL_NUM];
-
+	volatile DWORD                 dwPartitionNumber; //Partition sequence number.
 	__RESOURCE_DESCRIPTOR*         lpResDescriptor;   //Pointes to resource descriptor's list.
 
 	BOOL                 (*Initialize)(__COMMON_OBJECT*    lpThis);  //Initialize routine.

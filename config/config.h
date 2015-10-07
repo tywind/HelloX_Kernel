@@ -24,8 +24,8 @@
 //************************************************************************
 
 #define OS_VERSION   "    HelloX V1.78"
-#define VERSION_INFO "    HelloX [Version 1.780(Beta),build in 2015/05/09,by Garry.Xin]"
-#define SLOGAN_INFO  "    HelloX OS,through which you can talk to everything."
+#define VERSION_INFO "HelloX [Version 1.780(Beta),build in 2015/10/05,by Garry.Xin]"
+#define SLOGAN_INFO  "HelloX OS,through which you can talk to everything."
 
 //************************************************************************
 //
@@ -82,7 +82,7 @@
 //if the user does not give a stack size in CreateKernelThread calling,then
 //use this value as stack size.
 //
-#define DEFAULT_STACK_SIZE 0x00001000 //4k bytes.
+#define DEFAULT_STACK_SIZE 0x00002000 //8k bytes.
 
 //************************************************************************
 //
@@ -106,7 +106,7 @@
 //#define __CFG_SYS_INTNEST
 
 //Include thread heap functions.
-//#define __CFG_SYS_HEAP
+#define __CFG_SYS_HEAP
 
 //Include bus management code.
 #define __CFG_SYS_BM
@@ -129,12 +129,15 @@
 //output device is ready.
 #define __CFG_SYS_SHELL
 
+//Include system call support.
+#define __CFG_SYS_SYSCALL
+
+//Include USB host controller suppot.
+#define __CFG_SYS_USB
+
 //Include console object into kernel.COM input and output functions are implemented
 //in console object.
 //#define __CFG_SYS_CONSOLE
-
-// Logcat service for debug subsystem
-//#define __CFG_SYS_LOGCAT
 
 //************************************************************************
 //
@@ -143,10 +146,10 @@
 //************************************************************************
 
 //Include IDE driver in OS.
-#define __CFG_DRV_IDE
+//#define __CFG_DRV_IDE
 
 //Include COM driver in OS.
-//#define __CFG_DRV_COM
+#define __CFG_DRV_COM
 
 //Include USART driver in OS,specific for STM32 or ARM platform.
 //#define __CFG_DRV_USART
@@ -190,6 +193,9 @@
 //Include IPv4 network protocol in OS.
 #define __CFG_NET_IPv4
 
+//Include PCNet driver in OS.
+#define __CFG_NET_PCNET
+
 //Include IPv6 network protocol in OS.
 //#define __CFG_NET_IPv6
 
@@ -224,3 +230,6 @@
 //Enable or disable Java virtual machine in system.
 #define __CFG_APP_JVM
 
+#define _TIME_T_DEFINED
+
+//#define __GCC__
