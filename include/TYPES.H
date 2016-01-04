@@ -79,6 +79,9 @@ typedef signed long         __s32;
 //size_t for ANSI C library.
 typedef unsigned int size_t;
 
+//May used by some device drivers,refer to DMA address space.
+typedef __u32 dma_addr_t;
+
 //Special values for basic data types defined above.
 #define FALSE               0x00000000
 #define TRUE                0x00000001
@@ -98,6 +101,15 @@ typedef unsigned int size_t;
 
 #define LOBYTE(wr)          BYTE(wr)
 #define HIBYTE(wr)          BYTE(wr >> 16)
+
+//Atomic integer and it's operations.
+typedef unsigned long __ATOMIC_T;
+
+#define INIT_ATOMIC(t)          __INIT_ATOMIC(t)       //t = 0;
+#define INCREASE_ATOMIC(t)      __INCREASE_ATOMIC(t)   //t ++;
+#define DECREASE_ATOMIC(t)      __DECREASE_ATOMIC(t)   //t --;
+#define ADD_ATOMIC(t,a)         __ADD_ATOMIC(t,a)      //t ++ a;
+#define MINUS_ATOMIC(t,a)       __MINUS_ATOMIC(t,a)    //t -= a;
 
 //
 //The definition of unsigned 64 bit integer.

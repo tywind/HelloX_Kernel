@@ -21,6 +21,10 @@
 //***********************************************************************/
 
 #include <StdAfx.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <align.h>
 
 #include "statcpu.h"
 #include "modmgr.h"
@@ -32,7 +36,7 @@
 #include "../shell/shell.h"
 #include "../shell/stat_s.h"
 #include "../kthread/idle.h"
-#include "../network/ethernet/ethif.h"
+#include "../netcore/ethmgr.h"
 
 #include "../kthread/logcat.h"
 #include "ktmgr.h"
@@ -41,13 +45,15 @@
 #include "../arch/x86/biosvga.h"
 #endif
 
-//Welcome information.
-char* pszStartMsg1 = "HelloX is running now.If you have any question,";
-char* pszStartMsg2 = "please send email to : garryxin@yahoo.com.cn.";
-char* pszWelcome   = "Welcome to use HelloX!";
+#ifdef __CFG_SYS_USB
+#include "../usb/usb_defs.h"
+#include "../usb/usbdescriptors.h"
+#include "../usb/ch9.h"
+#include "../usb/usb.h"
+#endif
 
-//Help information.
-char* pszHelpInfo = "Any help please press 'help' + return.";
+//Welcome information.
+char* pszLoadWelcome   = "Welcome to use HelloX. Initializing now...";
 
 //Driver entry point array,this array resides in drventry.cpp file in the 
 //same directory as os_entry.cpp,which is OSENTRY in current version.
@@ -75,11 +81,6 @@ static void DeadLoop(BOOL bDisableInt)
 //User entry point if used as EOS.
 #ifdef __CFG_USE_EOS
 extern DWORD _HCNMain(LPVOID);
-#endif
-
-//USB initialization entry.
-#ifdef __CFG_SYS_USB
-extern int usb_init(void);
 #endif
 
 //
@@ -116,12 +117,9 @@ void __OS_Entry()
 	//Please note the output should put here that before the System.BeginInitialization routine,
 	//since it may cause the interrupt enable,which will lead the failure of system initialization.
 	ClearScreen();
-	PrintStr(pszStartMsg1);
-	PrintStr(pszStartMsg2);
 	GotoHome();
 	ChangeLine();
-
-	PrintStr(pszHelpInfo); //Print out help information.
+	PrintLine(pszLoadWelcome);
 	GotoHome();
 	ChangeLine();
 
@@ -256,7 +254,7 @@ void __OS_Entry()
 
 //Initialize USB support if enabled.
 #ifdef __CFG_SYS_USB
-	usb_init();
+	USBManager.Initialize(&USBManager);
 #endif
 
 	//********************************************************************************
@@ -450,11 +448,10 @@ void __OS_Entry()
 		goto __TERMINAL;
 	}
 #endif
-
-	System.EndInitialize((__COMMON_OBJECT*)&System);
 	_hx_printf("\r\n");
 	_hx_printf("Loading process is successful.\r\n");
 	_hx_printf("\r\n");
+	System.EndInitialize((__COMMON_OBJECT*)&System);
 	//Enter a dead loop to wait for the scheduling of kernel threads.
 	DeadLoop(FALSE);
 

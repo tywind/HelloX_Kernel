@@ -40,7 +40,9 @@ DECLARE_GLOBAL_DATA_PTR;
 #include <asm/4xx_pci.h>
 #endif
 
+#ifndef USB_BUFSIZ
 #define USB_BUFSIZ	512
+#endif
 
 /* TODO(sjg@chromium.org): Remove this when CONFIG_DM_USB is defined */
 static struct usb_hub_device hub_dev[USB_MAX_HUB];
@@ -121,7 +123,7 @@ static void usb_hub_power_on(struct usb_hub_device *hub)
 		(unsigned)simple_strtol(env, NULL, 0));
 #endif
 	debug("pgood_delay=%dms\r\n", pgood_delay);
-	mdelay(pgood_delay + 1000);
+	mdelay(pgood_delay + 200);
 }
 
 void usb_hub_reset(void)
@@ -178,9 +180,13 @@ int legacy_hub_port_reset(struct usb_device *dev, int port,
 	for (tries = 0; tries < MAX_TRIES; tries++) {
 		err = usb_set_port_feature(dev, port + 1, USB_PORT_FEAT_RESET);
 		if (err < 0)
+		{
+			debug("%s: usb_set_port_feature [%d] failed with err = %d.\r\n", __func__,port, err);
 			return err;
+		}
+		debug("%s: usb_set_port_feature [%d] success.\r\n", __func__, port);
 
-		mdelay(200);
+		mdelay(100);
 
 		if (usb_get_port_status(dev, port + 1, portsts) < 0) {
 			debug("get_port_status failed status %lX\r\n",
@@ -248,6 +254,7 @@ int usb_hub_port_connect_change(struct usb_device *dev, int port)
 	ALLOC_CACHE_ALIGN_BUFFER(struct usb_port_status, portsts, 1);
 	unsigned short portstatus;
 	int ret, speed;
+	struct usb_device *usb;
 
 	/* Check status */
 	ret = usb_get_port_status(dev, port + 1, portsts);
@@ -306,7 +313,7 @@ int usb_hub_port_connect_change(struct usb_device *dev, int port)
 
 	ret = usb_scan_device(dev->dev, port + 1, speed, &child);
 #else
-	struct usb_device *usb;
+	//struct usb_device *usb;
 
 	ret = usb_alloc_new_device(dev->controller, &usb);
 	if (ret) {
@@ -481,12 +488,14 @@ static int usb_hub_configure(struct usb_device *dev)
 		unsigned short portstatus, portchange;
 		int ret;
 		//ulong start = get_timer(0);
-		ulong start = CONFIG_SYS_HZ / 100;
+		ulong start = CONFIG_SYS_HZ;
 
 #ifdef CONFIG_DM_USB
 		debug("Scanning '%s' port %d\r\n", dev->dev->name, i + 1);
 #else
-		//debug("Scanning port %d\r\n", i + 1);
+		debug("%s: scanning port %d...\r\n",__func__,i + 1);
+		//Reset the port first.
+		legacy_hub_port_reset(dev, i, &portstatus);
 #endif
 		/*
 		* Wait for (whichever finishes first)
@@ -523,10 +532,26 @@ static int usb_hub_configure(struct usb_device *dev)
 		debug("Port %d Status %X Change %X\r\n",
 			i + 1, portstatus, portchange);
 
-		if (portchange & USB_PORT_STAT_C_CONNECTION) {
+		//Original code from uboot only has the first if condition of the following code,
+		//but in some case,especial the EHCI controller managing a rate matching hub,
+		//the portchange may not change,but portstatus reflects that port is enabled and
+		//has connection.So we add the second if condition,treat it also as the port change
+		//event.
+		if ((portchange & USB_PORT_STAT_C_CONNECTION) || 
+			((portstatus & USB_PORT_STAT_ENABLE) && (portstatus & USB_PORT_STAT_CONNECTION)))
+		{
 			debug("port %d connection change\r\n", i + 1);
+			_hx_printf("USB: Find a device on port [%d] of USB HUB [%d].\r\n",
+				i,
+				dev->devnum);
 			usb_hub_port_connect_change(dev, i);
 		}
+
+		//if ((portstatus & USB_PORT_STAT_ENABLE) && (portstatus & USB_PORT_STAT_CONNECTION))
+		//{
+		//	usb_hub_port_connect_change(dev, i);
+		//}
+
 		if (portchange & USB_PORT_STAT_C_ENABLE) {
 			debug("port %d enable change, status %x\r\n",
 				i + 1, portstatus);
