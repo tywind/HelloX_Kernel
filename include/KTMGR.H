@@ -137,9 +137,6 @@ END_DEFINE_OBJECT(__KERNEL_THREAD_MESSAGE)
 //The definition of kernel thread's message.
 //
 
-//#define KERNEL_MESSAGE_TERMINAL    0x0001
-//#define KERNEL_MESSAGE_TIMER       0x0002
-
 #ifndef MAX_KTHREAD_MSG_NUM
 #define MAX_KTHREAD_MSG_NUM 32  //The maximal message number in the kernel thread's message
                                 //queue.
@@ -243,9 +240,11 @@ BEGIN_DEFINE_OBJECT(__KERNEL_THREAD_OBJECT)
 	volatile UCHAR                       ucMsgQueueTrial;
 	volatile UCHAR                       ucCurrentMsgNum;
 	UCHAR                                ucAligment;
+	UINT                                 nMsgReceived;  //How many messages received from start.
+	UINT                                 nMsgDroped;    //Messages droped,caused by queue full or others.
 	__PRIORITY_QUEUE*                    lpMsgWaitingQueue;
 
-	DWORD                                dwUserData;  //User custom data.
+	DWORD                                dwUserData;    //User private data.
 	DWORD                                dwLastError;
 	UCHAR                                KernelThreadName[MAX_THREAD_NAME];
 

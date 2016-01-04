@@ -1,1 +1,0 @@
-Here is the source code location of JamVM 2.0,which is ported to HelloX to support the isolation between Hardware/OS and application,which is a key feature of Internet of Things.With this feature,one application can be hosted at any hardware without any modification and configuration.

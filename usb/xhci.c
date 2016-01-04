@@ -1065,27 +1065,18 @@ static int submit_int_msg(struct usb_device *udev, unsigned long pipe, void *buf
 //Create a common USB controller object to unify the OHCI USB controller.
 static __COMMON_USB_CONTROLLER* CreateUsbCtrl(LPVOID pCtrl)
 {
-	__COMMON_USB_CONTROLLER* pUsbCtrl = (__COMMON_USB_CONTROLLER*)_hx_malloc(
-		sizeof(__COMMON_USB_CONTROLLER));
-	if (NULL == pUsbCtrl)
-	{
-		return pUsbCtrl;
-	}
-	//Initialize it.
-	pUsbCtrl->dwObjectSignature = KERNEL_OBJECT_SIGNATURE;
-	pUsbCtrl->dwCtrlType = USB_CONTROLLER_OHCI;
-	//memset(&pUsbCtrl->ctrlOps, 0, sizeof(__USB_CONTROLLER_OPERATIONS));
-	pUsbCtrl->ctrlOps.submit_bulk_msg = submit_bulk_msg;
-	pUsbCtrl->ctrlOps.submit_control_msg = submit_control_msg;
-	pUsbCtrl->ctrlOps.submit_int_msg = submit_int_msg;
-	pUsbCtrl->ctrlOps.create_int_queue = NULL;
-	pUsbCtrl->ctrlOps.destroy_int_queue = NULL;
-	pUsbCtrl->ctrlOps.poll_int_queue = NULL;
-	pUsbCtrl->ctrlOps.usb_reset_root_port = NULL;
+	__USB_CONTROLLER_OPERATIONS ctrlOps;
 
-	pUsbCtrl->pUsbCtrl = pCtrl;
+	ctrlOps.submit_bulk_msg = submit_bulk_msg;
+	ctrlOps.submit_control_msg = submit_control_msg;
+	ctrlOps.submit_int_msg = submit_int_msg;
+	ctrlOps.create_int_queue = NULL;
+	ctrlOps.destroy_int_queue = NULL;
+	ctrlOps.poll_int_queue = NULL;
+	ctrlOps.usb_reset_root_port = NULL;
+	ctrlOps.get_ctrl_status = NULL;
 
-	return pUsbCtrl;
+	return USBManager.CreateUsbCtrl(&ctrlOps, USB_CONTROLLER_XHCI,NULL,pCtrl);
 }
 
 /**
@@ -1104,11 +1095,18 @@ int _xhci_usb_lowlevel_init(int index, enum usb_init_type init, void **controlle
 
 	*controller = NULL;
 
-	if (xhci_hcd_init(index, &hccr, (struct xhci_hcor **)&hcor) != 0)
+	ret = xhci_hcd_init(index, &hccr, (struct xhci_hcor **)&hcor);
+	if (ret != 0)
+	{
+		debug("xHCI: Host controller init failed[%d].\r\n", ret);
 		return -ENODEV;
+	}
 
 	if (xhci_reset(hcor) != 0)
+	{
+		debug("xHCI: xHCI controller reset failed.\r\n");
 		return -ENODEV;
+	}
 
 	ctrl = &xhcic[index];
 
@@ -1118,6 +1116,7 @@ int _xhci_usb_lowlevel_init(int index, enum usb_init_type init, void **controlle
 	ret = xhci_lowlevel_init(ctrl);
 
 	if (ret) {
+		debug("xHCI: xHCI lowlevel init failed[%d].\r\n", ret);
 		ctrl->hccr = NULL;
 		ctrl->hcor = NULL;
 	}

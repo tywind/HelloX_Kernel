@@ -283,9 +283,7 @@ __TERMINAL:
 // 3. Create the kernel thread's stack by calling KMemAlloc;
 // 4. Insert the kernel thread object into proper queue.
 //
-static
-
- __KERNEL_THREAD_OBJECT* kCreateKernelThread(__COMMON_OBJECT*             lpThis,
+static __KERNEL_THREAD_OBJECT* kCreateKernelThread(__COMMON_OBJECT*             lpThis,
 												  DWORD                        dwStackSize,
 												  DWORD                        dwStatus,
 												  DWORD                        dwPriority,
@@ -370,6 +368,8 @@ static
 	lpKernelThread->ucMsgQueueHeader      = 0;
 	lpKernelThread->ucMsgQueueTrial       = 0;
 	lpKernelThread->ucCurrentMsgNum       = 0;
+	lpKernelThread->nMsgReceived          = 0;
+	lpKernelThread->nMsgDroped            = 0;
 
 	lpKernelThread->dwLastError           = 0;
 	lpKernelThread->dwWaitingStatus       = OBJECT_WAIT_WAITING;
@@ -1076,14 +1076,22 @@ static BOOL kSleep(__COMMON_OBJECT* lpThis,/*__COMMON_OBJECT* lpKernelThread,*/D
 	__KERNEL_THREAD_MANAGER*           lpManager      = (__KERNEL_THREAD_MANAGER*)lpThis;
 	__KERNEL_THREAD_OBJECT*            lpKernelThread = NULL;
 	DWORD                              dwTmpCounter   = 0;
-	//__KERNEL_THREAD_CONTEXT*           lpContext      = NULL;
 	DWORD                              dwFlags        = 0;
 
 	if(NULL == lpManager)    //Parameters check.
 	{
 	     return FALSE;
 	}
-	if(dwMillisecond < SYSTEM_TIME_SLICE)  //Just re-schedule all kernel thread(s).
+	
+	//Just re-schedule all kernel thread(s) if the sleep time is less than
+	//system slice,this may cause issues,suppose that one kernel thread want
+	//to pausing execution for 10ms,to yeild CPU to other kernel threads,
+	//then it calls Sleep routine by giving 10 as parameter.The objective
+	//will not achieved since the Sleep routine will return immediately.
+	//A feasible approach is round any sleep time less than system time
+	//slice to one SYSTEM_TIME_SLICE.
+	//But we keep it is since no problem encountered up to now.
+	if(dwMillisecond < SYSTEM_TIME_SLICE)
 	{
 		lpManager->ScheduleFromProc(NULL);
 		return TRUE;
@@ -1097,12 +1105,12 @@ static BOOL kSleep(__COMMON_OBJECT* lpThis,/*__COMMON_OBJECT* lpKernelThread,*/D
 		return FALSE;
 	}
 	dwTmpCounter =  dwMillisecond / SYSTEM_TIME_SLICE;
+	
+	__ENTER_CRITICAL_SECTION(NULL, dwFlags);
 	dwTmpCounter += System.dwClockTickCounter;         //Now,dwTmpCounter countains the 
 	                                                   //tick counter value when this
 	                                                   //kernel thread who calls this routine
 	                                                   //must be waken up.
-	//ENTER_CRITICAL_SECTION();
-	__ENTER_CRITICAL_SECTION(NULL,dwFlags);
 	if((0 == lpManager->dwNextWakeupTick) || (lpManager->dwNextWakeupTick > dwTmpCounter))
 	{
 		lpManager->dwNextWakeupTick = dwTmpCounter;     //Update dwNextWakeupTick value.
@@ -1115,7 +1123,6 @@ static BOOL kSleep(__COMMON_OBJECT* lpThis,/*__COMMON_OBJECT* lpKernelThread,*/D
 		(__COMMON_OBJECT*)lpKernelThread,
 		dwTmpCounter);
 	__LEAVE_CRITICAL_SECTION(NULL,dwFlags);
-	//lpContext = &lpKernelThread->KernelThreadContext;
 	lpManager->ScheduleFromProc(NULL);
 	return TRUE;
 }
@@ -1236,7 +1243,11 @@ static BOOL MgrSendMessage(__COMMON_OBJECT* lpThread,__KERNEL_THREAD_MESSAGE* lp
 	__ENTER_CRITICAL_SECTION(NULL,dwFlags);
 	if(MsgQueueFull((__COMMON_OBJECT*)lpKernelThread))             //Message queue is full.
 	{
+		lpKernelThread->nMsgDroped += 1;
 		__LEAVE_CRITICAL_SECTION(NULL,dwFlags);
+		//Show out a warning message.
+		//_hx_printf("Kernel Warning: Message queue of kthread [%s] is full.\r\n",
+		//	lpKernelThread->KernelThreadName);
 		goto __TERMINAL;
 	}
 	//Message queue not full,put the message to the queue.
@@ -1252,6 +1263,7 @@ static BOOL MgrSendMessage(__COMMON_OBJECT* lpThread,__KERNEL_THREAD_MESSAGE* lp
 		lpKernelThread->ucMsgQueueTrial = 0;
 	}
 	lpKernelThread->ucCurrentMsgNum ++;
+	lpKernelThread->nMsgReceived += 1;
 
 	lpNewThread = (__KERNEL_THREAD_OBJECT*)lpKernelThread->lpMsgWaitingQueue->GetHeaderElement(
 		(__COMMON_OBJECT*)lpKernelThread->lpMsgWaitingQueue,
